@@ -2522,6 +2522,16 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 	/* ---------- 视图 ---------- */
 	function openView(node){ bodyEl.innerHTML=''; bodyEl.appendChild(node); viewer.classList.add('on'); }
 	function closeView(){ var v=bodyEl.querySelector('video'); if(v) v.pause(); bodyEl.innerHTML=''; viewer.classList.remove('on'); }
+	/* 刚上传的图，Pages 发布有几十秒延迟，先在原地自动重试几次 */
+	function attachRetry(el,base){
+		if(!base||!/^https?:/.test(base)) return;
+		var n=0;
+		el.addEventListener('error',function(){
+			if(n>=4) return;
+			n++;
+			setTimeout(function(){ el.src=base+(base.indexOf('?')>=0?'&':'?')+'r='+n; },3000);
+		});
+	}
 	function makeTile(item){
 		var box=document.createElement('div');
 		box.className='photo-item';
@@ -2530,12 +2540,12 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 		if(!src && item.blob){ src=URL.createObjectURL(item.blob); urls.push(src); }
 		if(isVideo){
 			var v=document.createElement('video');
-			v.src=src; v.muted=true; v.playsInline=true; v.preload='metadata';
+			v.src=src; v.muted=true; v.playsInline=true; v.preload='metadata'; attachRetry(v,src);
 			box.appendChild(v);
 			var badge=document.createElement('span'); badge.className='photo-play'; badge.textContent='▶';
 			box.appendChild(badge);
 		}else{
-			var im=document.createElement('img'); im.src=src; im.alt=item.name||'照片';
+			var im=document.createElement('img'); im.src=src; im.alt=item.name||'照片'; attachRetry(im,src);
 			box.appendChild(im);
 		}
 		box.addEventListener('click',function(){

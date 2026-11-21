@@ -2422,8 +2422,8 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 		if(cloud){ statusEl.className='photo-status'; statusEl.innerHTML='<i></i>共享模式：所有人上传的都看得见'; }
 		else { statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>本机模式：只有这台设备看得到'; }
 		if(hint) hint.innerHTML = cloud
-			? '点按钮会调用系统选择器：电脑上选文件，手机上可直接从相册挑，在微信里打开也能从聊天记录选。<br>内容存在云端（GitHub 仓库），所有打开这个网站的人都能看到；单个文件建议 20MB 以内。'
-			: '点按钮会调用系统选择器：电脑上选文件，手机上可直接从相册挑，在微信里打开也能从聊天记录选。<br>内容只存在当前这台设备上，换设备或清理浏览器数据后看不到。';
+			? '单个文件在 20MB 以内就行'
+			: '单个文件在 200MB 以内就行';
 	}
 
 	/* ---------- 本机存储 ---------- */

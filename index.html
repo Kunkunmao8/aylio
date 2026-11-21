@@ -2412,7 +2412,21 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 	if(!wall||!input||!viewer||!bodyEl) return;
 	var cloud=!!(CFG.token&&CFG.owner&&CFG.repo);
 	var GH={'Authorization':'Bearer '+CFG.token,'Accept':'application/vnd.github+json'};
-	var API='https://api.github.com/repos/'+CFG.owner+'/'+CFG.repo+'/contents/'+(CFG.dir||'photos');
+	var APIS=['https://api.github.com','https://gh-proxy.com/https://api.github.com','https://ghfast.top/https://api.github.com','https://gh-proxy.net/https://api.github.com'];
+	var APIBASE=(function(){try{return localStorage.getItem('aylio_api_base')||APIS[0];}catch(e){return APIS[0];}})();
+	var PATH='/repos/'+CFG.owner+'/'+CFG.repo+'/contents/'+(CFG.dir||'photos');
+	function apiTry(path,opts){
+		var bases=[APIBASE].concat(APIS.filter(function(b){return b!==APIBASE;}));
+		var i=0;
+		function one(b){
+			return fetch(b+PATH+path,opts).then(function(r){
+				if((r.status===0||r.status>=500||r.status===403||r.status===429)&&i<bases.length-1){ i++; return one(bases[i]); }
+				try{ localStorage.setItem('aylio_api_base',b); APIBASE=b; }catch(e){}
+				return r;
+			}).catch(function(e){ i++; if(i<bases.length) return one(bases[i]); throw e; });
+		}
+		return one(bases[0]);
+	}
 	var RAW='https://'+String(CFG.owner).toLowerCase()+'.github.io/'+CFG.repo+'/'+(CFG.dir||'photos')+'/';
 	var MYID=(function(){try{var k='aylio_owner_id',v=localStorage.getItem(k);if(!v){v='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);localStorage.setItem(k,v);}return v;}catch(e){return 'anon';}})();
 	var urls=[], dbp=null;
@@ -2466,7 +2480,7 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 
 	/* ---------- GitHub 云存储 ---------- */
 	function ghList(){
-		return fetch(API+'?ref='+(CFG.branch||'main')+'&t='+Date.now(),{headers:GH,cache:'no-store'})
+		return apiTry('?ref='+(CFG.branch||'main')+'&t='+Date.now(),{headers:GH,cache:'no-store'})
 			.then(function(r){
 				if(r.status===404) return [];
 				if(!r.ok) throw new Error('list '+r.status);
@@ -2499,12 +2513,36 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 			fr.readAsDataURL(blob);
 		});
 	}
+	/* 手机原图动辄几 MB，先无损缩小到 1600px 内再传，加载更快 */
+	function shrinkImage(file){
+		if(!/^image\//.test(file.type)||/gif$/i.test(file.type)) return Promise.resolve(file);
+		return new Promise(function(res){
+			var img=new Image(), u=URL.createObjectURL(file);
+			img.onload=function(){
+				URL.revokeObjectURL(u);
+				var w=img.naturalWidth,h=img.naturalHeight,MAX=1600;
+				if(w<=MAX&&h<=MAX&&file.size<700*1024) return res(file);
+				var k=Math.min(1,MAX/Math.max(w,h)), cw=Math.round(w*k), ch=Math.round(h*k);
+				var c=document.createElement('canvas'); c.width=cw; c.height=ch;
+				c.getContext('2d').drawImage(img,0,0,cw,ch);
+				c.toBlob(function(b){
+					if(!b) return res(file);
+					res(new File([b], file.name.replace(/\.[a-zA-Z0-9]+$/,'')+'.jpg', {type:'image/jpeg'}));
+				},'image/jpeg',0.82);
+			};
+			img.onerror=function(){ URL.revokeObjectURL(u); res(file); };
+			img.src=u;
+		});
+	}
 	function ghUpload(file){
+		file=null; return shrinkImage(arguments[0]).then(ghUploadRaw);
+	}
+	function ghUploadRaw(file){
 		var m=file.name.match(/\.[a-zA-Z0-9]+$/);
 		var ext=m?m[0].toLowerCase():'';
 		var name=Date.now()+'-'+MYID+'-'+Math.random().toString(36).slice(2,7)+ext;
 		return toBase64(file).then(function(b64){
-			return fetch(API+'/'+name,{
+			return apiTry('/'+name,{
 				method:'PUT',
 				headers:Object.assign({'Content-Type':'application/json'},GH),
 				body:JSON.stringify({message:'photo wall upload: '+name, content:b64, branch:CFG.branch||'main'})
@@ -2512,7 +2550,7 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 		});
 	}
 	function ghDel(item){
-		return fetch(API+'/'+encodeURIComponent(item.name),{
+		return apiTry('/'+encodeURIComponent(item.name),{
 			method:'DELETE',
 			headers:Object.assign({'Content-Type':'application/json'},GH),
 			body:JSON.stringify({message:'photo wall delete: '+item.name, sha:item.id, branch:CFG.branch||'main'})
@@ -2545,7 +2583,7 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 			var badge=document.createElement('span'); badge.className='photo-play'; badge.textContent='▶';
 			box.appendChild(badge);
 		}else{
-			var im=document.createElement('img'); im.src=src; im.alt=item.name||'照片'; attachRetry(im,src);
+			var im=document.createElement('img'); im.loading='lazy'; im.src=src; im.alt=item.name||'照片'; attachRetry(im,src);
 			box.appendChild(im);
 		}
 		box.addEventListener('click',function(){
@@ -2576,12 +2614,32 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 		var add=wall.querySelector('.photo-add');
 		rows.forEach(function(item){ wall.insertBefore(makeTile(item),add); });
 	}
+	function cacheSave(rows){
+		try{
+			localStorage.setItem('aylio_wall_list', JSON.stringify(rows.map(function(r){ return {name:r.name,id:r.id,owner:r.owner,ts:r.ts,type:r.type}; })));
+		}catch(e){}
+	}
+	function cacheRead(){
+		try{
+			var v=JSON.parse(localStorage.getItem('aylio_wall_list')||'[]');
+			if(Array.isArray(v)&&v.length) return v.map(function(r){ r=Object.assign({},r); r.src=RAW+r.name; return r; });
+		}catch(e){}
+		return [];
+	}
 	function refresh(){
 		if(cloud){
-			return ghList().then(paint).catch(function(e){
-				if(statusEl){ statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>云端读取失败：'+(e.message||'未知').slice(0,28); }
-				return localAll().then(paint);
-			});
+			var cached=cacheRead();
+			if(cached.length) paint(cached);          /* 先用上次的清单秒出图，云端连不上也照样能看 */
+			return ghList().then(function(rows){ cacheSave(rows); paint(rows); return rows; })
+				.catch(function(e){
+					if(statusEl){
+						statusEl.className='photo-status off';
+						statusEl.innerHTML = cached.length
+							? '<i></i>暂时连不上云端，先显示上次同步的照片'
+							: '<i></i>云端读取失败：'+((e&&e.message)||'未知').slice(0,28);
+					}
+					if(!cached.length) return localAll().then(paint);
+				});
 		}
 		return localAll().then(paint);
 	}
@@ -2589,10 +2647,12 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 	/* ---------- 上传 ---------- */
 	function handleFiles(files){
 		if(!files.length) return;
-		var limit=cloud?20*1024*1024:200*1024*1024;
+		var limitV=cloud?20*1024*1024:200*1024*1024;
+		var limitI=cloud?60*1024*1024:200*1024*1024;
 		var list=files.filter(function(f){
 			if(!/^(image|video)\//.test(f.type)) return false;
-			if(f.size>limit){ alert(cloud?'单个文件请控制在 20MB 以内（云端限制）':'单个文件请控制在 200MB 以内'); return false; }
+			if(/^video\//.test(f.type)&&f.size>limitV){ alert('视频请控制在 20MB 以内'); return false; }
+			if(/^image\//.test(f.type)&&f.size>limitI){ alert('这张图太大了，换一张再传'); return false; }
 			return true;
 		});
 		if(!list.length) return;

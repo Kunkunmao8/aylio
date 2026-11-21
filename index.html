@@ -1002,6 +1002,25 @@ body.modal-open{overflow:hidden;}
 				</tbody>
 			</table>
 		</div>
+
+		<div class="section-head">
+			<h3 class="section-title">照片墙</h3>
+			<span class="section-note">点一下上传，别人打开也能传</span>
+		</div>
+		<div class="photo-status off" id="photoStatus"><i></i>本机模式</div>
+		<div class="photo-wall" id="photoWall">
+			<label class="photo-add" for="photoInput">
+				<span class="photo-plus">＋</span>
+				<span class="photo-addtxt">上传照片 / 视频</span>
+				<span class="photo-addsub">文件 · 相册 · 微信</span>
+				<input type="file" id="photoInput" accept="image/*,video/*" multiple hidden>
+			</label>
+		</div>
+		<p class="photo-hint" id="photoHint">点按钮会调用系统选择器：电脑上选文件，手机上可以直接从相册挑，在微信里打开也能从聊天记录选。<br>内容保存在当前这台设备上，换设备或清理浏览器数据后看不到；单个文件建议 200MB 以内。</p>
+		<div class="photo-viewer" id="photoViewer" aria-hidden="true">
+			<div class="photo-viewer-body" id="photoViewerBody"></div>
+			<button type="button" class="photo-viewer-close" aria-label="关闭">×</button>
+		</div>
 	</section>
 </div>
 <div class="page" id="contact">
@@ -2286,6 +2305,292 @@ body.modal-open{overflow:hidden;}
 		window.openAlbumModal.__eq = true;
 	}
 	setInterval(equalize, 3000);
+})();
+</script>
+<style>
+.photo-addsub{font-size:11px;letter-spacing:.5px;color:#B99584;}
+.photo-status{
+	display:inline-flex;align-items:center;gap:7px;
+	margin:0 0 14px;
+	font-size:12.5px;letter-spacing:.6px;color:#A06443;
+	background:#FDEFE3;border:1px solid #F0D6C2;border-radius:999px;
+	padding:6px 14px;
+}
+.photo-status i{width:7px;height:7px;border-radius:50%;background:#BF5B2E;display:inline-block;}
+.photo-status.off i{background:#BFA093;}
+
+/* ===== 照片墙 ===== */
+.photo-wall{
+	display:grid;
+	grid-template-columns:repeat(4,minmax(0,1fr));
+	gap:16px;
+	margin-top:6px;
+	transition:outline-color .2s ease;
+}
+.photo-wall.dragover{outline:2px dashed #BF5B2E;outline-offset:6px;border-radius:20px;}
+.photo-add{
+	aspect-ratio:1/1;
+	border:1.5px dashed #E3B594;
+	border-radius:18px;
+	background:#FFFBF6;
+	display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+	cursor:pointer;
+	transition:border-color .25s ease, background .25s ease, transform .25s ease;
+}
+.photo-add:hover{border-color:#BF5B2E;background:#FDEFE3;transform:translateY(-2px);}
+.photo-plus{font-size:26px;line-height:1;color:#BF5B2E;font-weight:300;}
+.photo-addtxt{font-size:14px;letter-spacing:1.5px;color:#A06443;text-align:center;line-height:1.6;}
+.photo-addsub{font-size:11px;letter-spacing:.5px;color:#B99584;}
+.photo-item{
+	position:relative;
+	aspect-ratio:1/1;
+	border-radius:18px;
+	overflow:hidden;
+	background:#fff;
+	box-shadow:0 6px 20px rgba(150,74,30,.10);
+	cursor:zoom-in;
+}
+.photo-item img,.photo-item video{width:100%;height:100%;object-fit:cover;object-position:center;display:block;background:#1b120c;}
+.photo-play{
+	position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+	width:44px;height:44px;border-radius:50%;
+	background:rgba(191,91,46,.82);color:#fff;
+	display:flex;align-items:center;justify-content:center;
+	font-size:16px;pointer-events:none;
+	box-shadow:0 4px 14px rgba(0,0,0,.28);
+}
+.photo-del{
+	position:absolute;top:9px;right:9px;
+	width:26px;height:26px;border-radius:50%;border:0;
+	background:rgba(28,17,11,.55);color:#FFF8F2;font-size:15px;line-height:26px;
+	text-align:center;cursor:pointer;opacity:0;transition:opacity .25s ease, background .25s ease;
+}
+.photo-item:hover .photo-del,.photo-item:focus-within .photo-del{opacity:1;}
+.photo-del:hover{background:rgba(191,91,46,.85);}
+.photo-hint{
+	margin:14px 0 0;
+	font-size:13px;
+	line-height:1.8;
+	color:#9C8275;
+	letter-spacing:.5px;
+}
+.photo-viewer{
+	position:fixed;inset:0;z-index:120;
+	background:rgba(30,18,12,.86);
+	display:none;align-items:center;justify-content:center;
+	padding:48px;
+}
+.photo-viewer.on{display:flex;}
+.photo-viewer-body{display:flex;align-items:center;justify-content:center;}
+.photo-viewer-body img,.photo-viewer-body video{
+	max-width:88vw;max-height:86vh;border-radius:14px;
+	box-shadow:0 20px 60px rgba(0,0,0,.45);background:#000;
+}
+.photo-viewer-close{
+	position:absolute;top:22px;right:26px;
+	width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.4);
+	background:rgba(255,255,255,.14);color:#fff;font-size:20px;line-height:36px;
+	text-align:center;cursor:pointer;z-index:2;
+}
+@media(max-width:900px){.photo-wall{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}
+</style>
+<!-- photoWall -->
+<script>
+/* 共享照片墙配置：填上 Supabase 的 URL 和 anon key，所有人上传都进同一批；留空则只存在本机 */
+window.AYLIO_CLOUD = { url: "https://yzzktnkfprpystxbhnln.supabase.co", key: "sb_publishable_tN2E8-tQyAk2ORcmpIzmVA_DPgDkhEB", bucket: "wall", table: "photo_wall" };
+</script>
+<script>
+(function(){
+	var CFG=window.AYLIO_CLOUD||{url:'',key:'',bucket:'wall',table:'photo_wall'};
+	var wall=document.getElementById('photoWall');
+	var input=document.getElementById('photoInput');
+	var viewer=document.getElementById('photoViewer');
+	var bodyEl=document.getElementById('photoViewerBody');
+	var hint=document.getElementById('photoHint');
+	var statusEl=document.getElementById('photoStatus');
+	if(!wall||!input||!viewer||!bodyEl) return;
+	var cloud=!!(CFG.url&&CFG.key);
+	var H={'apikey':CFG.key,'Authorization':'Bearer '+CFG.key};
+	var MYID=(function(){try{var k='aylio_owner_id',v=localStorage.getItem(k);if(!v){v='u'+Date.now()+Math.random().toString(36).slice(2,8);localStorage.setItem(k,v);}return v;}catch(e){return 'anon';}})();
+	var urls=[], dbp=null;
+
+	function setStatus(){
+		if(!statusEl) return;
+		if(cloud){ statusEl.className='photo-status'; statusEl.innerHTML='<i></i>共享模式：所有人上传的都看得见'; }
+		else { statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>本机模式：只有这台设备看得到'; }
+		if(hint) hint.innerHTML = cloud
+			? '点按钮会调用系统选择器：电脑上选文件，手机上可直接从相册挑，在微信里打开也能从聊天记录选。<br>内容存在云端，所有打开这个网站的人都能看到；单个文件建议 30MB 以内。'
+			: '点按钮会调用系统选择器：电脑上选文件，手机上可直接从相册挑，在微信里打开也能从聊天记录选。<br>内容只存在当前这台设备上，换设备或清理浏览器数据后看不到；单个文件建议 200MB 以内。';
+	}
+
+	/* ---------- 本机存储 ---------- */
+	function db(){
+		if(dbp) return dbp;
+		dbp=new Promise(function(res,rej){
+			var rq=indexedDB.open('aylio_wall_db',1);
+			rq.onupgradeneeded=function(){ if(!rq.result.objectStoreNames.contains('items')) rq.result.createObjectStore('items',{keyPath:'id'}); };
+			rq.onsuccess=function(){ res(rq.result); };
+			rq.onerror=function(){ rej(rq.error); };
+		});
+		return dbp;
+	}
+	function localAll(){
+		return db().then(function(d){
+			return new Promise(function(res,rej){
+				var rq=d.transaction('items','readonly').objectStore('items').getAll();
+				rq.onsuccess=function(){ res((rq.result||[]).sort(function(a,b){return a.id-b.id;})); };
+				rq.onerror=function(){ rej(rq.error); };
+			});
+		});
+	}
+	function localAdd(item){
+		return db().then(function(d){
+			return new Promise(function(res,rej){
+				var rq=d.transaction('items','readwrite').objectStore('items').add(item);
+				rq.onsuccess=function(){ res(); };
+				rq.onerror=function(){ rej(rq.error); };
+			});
+		});
+	}
+	function localDel(id){
+		return db().then(function(d){
+			return new Promise(function(res){
+				var rq=d.transaction('items','readwrite').objectStore('items').delete(id);
+				rq.onsuccess=function(){ res(); }; rq.onerror=function(){ res(); };
+			});
+		});
+	}
+
+	/* ---------- 云端存储 ---------- */
+	function cloudList(){
+		return fetch(CFG.url+'/rest/v1/'+CFG.table+'?select=id,type,name,url,owner&order=id.desc',{headers:H})
+			.then(function(r){ if(!r.ok) throw new Error('list'); return r.json(); })
+			.then(function(rows){ return rows.map(function(x){ return {id:x.id,type:x.type,name:x.name,src:x.url,owner:x.owner}; }); });
+	}
+	function cloudUpload(file){
+		var m=file.name.match(/\.[a-zA-Z0-9]+$/);
+		var ext=m?m[0]:'';
+		var path=Date.now()+'-'+Math.random().toString(36).slice(2,7)+ext;
+		return fetch(CFG.url+'/storage/v1/object/'+CFG.bucket+'/'+path,{
+			method:'POST',
+			headers:{'apikey':CFG.key,'Authorization':'Bearer '+CFG.key,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},
+			body:file
+		}).then(function(r){
+			if(!r.ok) throw new Error('upload');
+			var pub=CFG.url+'/storage/v1/object/public/'+CFG.bucket+'/'+path;
+			return fetch(CFG.url+'/rest/v1/'+CFG.table,{
+				method:'POST',
+				headers:{'Content-Type':'application/json','Prefer':'return=minimal','apikey':CFG.key,'Authorization':'Bearer '+CFG.key},
+				body:JSON.stringify({type:file.type||'image/jpeg',name:file.name||'',url:pub,owner:MYID})
+			}).then(function(r2){ if(!r2.ok) throw new Error('row'); });
+		});
+	}
+	function cloudDel(item){
+		var row=fetch(CFG.url+'/rest/v1/'+CFG.table+'?id=eq.'+encodeURIComponent(item.id),{method:'DELETE',headers:H}).catch(function(){ return true; });
+		var path='';
+		if(item.src && item.src.indexOf('/public/')>=0){ path=decodeURIComponent(item.src.split('/public/')[1]); }
+		var obj=path?fetch(CFG.url+'/storage/v1/object/'+path,{method:'DELETE',headers:H}).catch(function(){ return true; }):Promise.resolve();
+		return Promise.all([row,obj]).then(function(){ return true; });
+	}
+
+	/* ---------- 视图 ---------- */
+	function openView(node){ bodyEl.innerHTML=''; bodyEl.appendChild(node); viewer.classList.add('on'); }
+	function closeView(){ var v=bodyEl.querySelector('video'); if(v) v.pause(); bodyEl.innerHTML=''; viewer.classList.remove('on'); }
+	function makeTile(item){
+		var box=document.createElement('div');
+		box.className='photo-item';
+		var isVideo=/^video\//.test(item.type||'');
+		var src=item.src;
+		if(!src && item.blob){ src=URL.createObjectURL(item.blob); urls.push(src); }
+		if(isVideo){
+			var v=document.createElement('video');
+			v.src=src; v.muted=true; v.playsInline=true; v.preload='metadata';
+			box.appendChild(v);
+			var badge=document.createElement('span'); badge.className='photo-play'; badge.textContent='▶';
+			box.appendChild(badge);
+		}else{
+			var im=document.createElement('img'); im.src=src; im.alt=item.name||'照片';
+			box.appendChild(im);
+		}
+		box.addEventListener('click',function(){
+			if(isVideo){
+				var vp=document.createElement('video');
+				vp.src=src; vp.controls=true; vp.autoplay=true; vp.playsInline=true;
+				openView(vp);
+			}else{
+				var ip=document.createElement('img'); ip.src=src; ip.alt=item.name||'照片';
+				openView(ip);
+			}
+		});
+		var b=document.createElement('button');
+		b.className='photo-del'; b.type='button'; b.title='删除'; b.textContent='×';
+		b.addEventListener('click',function(ev){
+			ev.stopPropagation();
+			if(!confirm('删掉这一张？')) return;
+			(cloud?cloudDel(item):localDel(item.id)).then(refresh);
+		});
+		if(cloud && item.owner && item.owner!==MYID){ b.style.display='none'; }
+		box.appendChild(b);
+		return box;
+	}
+	function paint(rows){
+		urls.forEach(function(u){ URL.revokeObjectURL(u); });
+		urls=[];
+		wall.querySelectorAll('.photo-item').forEach(function(n){ n.remove(); });
+		var add=wall.querySelector('.photo-add');
+		rows.forEach(function(item){ wall.insertBefore(makeTile(item),add); });
+	}
+	function refresh(){
+		if(cloud){
+			return cloudList().then(paint).catch(function(){
+				if(statusEl){ statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>云端暂时连不上，先显示本机内容'; }
+				return localAll().then(paint);
+			});
+		}
+		return localAll().then(paint);
+	}
+
+	/* ---------- 上传 ---------- */
+	function handleFiles(files){
+		if(!files.length) return;
+		var limit=cloud?30*1024*1024:200*1024*1024;
+		var list=files.filter(function(f){
+			if(!/^(image|video)\//.test(f.type)) return false;
+			if(f.size>limit){ alert(cloud?'单个文件请不要超过 30MB（云端限制）':'单个文件请不要超过 200MB'); return false; }
+			return true;
+		});
+		if(!list.length) return;
+		var done=0, total=list.length, fail=0;
+		list.forEach(function(f){
+			var task = cloud ? cloudUpload(f) : localAdd({id:Date.now()+done, type:f.type, name:f.name, blob:f});
+			task.then(function(){ done++; }).catch(function(){ fail++; done++; })
+			.finally(function(){
+				if(done===total){
+					if(fail) alert('有 '+fail+' 个文件没传上去，可能是网络或权限问题，稍后再试');
+					refresh();
+				}
+			});
+		});
+	}
+	input.addEventListener('change',function(){
+		handleFiles(Array.prototype.slice.call(input.files||[]));
+		input.value='';
+	});
+	wall.addEventListener('dragover',function(e){ e.preventDefault(); wall.classList.add('dragover'); });
+	wall.addEventListener('dragleave',function(){ wall.classList.remove('dragover'); });
+	wall.addEventListener('drop',function(e){
+		e.preventDefault(); wall.classList.remove('dragover');
+		handleFiles(Array.prototype.slice.call((e.dataTransfer&&e.dataTransfer.files)||[]));
+	});
+	viewer.addEventListener('click',function(e){
+		if(e.target===viewer||e.target===viewer.querySelector('.photo-viewer-close')) closeView();
+	});
+	document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeView(); });
+
+	setStatus();
+	refresh();
+	if(cloud) setInterval(function(){ if(!viewer.classList.contains('on')) refresh(); },20000);
 })();
 </script>
 </body>

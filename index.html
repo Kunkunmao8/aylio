@@ -2412,7 +2412,7 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 	if(!wall||!input||!viewer||!bodyEl) return;
 	var cloud=!!(CFG.token&&CFG.owner&&CFG.repo);
 	var GH={'Authorization':'Bearer '+CFG.token,'Accept':'application/vnd.github+json'};
-	var APIS=['https://api.github.com','https://gh-proxy.com/https://api.github.com','https://ghfast.top/https://api.github.com','https://gh-proxy.net/https://api.github.com'];
+	var APIS=['https://api.github.com','https://gh-proxy.com/https://api.github.com'];
 	var APIBASE=(function(){try{return localStorage.getItem('aylio_api_base')||APIS[0];}catch(e){return APIS[0];}})();
 	var PATH='/repos/'+CFG.owner+'/'+CFG.repo+'/contents/'+(CFG.dir||'photos');
 	function apiTry(path,opts){
@@ -2535,7 +2535,7 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 		});
 	}
 	function ghUpload(file){
-		file=null; return shrinkImage(arguments[0]).then(ghUploadRaw);
+		return shrinkImage(file).then(ghUploadRaw);
 	}
 	function ghUploadRaw(file){
 		var m=file.name.match(/\.[a-zA-Z0-9]+$/);

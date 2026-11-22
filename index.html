@@ -2135,6 +2135,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			b.disabled=false; paintFollowBtn();
 			$('upFollowing').textContent=followList(UP).length;
 			$('upFans').textContent=fansOf(UP).length;
+			if($('stFollow')) $('stFollow').textContent=followList(MYREC).length;
+			if($('stFans')) $('stFans').textContent=fansOf(MYREC).length;
 		}).catch(function(e){ b.disabled=false; alert(e.message||'没关注上'); });
 	}
 	function convKey(a,b){

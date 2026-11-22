@@ -857,11 +857,11 @@ body.modal-open{overflow:hidden;}
 			<form class="clip-form" id="clipForm">
 				<label class="clip-row">
 					<span>这段视频叫什么</span>
-					<input id="clipTitle" maxlength="40" placeholder="例如 那天在江边的十分钟">
+					<input id="clipTitle" maxlength="40" placeholder="例如 那天在阳台上拍的日落">
 				</label>
 				<label class="clip-row">
-					<span>投稿人</span>
-					<input id="clipWho" maxlength="16" placeholder="怎么称呼你">
+					<span>怎么称呼您</span>
+					<input id="clipWho" maxlength="16" placeholder="怎么称呼您">
 				</label>
 				<div class="clip-tabs">
 					<button type="button" class="clip-tab on" data-mode="file">上传视频</button>
@@ -2470,7 +2470,9 @@ body.modal-open{overflow:hidden;}
 .photo-viewer-dl.on{display:block;}
 
 /* ===== 视频投稿 ===== */
-.clip-box{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:26px;align-items:start;margin-top:8px;}
+.clip-box{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:26px;align-items:start;margin-top:8px;}
+.clip-list{order:1;}
+.clip-form{order:2;}
 .clip-form{background:#FFFBF6;border:1px solid #F0D6C2;border-radius:18px;padding:18px;}
 .clip-row{display:block;margin:0 0 12px;}
 .clip-row span{display:block;font-size:12.5px;letter-spacing:.5px;color:#A06443;margin-bottom:6px;}
@@ -2517,6 +2519,8 @@ body.modal-open{overflow:hidden;}
 .clip-empty{grid-column:1/-1;font-size:13px;color:#B99584;letter-spacing:.5px;padding:14px 2px;}
 @media(max-width:900px){
 	.clip-box{grid-template-columns:1fr;}
+	.clip-form{order:1;}
+	.clip-list{order:2;}
 	.clip-list{grid-template-columns:1fr;}
 }
 @media(max-width:900px){.photo-wall{grid-template-columns:repeat(3,minmax(0,1fr));}}

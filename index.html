@@ -1014,11 +1014,11 @@ body.modal-open{overflow:hidden;}
 			<label class="photo-add" for="photoInput">
 				<span class="photo-plus">＋</span>
 				<span class="photo-addtxt">上传照片 / 视频</span>
-				<span class="photo-addsub">文件 · 相册 · 微信</span>
+				<span class="photo-addsub">相册 · 拍照 · 文件</span>
 				<input type="file" id="photoInput" class="photo-file" accept="image/*,video/*" multiple>
 			</label>
 		</div>
-		<p class="photo-hint" id="photoHint">点按钮会调用系统选择器：电脑上选文件，手机上可以直接从相册挑，在微信里打开也能从聊天记录选。<br>内容保存在当前这台设备上，换设备或清理浏览器数据后看不到；单个文件建议 200MB 以内。</p>
+		<p class="photo-hint" id="photoHint">点按钮会调用系统选择器：电脑上选文件，手机上从相册或相机挑。</p>
 		<div class="photo-viewer" id="photoViewer" aria-hidden="true">
 			<div class="photo-viewer-body" id="photoViewerBody"></div>
 			<button type="button" class="photo-viewer-close" aria-label="关闭">×</button>
@@ -2452,7 +2452,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		if(cloud){ statusEl.className='photo-status'; statusEl.innerHTML='<i></i>共享模式：所有人上传的都看得见'; }
 		else { statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>本机模式：只有这台设备看得到'; }
 		if(hint) hint.innerHTML = cloud
-			? '单个文件：图片 60MB、视频 50MB 以内'
+			? ('单个文件：图片 60MB、视频 50MB 以内' + (IS_WX?'<br>微信聊天里的图，先长按保存到相册，再点这里选':'') )
 			: '单个文件在 200MB 以内';
 	}
 

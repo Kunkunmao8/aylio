@@ -1107,7 +1107,7 @@ body.modal-open{overflow:hidden;}
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" controls playsinline preload="none">
+			<video id="meetVideo" controls playsinline preload="metadata" poster="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/video/poster_v2.jpg" data-dur="231">
 				<source src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/video/v2_h264.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -1183,7 +1183,7 @@ body.modal-open{overflow:hidden;}
 		<p class="album-subtitle">共同出镜的那些瞬间</p>
 		
 		<div class="album-main-player">
-			<video id="collabMainVideo" controls playsinline preload="none">
+			<video id="collabMainVideo" controls playsinline preload="metadata" poster="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/video/poster_v1.jpg" data-dur="11">
 				<source src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/video/v1_h264.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -1301,7 +1301,7 @@ body.modal-open{overflow:hidden;}
 		<p class="album-subtitle">把普通的一天拍成纪念</p>
 		
 		<div class="album-main-player">
-			<video id="vlogMainVideo" controls playsinline preload="none">
+			<video id="vlogMainVideo" controls playsinline preload="metadata" poster="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/video/poster_v3.jpg" data-dur="56">
 				<source src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/video/v3_h264.mp4" type="video/mp4">
 			</video>
 			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
@@ -2552,6 +2552,19 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 			.catch(function(){ return removeFromManifest(item.name); });
 	}
 
+	/* 视频打开时先显示"加载中"，能播了就撤掉 */
+	function boxViewLoad(vp){
+		var tip=document.createElement('div');
+		tip.className='photo-viewer-tip';
+		tip.innerHTML='视频加载中…';
+		tip.style.cssText='position:absolute;left:50%;bottom:14%;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(25,16,10,.7);color:#FFF8F2;font-size:13px;letter-spacing:.5px;z-index:3;pointer-events:none;';
+		viewer.appendChild(tip);
+		function done(){ if(tip&&tip.parentNode) tip.parentNode.removeChild(tip); }
+		vp.addEventListener('canplay',done);
+		vp.addEventListener('playing',done);
+		vp.addEventListener('error',function(){ if(tip) tip.textContent='视频没能加载，检查网络后再试一次'; });
+		vp.addEventListener('loadeddata',done);
+	}
 	/* ---------- 视图 ---------- */
 	function openView(node){ bodyEl.innerHTML=''; bodyEl.appendChild(node); viewer.classList.add('on'); }
 	function closeView(){ var v=bodyEl.querySelector('video'); if(v) v.pause(); bodyEl.innerHTML=''; viewer.classList.remove('on'); }
@@ -2584,8 +2597,10 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		box.addEventListener('click',function(){
 			if(isVideo){
 				var vp=document.createElement('video');
-				vp.src=src; vp.controls=true; vp.autoplay=true; vp.playsInline=true;
+				vp.src=src; vp.controls=true; vp.playsInline=true; vp.preload='auto';
+				boxViewLoad(vp);
 				openView(vp);
+				try{ var pr=vp.play(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
 			}else{
 				var ip=document.createElement('img'); ip.src=src; ip.alt=item.name||'照片';
 				openView(ip);

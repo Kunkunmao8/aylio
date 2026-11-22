@@ -1138,10 +1138,6 @@ body.modal-open{overflow:hidden;}
 					<span>这段视频叫什么</span>
 					<input id="clipTitle" maxlength="40" placeholder="例如 维港的烟花">
 				</label>
-				<label class="clip-row">
-					<span>怎么称呼您</span>
-					<input id="clipWho" maxlength="16" placeholder="怎么称呼您">
-				</label>
 				<div class="clip-tabs">
 					<button type="button" class="clip-tab on" data-mode="file">上传视频</button>
 					<button type="button" class="clip-tab" data-mode="link">粘贴链接</button>
@@ -4075,7 +4071,10 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	var BASE='https://'+CFG.bucket+'.cos.'+(CFG.region||'ap-guangzhou')+'.myqcloud.com/clips/';
 	var MAN=BASE+'_index.json';
 	var listEl=document.getElementById('clipList'), tipEl=document.getElementById('clipTip');
-	var titleEl=document.getElementById('clipTitle'), whoEl=document.getElementById('clipWho');
+	var titleEl=document.getElementById('clipTitle');
+	function myName(){
+		try{ var me=JSON.parse(localStorage.getItem('aylio_pillow_user')||'null'); return String((me&&me.name)||'').slice(0,16); }catch(e){ return ''; }
+	}
 	var input=document.getElementById('clipInput'), urlEl=document.getElementById('clipUrl');
 	var nameEl=document.getElementById('clipFileName'), btn=document.getElementById('clipSubmit');
 	var paneFile=document.getElementById('clipPaneFile'), paneLink=document.getElementById('clipPaneLink');
@@ -4141,7 +4140,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 
 	form.addEventListener('submit',function(ev){
 		ev.preventDefault();
-		var title=titleEl.value.trim().slice(0,40), who=whoEl.value.trim().slice(0,16);
+		var title=titleEl.value.trim().slice(0,40), who=myName();
 		if(mode==='link'){
 			var link=(urlEl.value||'').trim();
 			if(!/^https?:\/\/[^\s]+$/i.test(link)){ alert('链接要以 http:// 或 https:// 开头'); return; }
@@ -4151,7 +4150,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 				return write(rows);
 			}).then(function(){
 				btn.disabled=false; tipEl.textContent='已经发布，下面就能看到，别人也能看到。';
-				urlEl.value=''; titleEl.value=''; whoEl.value='';
+				urlEl.value=''; titleEl.value='';
 				load();
 			}).catch(function(e){ btn.disabled=false; tipEl.textContent='没发出去：'+(e&&e.message||e); });
 			return;
@@ -4173,7 +4172,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 				return write(rows);
 			}).then(function(){
 				btn.disabled=false; tipEl.textContent='上传完成，下面就能看到，别人也能看到。';
-				input.value=''; picked=null; nameEl.textContent=''; titleEl.value=''; whoEl.value='';
+				input.value=''; picked=null; nameEl.textContent=''; titleEl.value='';
 				load();
 			}).catch(function(e){ btn.disabled=false; tipEl.textContent='视频传上去了，但清单没存住：'+(e&&e.message||e); });
 		};

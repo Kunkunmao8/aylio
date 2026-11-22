@@ -241,7 +241,7 @@ var NEED_LOGIN = true;          /* 免登录版会改成 false */
 		fetch('https://api.emailjs.com/api/v1.0/email/send',{
 			method:'POST',headers:{'Content-Type':'application/json'},
 			body:JSON.stringify({service_id:MAILCFG.serviceId,template_id:MAILCFG.templateId,user_id:MAILCFG.publicKey,
-				template_params:{to_email:mail,code:pendingCode,site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}})
+				template_params:{to_email:mail,code:pendingCode,passcode:pendingCode,time:'10 分钟',site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}})
 		}).then(function(r){ if(!r.ok) throw new Error('mail '+r.status);
 			document.getElementById('sendCode').disabled=false;
 			$('codeTip').textContent='验证码已经发到 '+mail+'，去邮箱收一下（找不到看垃圾箱）';

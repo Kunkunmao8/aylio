@@ -781,6 +781,14 @@ body.modal-open{overflow:hidden;}
 #authGate .ag-tabs button.on{background:#fff;color:#BF5B2E;box-shadow:0 2px 8px rgba(160,80,30,.12);font-weight:600;}
 #authGate .ag-field{display:block;width:100%;box-sizing:border-box;height:44px;padding:0 13px;margin-bottom:10px;border:1px solid #EEDCCB;border-radius:11px;background:#FFFCF9;font-size:14px;color:#4a3324;font-family:inherit;}
 #authGate .ag-field:focus{outline:0;border-color:#E9A97C;background:#fff;}
+#authGate .ag-pass{position:relative;margin-bottom:10px;}
+#authGate .ag-pass .ag-field{margin-bottom:0;padding-right:62px;}
+#authGate .ag-pass .pass-eye{
+	position:absolute;right:6px;top:0;height:44px;padding:0 10px;
+	border:0;background:transparent;color:#B0704D;font-size:12.5px;
+	font-family:inherit;letter-spacing:1px;cursor:pointer;
+}
+#authGate .ag-pass .pass-eye:active{color:#BF5B2E;}
 #authGate .ag-code{display:flex;gap:8px;align-items:center;}
 #authGate .ag-code .ag-field{margin-bottom:0;}
 #authGate .ag-mini{flex:0 0 auto;height:44px;padding:0 14px;border:1px solid #F0D6C2;background:#FDEFE3;color:#BF5B2E;border-radius:11px;font-size:13px;cursor:pointer;font-family:inherit;}
@@ -807,7 +815,10 @@ body.modal-open{overflow:hidden;}
 
 		<div id="agLogin">
 			<input class="ag-field" id="agLMail" placeholder="邮箱" autocomplete="username">
-			<input class="ag-field" id="agLPass" type="password" placeholder="密码" autocomplete="current-password">
+			<div class="ag-pass">
+				<input class="ag-field" id="agLPass" type="password" placeholder="密码" autocomplete="current-password">
+				<button class="pass-eye" type="button" data-eye="agLPass" aria-label="查看密码">显示</button>
+			</div>
 			<button class="ag-btn" id="agDoLogin" type="button">登录</button>
 			<p class="ag-msg" id="agLoginMsg"></p>
 			<p class="ag-forgot"><button type="button" id="agForgot">忘记密码？用邮箱验证码重设</button></p>
@@ -816,7 +827,10 @@ body.modal-open{overflow:hidden;}
 		<div id="agReg" class="hide">
 			<input class="ag-field" id="agRMail" placeholder="邮箱（找密码、收验证码用）">
 			<input class="ag-field" id="agRName" placeholder="昵称（社区里显示这个名字）" maxlength="10">
-			<input class="ag-field" id="agRPass" type="password" placeholder="设置密码，至少 6 位">
+			<div class="ag-pass">
+				<input class="ag-field" id="agRPass" type="password" placeholder="设置密码，至少 6 位">
+				<button class="pass-eye" type="button" data-eye="agRPass" aria-label="查看密码">显示</button>
+			</div>
 			<div class="ag-code">
 				<input class="ag-field" id="agCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
 				<button class="ag-mini" id="agSendCode" type="button">获取验证码</button>
@@ -828,7 +842,10 @@ body.modal-open{overflow:hidden;}
 
 		<div id="agReset" class="hide">
 			<input class="ag-field" id="agXMail" placeholder="注册用的邮箱">
-			<input class="ag-field" id="agXPass" type="password" placeholder="新密码，至少 6 位">
+			<div class="ag-pass">
+				<input class="ag-field" id="agXPass" type="password" placeholder="新密码，至少 6 位">
+				<button class="pass-eye" type="button" data-eye="agXPass" aria-label="查看密码">显示</button>
+			</div>
 			<div class="ag-code">
 				<input class="ag-field" id="agXCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
 				<button class="ag-mini" id="agXSend" type="button">获取验证码</button>
@@ -1366,6 +1383,14 @@ a{color:inherit;}
 #pillow .tabs button.on{background:#FDEFE3;border-color:#BF5B2E;color:#BF5B2E;font-weight:600;}
 #pillow .field{width:100%;height:42px;padding:0 12px;margin-bottom:10px;border:1px solid #EAD3C1;border-radius:10px;font-size:14px;font-family:inherit;color:#4A3226;background:#fff;outline:none;}
 #pillow .field:focus{border-color:#BF5B2E;}
+#pillow .pass-wrap{position:relative;margin-bottom:10px;}
+#pillow .pass-wrap .field{margin-bottom:0;padding-right:58px;}
+#pillow .pass-wrap .pass-eye{
+	position:absolute;right:4px;top:0;height:42px;padding:0 10px;
+	border:0;background:transparent;color:#A06443;font-size:12.5px;
+	font-family:inherit;letter-spacing:1px;cursor:pointer;
+}
+#pillow .pass-wrap .pass-eye:active{color:#BF5B2E;}
 #pillow .code-row{display:flex;gap:8px;margin-bottom:6px;}
 #pillow .code-row .field{margin:0;flex:1;}
 #pillow .code-tip{font-size:12px;color:#BF5B2E;min-height:18px;margin:0 0 10px;line-height:1.6;}
@@ -1642,7 +1667,10 @@ a{color:inherit;}
 
 				<div id="paneLogin">
 					<input class="field" id="lMail" placeholder="邮箱" autocomplete="username">
-					<input class="field" id="lPass" type="password" placeholder="密码" autocomplete="current-password">
+					<div class="pass-wrap">
+						<input class="field" id="lPass" type="password" placeholder="密码" autocomplete="current-password">
+						<button class="pass-eye" type="button" data-eye="lPass" aria-label="查看密码">显示</button>
+					</div>
 					<button class="send" id="doLogin" type="button">登录</button>
 					<p class="gmsg" id="loginMsg"></p>
 				</div>
@@ -1650,7 +1678,10 @@ a{color:inherit;}
 				<div id="paneReg" class="hide">
 					<input class="field" id="rMail" placeholder="邮箱">
 					<input class="field" id="rName" placeholder="昵称（留言时显示这个名字）" maxlength="10">
-					<input class="field" id="rPass" type="password" placeholder="设置密码，至少 6 位">
+					<div class="pass-wrap">
+						<input class="field" id="rPass" type="password" placeholder="设置密码，至少 6 位">
+						<button class="pass-eye" type="button" data-eye="rPass" aria-label="查看密码">显示</button>
+					</div>
 					<div class="code-row">
 						<input class="field" id="rCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
 						<button class="mini" id="sendCode" type="button" style="height:42px;">获取验证码</button>
@@ -5351,7 +5382,24 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	window.addEventListener('resize', soon);
 	setInterval(load, 1200);
 })();
-</script></body>
+</script>
+<script>
+/* 注册 / 登录 / 重设密码：点「显示」看明文，再点一次隐藏 */
+(function(){
+	[].forEach.call(document.querySelectorAll(".pass-eye"), function(btn){
+		btn.addEventListener("click", function(){
+			var input=document.getElementById(btn.getAttribute("data-eye"));
+			if(!input) return;
+			var show=input.type==="password";
+			input.type=show?"text":"password";
+			btn.textContent=show?"隐藏":"显示";
+			btn.setAttribute("aria-label",show?"隐藏密码":"查看密码");
+			try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); }
+		});
+	});
+})();
+</script>
+</body>
 </html>
 
 

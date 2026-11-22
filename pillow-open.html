@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小枕头留言箱（免登录版）· 政瞳之家</title>
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+	background:#FDF7F1;color:#3A241A;
+	font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+	-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;}
+.bar{position:sticky;top:0;z-index:20;background:rgba(253,247,241,.94);backdrop-filter:blur(10px);border-bottom:1px solid #F2DDCB;}
+.bar-in{max-width:900px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;}
+.logo{font-weight:700;font-size:16px;letter-spacing:2px;text-decoration:none;color:#3A241A;}
+.bar-tip{font-size:12.5px;color:#B99584;letter-spacing:1px;}
+.who{margin-left:auto;font-size:12.5px;color:#A06443;display:flex;align-items:center;gap:10px;}
+.who button{border:1px solid #F0D6C2;background:#FDEFE3;color:#BF5B2E;border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer;font-family:inherit;}
+.hero{position:relative;overflow:hidden;max-height:420px;}
+.hero img{width:100%;height:420px;object-fit:cover;object-position:center 45%;display:block;}
+.hero-txt{
+	position:absolute;left:0;right:0;bottom:0;
+	background:linear-gradient(to top,rgba(24,14,9,.78),rgba(24,14,9,.28) 55%,rgba(24,14,9,0));
+	padding:70px 20px 28px;color:#FFF8F2;
+}
+.hero-txt h1{margin:0 0 6px;font-size:26px;letter-spacing:4px;}
+.hero-txt p{margin:0;font-size:13.5px;color:#F3DCCB;letter-spacing:1px;}
+.wrap{max-width:900px;margin:0 auto;padding:22px 20px 60px;}
+.room{background:#fff;border:1px solid #F2DDCB;border-radius:20px;box-shadow:0 10px 34px rgba(150,74,30,.08);overflow:hidden;}
+.room-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #F7E8DC;font-size:13px;color:#A06443;}
+.room-head .live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#B99584;}
+.room-head .live i{width:6px;height:6px;border-radius:50%;background:#BF5B2E;display:inline-block;}
+.msgs{height:min(58vh,520px);overflow-y:auto;padding:18px;background:#FFFCF9;display:flex;flex-direction:column;gap:14px;}
+.empty{margin:auto;color:#B99584;font-size:13px;text-align:center;line-height:2;}
+.row{display:flex;}
+.row.mine{justify-content:flex-end;}
+.bub{max-width:74%;background:#FDEFE3;border-radius:14px;padding:9px 13px 11px;}
+.row.mine .bub{background:#BF5B2E;color:#FFF8F2;}
+.bhead{font-size:11.5px;color:#B99584;margin-bottom:4px;letter-spacing:.4px;}
+.row.mine .bhead{color:#F4D6C4;}
+.txt{font-size:14.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;}
+.media{display:block;margin-top:8px;max-width:100%;border-radius:10px;background:#1b120c;cursor:zoom-in;}
+video.media{cursor:default;}
+.composer{padding:12px 14px;border-top:1px solid #F7E8DC;display:flex;gap:8px;align-items:center;background:#FFFDFB;flex-wrap:wrap;}
+.composer input.txt-in{flex:1 1 200px;min-width:120px;padding:11px 14px;border:1px solid #EAD3C1;border-radius:999px;font-size:14px;font-family:inherit;color:#4A3226;background:#fff;outline:none;}
+.composer input.txt-in:focus{border-color:#BF5B2E;}
+.mini{border:1px solid #EAD3C1;background:#FFFDFB;color:#A06443;border-radius:999px;padding:0 12px;height:40px;font-size:12.5px;cursor:pointer;font-family:inherit;}
+.mini:hover{border-color:#BF5B2E;color:#BF5B2E;}
+.send{border:0;background:#BF5B2E;color:#fff;border-radius:999px;padding:0 22px;height:40px;font-size:14px;letter-spacing:1px;cursor:pointer;font-family:inherit;}
+.send[disabled]{opacity:.6;}
+.up{padding:0 16px;font-size:12px;color:#9C8275;min-height:16px;}
+.gate{padding:26px 18px 30px;border-top:1px solid #F7E8DC;background:#FFFCF9;}
+.gate-card{max-width:380px;margin:0 auto;}
+.gate h2{margin:0 0 6px;font-size:18px;letter-spacing:1px;}
+.gate-sub{margin:0 0 16px;font-size:12.5px;color:#A06443;line-height:1.7;}
+.tabs{display:flex;gap:8px;margin-bottom:14px;}
+.tabs button{flex:1;height:38px;border:1px solid #EAD3C1;background:#FFFDFB;border-radius:10px;font-size:13px;color:#A06443;cursor:pointer;font-family:inherit;}
+.tabs button.on{background:#FDEFE3;border-color:#BF5B2E;color:#BF5B2E;font-weight:600;}
+.field{width:100%;height:42px;padding:0 12px;margin-bottom:10px;border:1px solid #EAD3C1;border-radius:10px;font-size:14px;font-family:inherit;color:#4A3226;background:#fff;outline:none;}
+.field:focus{border-color:#BF5B2E;}
+.code-row{display:flex;gap:8px;margin-bottom:6px;}
+.code-row .field{margin:0;flex:1;}
+.code-tip{font-size:12px;color:#BF5B2E;min-height:18px;margin:0 0 10px;line-height:1.6;}
+.gate .send{width:100%;height:44px;margin-top:2px;}
+.gmsg{font-size:12.5px;color:#9C8275;min-height:18px;margin:10px 0 0;line-height:1.7;}
+.hide{display:none !important;}
+.nickbar{padding:10px 14px;border-top:1px solid #F7E8DC;display:flex;align-items:center;gap:8px;font-size:12.5px;color:#A06443;background:#FFFDFB;}
+.nickbar input{width:130px;height:32px;padding:0 10px;border:1px solid #EAD3C1;border-radius:8px;font-size:13px;font-family:inherit;color:#4A3226;outline:none;}
+.nickbar input:focus{border-color:#BF5B2E;}
+@media(max-width:600px){
+	.hero img{height:230px;}
+	.hero-txt h1{font-size:20px;letter-spacing:2px;}
+	.msgs{height:52vh;padding:14px;}
+	.bub{max-width:84%;}
+	.bar-tip{display:none;}
+}
+</style>
+</head>
+<body>
+<header class="bar">
+	<div class="bar-in">
+		<a class="logo" href="index.html">政瞳之家</a>
+		<span class="bar-tip">小枕头留言箱</span>
+		<span class="who" id="whoBox"></span>
+	</div>
+</header>
+
+<section class="hero">
+	<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/pillow/banner.jpg" alt="演唱会舞台前，两个人蹲在灯海前合影">
+	<div class="hero-txt">
+		<h1>小枕头留言箱</h1>
+		<p>想说的话，随时放进来</p>
+	</div>
+</section>
+
+<main class="wrap">
+	<div class="room">
+		<div class="room-head">
+			<span>大家都能看到的留言</span>
+			<span class="live"><i></i>自动刷新</span>
+		</div>
+		<div class="msgs" id="msgs"><div class="empty">还没有人留言，第一句留给你。</div></div>
+
+		<div class="nickbar hide" id="nickRow">
+			<span>我是</span><input id="nickIn" maxlength="10" placeholder="起个名字"><span>（改了立刻生效）</span>
+		</div>
+
+		<div class="composer hide" id="composer">
+			<input class="txt-in" id="txt" placeholder="写点什么…" maxlength="500">
+			<button class="mini" id="btnImg" type="button" title="发图片">图片</button>
+			<button class="mini" id="btnVid" type="button" title="发视频">视频</button>
+			<button class="send" id="btnSend" type="button">发送</button>
+			<input type="file" id="fileImg" accept="image/*" class="hide">
+			<input type="file" id="fileVid" accept="video/*" class="hide">
+		</div>
+		<div class="up" id="upTip"></div>
+
+		<div class="gate" id="gate">
+			<div class="gate-card">
+				<h2>先登录，再留言</h2>
+				<p class="gate-sub">用邮箱注册一个账号，注册完就能在这个箱子里说话、发图片和视频。没登录也能看大家留言。</p>
+				<div class="tabs">
+					<button type="button" class="on" data-t="login">登录</button>
+					<button type="button" data-t="reg">注册</button>
+				</div>
+
+				<div id="paneLogin">
+					<input class="field" id="lMail" placeholder="邮箱" autocomplete="username">
+					<input class="field" id="lPass" type="password" placeholder="密码" autocomplete="current-password">
+					<button class="send" id="doLogin" type="button">登录</button>
+					<p class="gmsg" id="loginMsg"></p>
+				</div>
+
+				<div id="paneReg" class="hide">
+					<input class="field" id="rMail" placeholder="邮箱">
+					<input class="field" id="rName" placeholder="昵称（留言时显示这个名字）" maxlength="10">
+					<input class="field" id="rPass" type="password" placeholder="设置密码，至少 6 位">
+					<div class="code-row">
+						<input class="field" id="rCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
+						<button class="mini" id="sendCode" type="button" style="height:42px;">获取验证码</button>
+					</div>
+					<p class="code-tip" id="codeTip"></p>
+					<button class="send" id="doReg" type="button">注册</button>
+					<p class="gmsg" id="regMsg"></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</main>
+
+<script>
+var NEED_LOGIN = false;          /* 免登录版会改成 false */
+(function(){
+	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+	var ROOM=HOST+'pillow/';
+	var MAN=ROOM+'_index.json';
+	var USERS=HOST+'auth/users.json';
+	var MAXMSG=300;
+
+	var msgsEl=document.getElementById('msgs');
+	var txtEl=document.getElementById('txt');
+	var btnSend=document.getElementById('btnSend');
+	var btnImg=document.getElementById('btnImg'), btnVid=document.getElementById('btnVid');
+	var fileImg=document.getElementById('fileImg'), fileVid=document.getElementById('fileVid');
+	var upTip=document.getElementById('upTip');
+	var gate=document.getElementById('gate'), composer=document.getElementById('composer');
+	var nickRow=document.getElementById('nickRow'), nickIn=document.getElementById('nickIn');
+	var whoBox=document.getElementById('whoBox');
+
+	var rendered={}, lastCount=-1, polling=null;
+	var ME={mail:'',name:''};
+	var mineIds=[];
+
+	function $(id){ return document.getElementById(id); }
+	function el(t,c){ var n=document.createElement(t); if(c) n.className=c; return n; }
+	function rand(n){ var s=''; var c='abcdefghijklmnopqrstuvwxyz0123456789'; for(var i=0;i<n;i++) s+=c.charAt(Math.floor(Math.random()*c.length)); return s; }
+	function hhmm(ts){ var d=new Date(ts||Date.now()); function p(n){ return (n<10?'0':'')+n; } return p(d.getHours())+':'+p(d.getMinutes()); }
+	function save(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+	function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+
+	/* ---------- 身份 ---------- */
+	function myName(){
+		if(NEED_LOGIN) return ME.name || '朋友';
+		var n=nickIn.value.trim();
+		return n || ('访客'+rand(4));
+	}
+	function paintWho(){
+		whoBox.innerHTML='';
+		if(!NEED_LOGIN){
+			var s=el('span'); s.textContent='当前：'+(nickIn.value.trim()||'未命名'); whoBox.appendChild(s);
+			return;
+		}
+		if(ME.mail){
+			var a=el('span'); a.textContent='已登录：'+ME.name+'（'+ME.mail+'）'; whoBox.appendChild(a);
+			var b=el('button'); b.type='button'; b.textContent='退出'; b.onclick=logout; whoBox.appendChild(b);
+		}else{
+			var c=el('span'); c.textContent='未登录，只能围观'; whoBox.appendChild(c);
+		}
+	}
+	function showComposer(){
+		if(NEED_LOGIN && !ME.mail){ composer.classList.add('hide'); gate.classList.remove('hide'); }
+		else { composer.classList.remove('hide'); gate.classList.add('hide'); }
+		if(!NEED_LOGIN) nickRow.classList.remove('hide');
+		paintWho();
+	}
+
+	/* ---------- 密码与账号 ---------- */
+	function buf2hex(b){ var a=new Uint8Array(b), s=''; for(var i=0;i<a.length;i++) s+=('0'+a[i].toString(16)).slice(-2); return s; }
+	function hashPass(mail,pass){
+		var s=(mail||'').trim().toLowerCase()+':'+pass+':aylio-pillow';
+		if(window.crypto && crypto.subtle && crypto.subtle.digest){
+			return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then(buf2hex);
+		}
+		var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0;
+		return Promise.resolve('w'+Math.abs(h));
+	}
+	function readUsers(){ return fetch(USERS,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+	function writeUsers(u){ return fetch(USERS,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(u)}).then(function(r){ if(!r.ok) throw new Error('账号表写入失败 '+r.status); }); }
+
+	var pendingCode='', pendingMail='';
+	document.querySelectorAll('#gate .tabs button').forEach(function(b){
+		b.onclick=function(){
+			document.querySelectorAll('#gate .tabs button').forEach(function(x){ x.classList.toggle('on',x===b); });
+			var t=b.getAttribute('data-t');
+			$('paneLogin').classList.toggle('hide',t!=='login');
+			$('paneReg').classList.toggle('hide',t!=='reg');
+		};
+	});
+
+	$('sendCode').onclick=function(){
+		var mail=$('rMail').value.trim();
+		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ $('codeTip').textContent='先填一个像样的邮箱'; return; }
+		pendingMail=mail;
+		pendingCode=String(Math.floor(100000+Math.random()*900000));
+		$('codeTip').textContent='验证码：'+pendingCode+'（站内体验版，正式发信要接服务器）';
+	};
+
+	$('doReg').onclick=function(){
+		var mail=$('rMail').value.trim(), name=$('rName').value.trim(), pass=$('rPass').value, code=$('rCode').value.trim();
+		var msg=$('regMsg');
+		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ msg.textContent='邮箱格式不对'; return; }
+		if(name.length<1){ msg.textContent='给自己起个昵称'; return; }
+		if(pass.length<6){ msg.textContent='密码至少 6 位'; return; }
+		if(!pendingCode){ msg.textContent='先点「获取验证码」'; return; }
+		if(code!==pendingCode||mail.toLowerCase()!==pendingMail.toLowerCase()){ msg.textContent='验证码不对，或邮箱换了，重新获取一次'; return; }
+		msg.textContent='正在注册…';
+		$('doReg').disabled=true;
+		readUsers().then(function(list){
+			if(list.some(function(u){ return (u.mail||'').toLowerCase()===mail.toLowerCase(); })) throw new Error('这个邮箱已经注册过了，直接登录');
+			return hashPass(mail,pass).then(function(ph){
+				list.push({mail:mail,name:name,ph:ph,ts:Date.now()});
+				return writeUsers(list);
+			});
+		}).then(function(){
+			ME={mail:mail,name:name};
+			save('aylio_pillow_user',JSON.stringify(ME));
+			$('doReg').disabled=false;
+			msg.textContent='注册好了，现在可以留言了';
+			showComposer();
+		}).catch(function(e){
+			$('doReg').disabled=false;
+			msg.textContent=e.message||'注册失败，稍后再试';
+		});
+	};
+
+	$('doLogin').onclick=function(){
+		var mail=$('lMail').value.trim(), pass=$('lPass').value, msg=$('loginMsg');
+		if(!mail||!pass){ msg.textContent='邮箱和密码都要填'; return; }
+		msg.textContent='正在登录…';
+		$('doLogin').disabled=true;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===mail.toLowerCase(); })[0];
+			if(!u) throw new Error('没找到这个邮箱，先注册一下');
+			return hashPass(mail,pass).then(function(ph){
+				if(ph!==u.ph) throw new Error('密码不对');
+				ME={mail:u.mail,name:u.name};
+				save('aylio_pillow_user',JSON.stringify(ME));
+			});
+		}).then(function(){
+			$('doLogin').disabled=false;
+			msg.textContent='登录成功';
+			$('loginMsg').textContent='';
+			showComposer();
+		}).catch(function(e){
+			$('doLogin').disabled=false;
+			msg.textContent=e.message||'登录失败';
+		});
+	};
+
+	function logout(){
+		ME={mail:'',name:''};
+		save('aylio_pillow_user','');
+		showComposer();
+	}
+
+	/* ---------- 留言 ---------- */
+	function readRoom(){ return fetch(MAN,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+	function writeRoom(list){
+		return fetch(MAN,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(list)})
+			.then(function(r){ if(!r.ok) throw new Error('留言没写进去 '+r.status); });
+	}
+	function dedupe(list){
+		var seen={}, out=[];
+		list.forEach(function(m){ if(m&&m.id&&!seen[m.id]){ seen[m.id]=1; out.push(m); } });
+		out.sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+		if(out.length>MAXMSG) out=out.slice(out.length-MAXMSG);
+		return out;
+	}
+	function bubble(m){
+		var mine=mineIds.indexOf(m.id)>=0;
+		var row=el('div','row'+(mine?' mine':''));
+		var bub=el('div','bub');
+		var head=el('div','bhead');
+		head.textContent=(mine?'我':(m.who||'匿名'))+' · '+hhmm(m.ts);
+		bub.appendChild(head);
+		if(m.text){ var t=el('div','txt'); t.textContent=m.text; bub.appendChild(t); }
+		if(m.img){
+			var im=el('img','media'); im.src=m.img; im.alt='图片';
+			im.onclick=function(){ window.open(m.img,'_blank'); };
+			bub.appendChild(im);
+		}
+		if(m.video){
+			var v=document.createElement('video'); v.className='media'; v.src=m.video;
+			v.controls=true; v.playsInline=true; v.preload='metadata';
+			bub.appendChild(v);
+		}
+		row.appendChild(bub);
+		return row;
+	}
+	function paint(list, animate){
+		if(!list.length){
+			msgsEl.innerHTML='<div class="empty">还没有人留言，第一句留给你。</div>';
+			rendered={}; lastCount=0;
+			return;
+		}
+		var empty=msgsEl.querySelector('.empty'); if(empty) empty.remove();
+		var nearBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 90;
+		var added=0;
+		list.forEach(function(m){
+			if(rendered[m.id]) return;
+			rendered[m.id]=1; msgsEl.appendChild(bubble(m)); added++;
+		});
+		if(added && (nearBottom || animate)) msgsEl.scrollTop=msgsEl.scrollHeight;
+	}
+	function refresh(){
+		readRoom().then(function(list){
+			list=dedupe(list||[]);
+			if(list.length!==lastCount){ lastCount=list.length; paint(list); }
+		});
+	}
+	function post(msg){
+		return readRoom().then(function(list){
+			list=dedupe(list||[]);
+			list.push(msg);
+			return writeRoom(list).then(function(){
+				/* 多人同时写会被覆盖，1 秒后自检一次，真丢了就再补一次 */
+				setTimeout(function(){
+					readRoom().then(function(now){
+						now=dedupe(now||[]);
+						if(!now.some(function(x){ return x.id===msg.id; })){
+							now.push(msg); writeRoom(dedupe(now));
+						}
+						refresh();
+					});
+				},1200);
+			});
+		});
+	}
+	function sendText(){
+		var t=txtEl.value.trim();
+		if(!t) return;
+		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
+		var msg={id:Date.now()+'-'+rand(5),who:myName(),text:t,ts:Date.now()};
+		mineIds.push(msg.id);
+		btnSend.disabled=true;
+		post(msg).then(function(){
+			txtEl.value=''; btnSend.disabled=false;
+			paint(dedupe([msg]),true); refresh();
+		}).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'发送失败'; });
+	}
+	function upload(file, kind){
+		var name=(file.name||'x'), ext=((name.match(/\.[a-zA-Z0-9]+$/)||[''])[0]).toLowerCase();
+		if(!ext) ext = kind==='video' ? '.mp4' : '.jpg';
+		var key='pillow/u/'+Date.now()+'-'+rand(6)+ext;
+		var type=file.type||(kind==='video'?'video/mp4':'image/jpeg');
+		return fetch(HOST+key,{method:'PUT',headers:{'Content-Type':type,'Cache-Control':'public, max-age=31536000'},body:file})
+			.then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return HOST+key; });
+	}
+	function sendFile(file, kind){
+		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
+		var limit= kind==='video' ? 50*1024*1024 : 20*1024*1024;
+		if(file.size>limit){ alert(kind==='video'?'视频请控制在 50MB 以内':'图片请控制在 20MB 以内'); return; }
+		upTip.textContent='正在上传，别关页面…';
+		upload(file,kind).then(function(url){
+			var msg={id:Date.now()+'-'+rand(5),who:myName(),ts:Date.now()};
+			if(kind==='video') msg.video=url; else msg.img=url;
+			var t=txtEl.value.trim(); if(t) { msg.text=t; txtEl.value=''; }
+			mineIds.push(msg.id);
+			return post(msg).then(function(){
+				upTip.textContent='发出去了';
+				paint(dedupe([msg]),true); refresh();
+				setTimeout(function(){ upTip.textContent=''; },2000);
+			});
+		}).catch(function(e){ upTip.textContent=e.message||'没发出去'; });
+	}
+
+	/* ---------- 绑定 ---------- */
+	btnSend.onclick=sendText;
+	txtEl.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendText(); } });
+	btnImg.onclick=function(){ fileImg.click(); };
+	btnVid.onclick=function(){ fileVid.click(); };
+	fileImg.addEventListener('change',function(){ var f=fileImg.files&&fileImg.files[0]; fileImg.value=''; if(f) sendFile(f,'image'); });
+	fileVid.addEventListener('change',function(){ var f=fileVid.files&&fileVid.files[0]; fileVid.value=''; if(f) sendFile(f,'video'); });
+	nickIn.addEventListener('input',function(){ save('aylio_pillow_nick',nickIn.value.trim()); paintWho(); });
+
+	/* ---------- 启动 ---------- */
+	var saved=load('aylio_pillow_user');
+	if(saved){ try{ ME=JSON.parse(saved)||{mail:'',name:''}; }catch(e){ ME={mail:'',name:''}; } }
+	var nick=load('aylio_pillow_nick'); if(nick) nickIn.value=nick;
+
+	showComposer();
+	refresh();
+	polling=setInterval(function(){ if(!document.hidden) refresh(); },2500);
+	document.addEventListener('visibilitychange',function(){ if(!document.hidden) refresh(); });
+})();
+</script>
+</body>
+</html>

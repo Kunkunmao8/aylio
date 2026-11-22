@@ -2694,7 +2694,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		var m=(item.name||'').match(/\.[a-zA-Z0-9]+$/);
 		var ext=m?m[0].toLowerCase():'';
 		var name='政瞳之家-'+((item.ts?new Date(item.ts):new Date()).toISOString().slice(0,10))+'-'+Date.now().toString().slice(-6)+ext;
-		fetch(src,{cache:'force-cache'}).then(function(r){
+		fetch(src,{cache:'no-store'}).then(function(r){   /* 不能用 force-cache：图片是当普通图片缓存过的，没有跨域头，取回来会被拦 */
 			if(!r.ok) throw new Error('fetch'+r.status);
 			return r.blob();
 		}).then(function(blob){

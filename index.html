@@ -773,6 +773,8 @@ body.modal-open{overflow:hidden;}
 #authGate .ag-btn:disabled{opacity:.6;cursor:default;}
 #authGate .ag-tip{margin:8px 0 0;font-size:12.5px;color:#B07A56;min-height:16px;}
 #authGate .ag-msg{margin:8px 0 0;font-size:12.5px;color:#C0392B;min-height:16px;}
+#authGate .ag-forgot{margin:2px 0 0;text-align:center;}
+#authGate .ag-forgot button{border:0;background:transparent;color:#B0704D;font-size:12.5px;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px;}
 #authGate .ag-foot{margin:16px 0 0;font-size:12px;line-height:1.7;color:#B28A6C;text-align:center;}
 #authGate .hide{display:none;}
 @media (max-width:420px){#authGate .ag-card{padding:22px 18px 16px;}}
@@ -789,15 +791,17 @@ body.modal-open{overflow:hidden;}
 		</div>
 
 		<div id="agLogin">
-			<input class="ag-field" id="agLMail" placeholder="邮箱" autocomplete="username">
+			<input class="ag-field" id="agLMail" placeholder="邮箱或手机号" autocomplete="username">
 			<input class="ag-field" id="agLPass" type="password" placeholder="密码" autocomplete="current-password">
 			<button class="ag-btn" id="agDoLogin" type="button">登录</button>
 			<p class="ag-msg" id="agLoginMsg"></p>
+			<p class="ag-forgot"><button type="button" id="agForgot">忘记密码？用邮箱验证码重设</button></p>
 		</div>
 
 		<div id="agReg" class="hide">
-			<input class="ag-field" id="agRMail" placeholder="邮箱">
-			<input class="ag-field" id="agRName" placeholder="昵称（留言时显示这个名字）" maxlength="10">
+			<input class="ag-field" id="agRMail" placeholder="邮箱（找密码、收验证码用）">
+			<input class="ag-field" id="agRPhone" placeholder="手机号（选填，之后可用手机号登录）" maxlength="11" inputmode="numeric">
+			<input class="ag-field" id="agRName" placeholder="昵称（社区里显示这个名字）" maxlength="10">
 			<input class="ag-field" id="agRPass" type="password" placeholder="设置密码，至少 6 位">
 			<div class="ag-code">
 				<input class="ag-field" id="agCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
@@ -806,6 +810,19 @@ body.modal-open{overflow:hidden;}
 			<p class="ag-tip" id="agCodeTip"></p>
 			<button class="ag-btn" id="agDoReg" type="button">注册</button>
 			<p class="ag-msg" id="agRegMsg"></p>
+		</div>
+
+		<div id="agReset" class="hide">
+			<input class="ag-field" id="agXMail" placeholder="注册用的邮箱">
+			<input class="ag-field" id="agXPass" type="password" placeholder="新密码，至少 6 位">
+			<div class="ag-code">
+				<input class="ag-field" id="agXCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
+				<button class="ag-mini" id="agXSend" type="button">获取验证码</button>
+			</div>
+			<p class="ag-tip" id="agXTip"></p>
+			<button class="ag-btn" id="agDoReset" type="button">重设密码并登录</button>
+			<p class="ag-msg" id="agXMsg"></p>
+			<p class="ag-forgot"><button type="button" id="agBackLogin">返回登录</button></p>
 		</div>
 
 		<p class="ag-foot">登录之后可以看全部的图片和视频，也能在社区说话、投稿。<br>第一次来先注册，验证码发到你填的邮箱。</p>
@@ -850,6 +867,7 @@ body.modal-open{overflow:hidden;}
 			var t=b.getAttribute('data-t');
 			$('agLogin').classList.toggle('hide',t!=='login');
 			$('agReg').classList.toggle('hide',t!=='reg');
+			$('agReset').classList.add('hide');
 		};
 	});
 
@@ -882,9 +900,10 @@ body.modal-open{overflow:hidden;}
 	};
 
 	$('agDoReg').onclick=function(){
-		var mail=$('agRMail').value.trim(), name=$('agRName').value.trim(), pass=$('agRPass').value, code=$('agCode').value.trim();
+		var mail=$('agRMail').value.trim(), phone=$('agRPhone').value.trim(), name=$('agRName').value.trim(), pass=$('agRPass').value, code=$('agCode').value.trim();
 		var msg=$('agRegMsg');
 		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ msg.textContent='邮箱格式不对'; return; }
+		if(phone && !/^1[3-9]\d{9}$/.test(phone)){ msg.textContent='手机号看起来不对'; return; }
 		if(name.length<1){ msg.textContent='给自己起个昵称'; return; }
 		if(pass.length<6){ msg.textContent='密码至少 6 位'; return; }
 		if(!pendCode){ msg.textContent='先点「获取验证码」'; return; }
@@ -893,8 +912,9 @@ body.modal-open{overflow:hidden;}
 		$('agDoReg').disabled=true;
 		readUsers().then(function(list){
 			if(list.some(function(u){ return (u.mail||'').toLowerCase()===mail.toLowerCase(); })) throw new Error('这个邮箱已经注册过了，切到登录吧');
+			if(phone && list.some(function(u){ return (u.phone||'')===phone; })) throw new Error('这个手机号已经注册过了');
 			return hashPass(mail,pass).then(function(ph){
-				list.push({mail:mail,name:name,ph:ph,ts:Date.now()});
+				list.push({mail:mail,name:name,phone:phone,ph:ph,ts:Date.now()});
 				return writeUsers(list);
 			});
 		}).then(function(){
@@ -906,22 +926,72 @@ body.modal-open{overflow:hidden;}
 		});
 	};
 
-	$('agDoLogin').onclick=function(){
-		var mail=$('agLMail').value.trim(), pass=$('agLPass').value, msg=$('agLoginMsg');
-		if(!mail||!pass){ msg.textContent='邮箱和密码都要填'; return; }
-		msg.textContent='正在登录…';
-		$('agDoLogin').disabled=true;
+	function showPane(t){
+		Array.prototype.forEach.call(g.querySelectorAll('.ag-tabs button'),function(x){ x.classList.toggle('on',x.getAttribute('data-t')===t); });
+		$('agLogin').classList.toggle('hide',t!=='login');
+		$('agReg').classList.toggle('hide',t!=='reg');
+		$('agReset').classList.toggle('hide',t!=='reset');
+		if(t==='reset'){ $('agXMail').value=$('agLMail').value.trim(); }
+	}
+	$('agForgot').onclick=function(){ showPane('reset'); };
+	$('agBackLogin').onclick=function(){ showPane('login'); };
+
+	var xCode='', xMail='';
+	$('agXSend').onclick=function(){
+		var mail=$('agXMail').value.trim();
+		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ $('agXTip').textContent='先填注册用的邮箱'; return; }
+		xMail=mail; xCode=String(Math.floor(100000+Math.random()*900000));
+		if(!ready()){ $('agXTip').textContent='验证码：'+xCode+'（还没接发信服务，先在页面显示）'; return; }
+		$('agXTip').textContent='正在发到 '+mail+' …';
+		$('agXSend').disabled=true;
+		var c=mailcfg();
+		var payload=JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
+			template_params:{to_email:mail,code:xCode,passcode:xCode,time:'10 分钟',site_name:'政瞳之家 · 社区',note:'10 分钟内有效'}});
+		fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:payload})
+			.then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); $('agXTip').textContent='验证码已经发到 '+mail+'，去邮箱收一下'; })
+			.catch(function(){ $('agXTip').textContent='发信没成功，先显示验证码：'+xCode; })
+			.then(function(){ $('agXSend').disabled=false; });
+	};
+
+	$('agDoReset').onclick=function(){
+		var mail=$('agXMail').value.trim(), np=$('agXPass').value, code=$('agXCode').value.trim();
+		var msg=$('agXMsg'); msg.textContent='';
+		if(!xCode){ msg.textContent='先点「获取验证码」'; return; }
+		if(code!==xCode||mail.toLowerCase()!==(xMail||'').toLowerCase()){ msg.textContent='验证码不对，或者邮箱换了，重新获取一次'; return; }
+		if(np.length<6){ msg.textContent='新密码至少 6 位'; return; }
+		$('agDoReset').disabled=true;
 		var uname='', uava='';
 		readUsers().then(function(list){
 			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===mail.toLowerCase(); })[0];
-			if(!u) throw new Error('没找到这个邮箱，先注册一下');
+			if(!u) throw new Error('这个邮箱没注册过，先去注册');
 			uname=u.name; uava=u.avatar||'';
-			return hashPass(mail,pass).then(function(ph){
+			return hashPass(u.mail||mail,np).then(function(ph){ u.ph=ph; return writeUsers(list); });
+		}).then(function(){
+			msg.textContent='密码重设好了，正在进门…';
+			done(mail,uname,uava);
+		}).catch(function(e){
+			$('agDoReset').disabled=false;
+			msg.textContent=e.message||'重设失败，稍后再试';
+		});
+	};
+
+	
+	$('agDoLogin').onclick=function(){
+		var id=$('agLMail').value.trim(), pass=$('agLPass').value, msg=$('agLoginMsg');
+		if(!id||!pass){ msg.textContent='账号和密码都要填'; return; }
+		msg.textContent='正在登录…';
+		$('agDoLogin').disabled=true;
+		var uname='', uava='', umail=id;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===id.toLowerCase() || (x.phone&&x.phone===id); })[0];
+			if(!u) throw new Error('没找到这个邮箱 / 手机号，先注册一下');
+			uname=u.name; uava=u.avatar||''; umail=u.mail||id;
+			return hashPass(u.mail||id,pass).then(function(ph){
 				if(ph!==u.ph) throw new Error('密码不对');
 			});
 		}).then(function(){
 			msg.textContent='登录成功，正在进门…';
-			done(mail,uname,uava);
+			done(umail,uname,uava);
 		}).catch(function(e){
 			$('agDoLogin').disabled=false;
 			msg.textContent=e.message||'登录失败';
@@ -1324,6 +1394,19 @@ a{color:inherit;}
 #pillow .post-acts button{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:0;}
 #pillow .post-acts button.on{color:#C05E2A;font-weight:600;}
 #pillow .post-acts .badge{opacity:.75;}
+#pillow .post-acts .del{margin-left:auto;color:#B98B72;}
+#pillow .post-acts .del:hover{color:#C0392B;}
+#pillow .reply-item .rfloor{color:#BF5B2E;font-size:11.5px;margin-right:6px;}
+#pillow .reply-item .rdel{border:0;background:transparent;color:#C07A5C;font-size:11.5px;margin-left:8px;cursor:pointer;text-decoration:underline;font-family:inherit;}
+#pillow .post-replies{margin-top:10px;background:#FFFCF9;border:1px solid #F6E7D8;border-radius:12px;padding:10px 12px;}
+#pillow .reply-item{font-size:13.5px;line-height:1.7;color:#5A4234;padding:4px 0;}
+#pillow .reply-item b{color:#BF5B2E;font-weight:600;}
+#pillow .reply-item .rt{color:#B9A092;font-size:11.5px;margin-left:6px;}
+#pillow .reply-box{display:flex;gap:8px;margin-top:6px;}
+#pillow .reply-box input{flex:1;height:38px;padding:0 12px;border:1px solid #EAD3C1;border-radius:9px;font-size:13.5px;font-family:inherit;color:#4A3226;background:#fff;outline:none;}
+#pillow .reply-box input:focus{border-color:#BF5B2E;}
+#pillow .reply-box button{height:38px;padding:0 14px;border:0;border-radius:9px;background:#C05E2A;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;}
+#pillow .reply-none{font-size:12.5px;color:#B9A092;}
 #pillow .composer{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px max(16px,calc((100vw - 900px)/2 + 16px));background:rgba(255,252,249,.97);backdrop-filter:blur(10px);border-top:1px solid #F0D8C6;flex-wrap:nowrap;}
 #pillow .composer .txt-in{height:44px;border-radius:12px;font-size:14.5px;}
 #pillow .composer .mini{height:44px;border-radius:12px;}
@@ -1362,6 +1445,8 @@ a{color:inherit;}
 #mine .me-btn.ghost{background:#FFF7F1;border:1px solid #EAD3C1;color:#A06443;}
 #mine .me-msg{margin:8px 0 0;font-size:12.5px;min-height:18px;color:#9C8275;}
 #mine .me-msg.err{color:#C0392B;}
+#mine .me-forgot{margin:6px 0 0;}
+#mine .me-forgot button{border:0;background:transparent;color:#B0704D;font-size:12.5px;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px;}
 #mine .me-msg.ok{color:#2E7D4F;}
 @media(max-width:760px){
 #mine .mine-wrap{grid-template-columns:1fr;}
@@ -1458,6 +1543,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var ME={mail:'',name:'',avatar:''};
 	var mineIds=[];
 	var USERSMAP={};
+	var ADMIN=['2383535524@qq.com'];
+	function isAdmin(){ return ADMIN.indexOf(String(ME.mail||'').toLowerCase())>=0; }
+	function canDel(x){
+		if(!x) return false;
+		if(isAdmin()) return true;
+		if(x.uid && ME.mail) return String(x.uid).toLowerCase()===String(ME.mail).toLowerCase();
+		return !x.uid && !!ME.mail && x.who===ME.name;
+	}
 
 	function $(id){ return document.getElementById(id); }
 	function el(t,c){ var n=document.createElement(t); if(c) n.className=c; return n; }
@@ -1633,7 +1726,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		return box;
 	}
 	function bubble(m, floor){
-		var mine=mineIds.indexOf(m.id)>=0;
+		var mine=mineIds.indexOf(m.id)>=0 || (m.uid&&ME.mail&&String(m.uid).toLowerCase()===String(ME.mail).toLowerCase());
 		var card=el('div','post'+(mine?' mine':''));
 		var head=el('div','post-head');
 		head.appendChild(avatarBox(m.who));
@@ -1677,16 +1770,83 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		};
 		acts.appendChild(likeBtn);
 
-		var copyBtn=el('button');
-		copyBtn.type='button'; copyBtn.textContent='🔗 复制链接';
-		copyBtn.onclick=function(){
-			var url=location.origin+location.pathname+'#pillow';
-			function ok(){ copyBtn.textContent='已复制'; setTimeout(function(){ copyBtn.textContent='🔗 复制链接'; },1600); }
-			if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(ok,function(){}); }
-			else{ ok(); }
-		};
-		acts.appendChild(copyBtn);
+		var replyBtn=el('button');
+		replyBtn.type='button';
+		replyBtn.textContent='💬 回复'+(m.replies&&m.replies.length?' '+m.replies.length:'');
+		acts.appendChild(replyBtn);
+		if(canDel(m)){
+			var delBtn=el('button','del');
+			delBtn.type='button'; delBtn.textContent='🗑 删帖';
+			delBtn.onclick=function(){
+				if(!confirm(isAdmin()&&!mine?'删掉这条帖子？（管理员可以删任何人的）':'删掉自己这条帖子？')) return;
+				delBtn.disabled=true;
+				readRoom().then(function(list){
+					var arr=dedupe(list||[]).filter(function(x){ return x.id!==m.id; });
+					return writeRoom(arr);
+				}).then(function(){ refresh(); setTimeout(refresh,900); })
+				.catch(function(e){ delBtn.disabled=false; alert(e.message||'没删掉'); });
+			};
+			acts.appendChild(delBtn);
+		}
 		card.appendChild(acts);
+
+		var repWrap=el('div','post-replies');
+		var reps=(m.replies||[]);
+		if(!reps.length){ var none=el('div','reply-none'); none.textContent='还没有回复，抢个沙发'; repWrap.appendChild(none); }
+		reps.forEach(function(r, ri){
+			var item=el('div','reply-item');
+			var no=el('span','rfloor'); no.textContent='#'+(ri+2)+'楼'; item.appendChild(no);
+			var b=document.createElement('b'); b.textContent=(r.who||'匿名')+'：'; item.appendChild(b);
+			var tx=document.createElement('span'); tx.textContent=r.text||''; item.appendChild(tx);
+			var tm=el('span','rt'); tm.textContent=hhmm(r.ts); item.appendChild(tm);
+			if(canDel(r)){
+				var rd=el('button','rdel'); rd.type='button'; rd.textContent='删除';
+				rd.onclick=function(){
+					if(!confirm('删掉这条回复？')) return;
+					rd.disabled=true;
+					readRoom().then(function(list){
+						var arr=dedupe(list||[]);
+						arr.forEach(function(x){
+							if(x.id===m.id && x.replies){
+								x.replies=x.replies.filter(function(y){ return y.id!==r.id; });
+							}
+						});
+						return writeRoom(arr);
+					}).then(function(){ refresh(); setTimeout(refresh,900); })
+					.catch(function(e){ rd.disabled=false; alert(e.message||'没删掉'); });
+				};
+				item.appendChild(rd);
+			}
+			repWrap.appendChild(item);
+		});
+		var box=el('div','reply-box');
+		var rin=document.createElement('input');
+		rin.type='text'; rin.placeholder='回复 '+(m.who||'这条帖子')+'…'; rin.maxLength=200;
+		box.appendChild(rin);
+		var rbtn=el('button'); rbtn.type='button'; rbtn.textContent='回复';
+		rbtn.onclick=function(){
+			var t=(rin.value||'').trim();
+			if(!t) return;
+			if(NEED_LOGIN&&!ME.mail){ alert('先登录再回复'); return; }
+			rbtn.disabled=true;
+			readRoom().then(function(list){
+				var arr=dedupe(list||[]);
+				var hit=null;
+				arr.forEach(function(x){ if(x.id===m.id){ hit=x; } });
+				if(!hit) throw new Error('这条帖子找不到了');
+				hit.replies=hit.replies||[];
+				hit.replies.push({id:Date.now()+'-'+rand(4),who:myName(),uid:ME.mail||'',text:t,ts:Date.now()});
+				return writeRoom(arr);
+			}).then(function(){
+				rbtn.disabled=false; rin.value='';
+				refresh(); setTimeout(refresh,900);
+			}).catch(function(e){ rbtn.disabled=false; alert(e.message||'没回复上'); });
+		};
+		rin.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); rbtn.click(); } });
+		box.appendChild(rbtn);
+		repWrap.appendChild(box);
+		card.appendChild(repWrap);
+		replyBtn.onclick=function(){ rin.focus(); };
 		return card;
 	}
 	function paint(list, animate){
@@ -1729,7 +1889,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		var t=txtEl.value.trim();
 		if(!t) return;
 		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
-		var msg={id:Date.now()+'-'+rand(5),who:myName(),text:t,ts:Date.now()};
+		var msg={id:Date.now()+'-'+rand(5),who:myName(),uid:ME.mail||'',text:t,ts:Date.now()};
 		mineIds.push(msg.id);
 		btnSend.disabled=true;
 		post(msg).then(function(){
@@ -1751,7 +1911,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(file.size>limit){ alert(kind==='video'?'视频请控制在 50MB 以内':'图片请控制在 20MB 以内'); return; }
 		upTip.textContent='正在上传，别关页面…';
 		upload(file,kind).then(function(url){
-			var msg={id:Date.now()+'-'+rand(5),who:myName(),ts:Date.now()};
+			var msg={id:Date.now()+'-'+rand(5),who:myName(),uid:ME.mail||'',ts:Date.now()};
 			if(kind==='video') msg.video=url; else msg.img=url;
 			var t=txtEl.value.trim(); if(t) { msg.text=t; txtEl.value=''; }
 			mineIds.push(msg.id);
@@ -1823,6 +1983,16 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 					<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
 					<button class="me-btn" id="mePassBtn" type="button">修改密码</button>
 					<p class="me-msg" id="mePassMsg"></p>
+					<p class="me-forgot"><button type="button" id="meForgotBtn">忘记现在的密码？用邮箱验证码重设</button></p>
+					<div id="meResetBox" class="hide" style="margin-top:10px">
+						<input class="me-input" id="meRCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
+						<input class="me-input" id="meRPass" type="password" placeholder="新密码，至少 6 位">
+						<div class="me-row">
+							<button class="me-btn" id="meRSend" type="button">获取验证码</button>
+							<button class="me-btn" id="meRSave" type="button">重设密码</button>
+						</div>
+						<p class="me-msg" id="meRMsg"></p>
+					</div>
 				</div>
 				<div class="me-block">
 					<h4>账号</h4>
@@ -1944,6 +2114,43 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(e){
 			$('mePassBtn').disabled=false; msg('mePassMsg',e.message||'没改成','err');
 		});
+	};
+
+	var rCode='';
+	$('meForgotBtn').onclick=function(){
+		if(!ME||!ME.mail){ msg('meRMsg','先登录再重设','err'); return; }
+		$('meResetBox').classList.toggle('hide');
+	};
+	$('meRSend').onclick=function(){
+		if(!ME||!ME.mail){ msg('meRMsg','先登录再重设','err'); return; }
+		var c=window.AYLIO_MAIL||{};
+		rCode=String(Math.floor(100000+Math.random()*900000));
+		if(!(c.serviceId&&c.templateId&&c.publicKey)){ msg('meRMsg','验证码：'+rCode+'（发信服务未配置）','ok'); return; }
+		msg('meRMsg','正在发到 '+ME.mail+' …');
+		$('meRSend').disabled=true;
+		fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},
+			body:JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
+				template_params:{to_email:ME.mail,code:rCode,passcode:rCode,time:'10 分钟',site_name:'政瞳之家 · 社区',note:'10 分钟内有效'}})})
+			.then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); msg('meRMsg','验证码已经发到你的邮箱','ok'); })
+			.catch(function(){ msg('meRMsg','发信失败，先显示验证码：'+rCode,'err'); })
+			.then(function(){ $('meRSend').disabled=false; });
+	};
+	$('meRSave').onclick=function(){
+		if(!ME||!ME.mail){ msg('meRMsg','先登录再重设','err'); return; }
+		var code=$('meRCode').value.trim(), np=$('meRPass').value;
+		if(!rCode){ msg('meRMsg','先点「获取验证码」','err'); return; }
+		if(code!==rCode){ msg('meRMsg','验证码不对','err'); return; }
+		if(np.length<6){ msg('meRMsg','新密码至少 6 位','err'); return; }
+		$('meRSave').disabled=true;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) throw new Error('没找到账号记录');
+			return hashPass(u.mail||ME.mail,np).then(function(ph){ u.ph=ph; return writeUsers(list); });
+		}).then(function(){
+			$('meRSave').disabled=false;
+			$('meRCode').value=''; $('meRPass').value='';
+			msg('meRMsg','密码重设好了，下次用新密码登录','ok');
+		}).catch(function(e){ $('meRSave').disabled=false; msg('meRMsg',e.message||'没成功','err'); });
 	};
 
 	$('meOut').onclick=function(){

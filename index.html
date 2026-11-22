@@ -2562,7 +2562,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		el.addEventListener('error',function(){
 			if(n>=4) return;
 			n++;
-			setTimeout(function(){ el.src=base+(base.indexOf('?')>=0?'&':'?')+'r='+n; },3000);
+			setTimeout(function(){ el.removeAttribute('src'); el.src=base; },2500);
 		});
 	}
 	function makeTile(item){
@@ -2578,7 +2578,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 			var badge=document.createElement('span'); badge.className='photo-play'; badge.textContent='▶';
 			box.appendChild(badge);
 		}else{
-			var im=document.createElement('img'); im.loading='lazy'; im.src=src; im.alt=item.name||'照片'; attachRetry(im,src);
+			var im=document.createElement('img'); im.src=src; im.alt=item.name||'照片'; attachRetry(im,src);
 			box.appendChild(im);
 		}
 		box.addEventListener('click',function(){

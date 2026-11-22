@@ -1479,39 +1479,52 @@ a{color:inherit;}
 #mine .mine-card{padding:22px 18px;}
 }
 
-/* ================= 小红书式个人主页（我的 / 别人主页共用） ================= */
-.xp{max-width:1000px;margin:0 auto;padding:0 0 120px;}
-.xp-cover{position:relative;height:440px;overflow:hidden;background:#2A1B13;}
-.xp-cover-img{width:100%;height:100%;object-fit:cover;display:block;}
-.xp-mask{position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,11,7,.46),rgba(18,11,7,.08) 30%,rgba(18,11,7,.86) 100%);}
-.xp-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;gap:14px;padding:18px 24px;}
-.xp-brand{color:#FFF3E9;font-size:12px;letter-spacing:.22em;text-shadow:0 2px 8px rgba(0,0,0,.5);}
-.xp-back{margin-left:0;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,240,228,.45);background:rgba(30,18,12,.35);color:#FFF6EE;font-size:18px;cursor:pointer;font-family:inherit;backdrop-filter:blur(6px);}
-.xp-edit{margin-left:auto;height:38px;padding:0 20px;border-radius:999px;border:1px solid rgba(255,240,228,.55);background:rgba(35,20,12,.35);color:#FFF6EE;font-size:13px;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px);}
-.xp-edit:hover{background:rgba(192,94,42,.55);border-color:#F0C4A4;}
-.xp-info{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 30px 26px;color:#FFF6EE;}
-.xp-head{display:flex;align-items:flex-end;gap:18px;}
-.xp-ava{width:98px;height:98px;flex:0 0 auto;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:2px solid rgba(255,246,238,.9);cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);}
+/* ================= 个人主页（我的 / 别人主页共用，参考浅色卡片版） ================= */
+.xp{max-width:960px;margin:0 auto;padding:18px 16px 120px;background:
+	radial-gradient(1200px 400px at 50% 0,#FFE9DC 0%,rgba(255,233,220,0) 70%),
+	linear-gradient(180deg,#FFF3EA 0%,#FDEADC 46%,#FFF9F4 100%);}
+.xp-page-head{text-align:center;padding:14px 0 20px;}
+.xp-page-head h2{margin:0;font-size:26px;line-height:1.35;letter-spacing:.14em;color:#3A241A;font-weight:700;}
+.xp-page-head p{margin:9px 0 0;font-size:12.5px;letter-spacing:.08em;color:#B07A5D;}
+.xp-card{background:#FFFCF9;border:1px solid #F6E3D3;border-radius:22px;box-shadow:0 14px 38px rgba(170,90,45,.10);overflow:hidden;}
+.xp-cover{position:relative;height:168px;overflow:hidden;background:#F3E3D4;cursor:pointer;}
+.xp-cover-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
+.xp-cover-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,18,12,.22),rgba(30,18,12,0) 45%,rgba(30,18,12,.30));pointer-events:none;}
+.xp-cover-btn{position:absolute;right:12px;bottom:11px;z-index:3;height:30px;padding:0 13px;border:1px solid rgba(255,244,234,.6);border-radius:999px;background:rgba(35,22,14,.42);color:#FFF6EE;font-size:12px;font-family:inherit;letter-spacing:.04em;cursor:pointer;backdrop-filter:blur(6px);}
+.xp-cover-btn:hover{background:rgba(192,94,42,.62);}
+.xp-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;gap:12px;padding:12px 16px;}
+.xp-brand{color:#FFF6EE;font-size:11.5px;letter-spacing:.2em;text-shadow:0 2px 8px rgba(0,0,0,.45);}
+.xp-back{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,240,228,.5);background:rgba(30,18,12,.35);color:#FFF6EE;font-size:17px;cursor:pointer;font-family:inherit;backdrop-filter:blur(6px);}
+.xp-info{position:relative;padding:0 24px 22px;}
+.xp-head{display:flex;align-items:flex-end;gap:16px;margin-top:-46px;}
+.xp-ava{width:92px;height:92px;flex:0 0 auto;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;border:3px solid #FFFCF9;cursor:pointer;box-shadow:0 10px 24px rgba(120,60,30,.18);}
 .xp-ava img{width:100%;height:100%;object-fit:cover;display:block;}
-.xp-who{padding-bottom:4px;min-width:0;}
-.xp-name{font-size:25px;font-weight:700;letter-spacing:.02em;text-shadow:0 2px 10px rgba(0,0,0,.45);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.xp-sub{margin-top:6px;font-size:12.5px;color:#EBD5C6;}
-.xp-stats{display:flex;gap:26px;margin-top:18px;}
-.xp-stats button,.xp-stats .xp-st{border:0;background:transparent;color:#EBD5C6;font:inherit;font-family:inherit;padding:0;display:flex;align-items:baseline;gap:6px;}
+.xp-who{padding-bottom:2px;min-width:0;flex:1;}
+.xp-name{font-size:23px;font-weight:700;letter-spacing:.02em;color:#3A241A;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.xp-sub{margin-top:6px;font-size:12px;color:#A08472;letter-spacing:.03em;}
+.xp-edit{margin-left:auto;flex:0 0 auto;align-self:flex-start;height:34px;padding:0 16px;border-radius:999px;border:1px solid #EAD3C1;background:#FFF7F1;color:#A06443;font-size:12.5px;font-family:inherit;cursor:pointer;}
+.xp-edit:hover{border-color:#C05E2A;color:#C05E2A;}
+.xp-stats{display:flex;gap:30px;margin-top:18px;}
+.xp-stats button,.xp-stats .xp-st{border:0;background:transparent;color:#A08472;font:inherit;font-family:inherit;padding:0;display:flex;align-items:baseline;gap:6px;}
 .xp-stats button{cursor:pointer;}
-.xp-stats b{font-size:17px;font-weight:700;color:#FFF6EE;}
-.xp-bio{margin:14px 0 0;font-size:13.5px;line-height:1.9;color:#F7E3D6;max-width:640px;white-space:pre-wrap;word-break:break-word;}
-.xp-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
-.xp-tag{font-size:12px;color:#FFE8D9;background:rgba(255,240,228,.14);border:1px solid rgba(255,240,228,.2);border-radius:999px;padding:4px 12px;}
-.xp-sheet{position:relative;margin-top:-22px;z-index:4;background:#FFFCF9;border-radius:22px 22px 0 0;padding:8px 24px 46px;box-shadow:0 -8px 26px rgba(40,20,10,.18);}
+.xp-stats b{font-size:18px;font-weight:700;color:#C05E2A;}
+.xp-bio{margin:13px 0 0;font-size:13.5px;line-height:1.9;color:#6A5040;max-width:660px;white-space:pre-wrap;word-break:break-word;}
+.xp-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;}
+.xp-tag{font-size:12px;color:#A06443;background:#FFF3EA;border:1px solid #F0D5C2;border-radius:999px;padding:4px 12px;}
+.up-acts{display:flex;gap:10px;margin-top:16px;}
+.up-follow{height:36px;padding:0 22px;border:0;border-radius:999px;background:#C05E2A;color:#FFF8F2;font-size:13px;font-family:inherit;cursor:pointer;letter-spacing:.05em;}
+.up-follow.on{background:#FFF3EA;color:#A06443;border:1px solid #EAD3C1;}
+.up-dm{height:36px;padding:0 22px;border-radius:999px;border:1px solid #EAD3C1;background:#FFFCF9;color:#A06443;font-size:13px;font-family:inherit;cursor:pointer;}
+.up-dm:hover{border-color:#C05E2A;color:#C05E2A;}
+.xp-sheet{position:relative;z-index:4;margin-top:16px;background:#FFFCF9;border:1px solid #F6E3D3;border-radius:22px;box-shadow:0 12px 30px rgba(170,90,45,.08);padding:4px 22px 26px;}
 .xp-tabs{display:flex;align-items:center;gap:26px;border-bottom:1px solid #F0DFD0;overflow-x:auto;}
 .xp-tabs button{border:0;background:transparent;font-family:inherit;font-size:14.5px;color:#A8897A;padding:12px 0 13px;cursor:pointer;position:relative;white-space:nowrap;}
 .xp-tabs button.on{color:#3A241A;font-weight:700;}
 .xp-tabs button.on:after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:-1px;width:22px;height:2.5px;border-radius:2px;background:#C05E2A;}
 .xp-tabs b{font-weight:400;font-size:12px;color:#B99584;margin-left:2px;}
 .xp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:20px;}
-.xp-card{background:#fff;border:1px solid #F0DFD0;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;text-align:left;font-family:inherit;padding:0;transition:transform .16s,box-shadow .16s;}
-.xp-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(150,74,30,.12);}
+.xp-card-item{background:#fff;border:1px solid #F0DFD0;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;text-align:left;font-family:inherit;padding:0;transition:transform .16s,box-shadow .16s;}
+.xp-card-item:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(150,74,30,.12);}
 .xp-card-img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#F6E3D4;}
 .xp-card-txt{aspect-ratio:4/5;padding:16px 14px;font-size:13.5px;line-height:1.8;color:#5A4234;background:#FDEFE3;overflow:hidden;}
 .xp-card-body{padding:8px 10px 12px;display:flex;flex-direction:column;gap:6px;flex:1;}
@@ -1526,12 +1539,11 @@ a{color:inherit;}
 .xp-row .sb{font-size:11.5px;color:#AC9184;margin-top:3px;}
 .xp-row .go{margin-left:auto;font-size:12px;color:#BF5B2E;border:1px solid #F0C9AF;background:#FFF3EA;border-radius:999px;padding:5px 12px;flex:0 0 auto;}
 .xp-row .go.done{color:#A8897A;border-color:#E7D6C7;background:#FAF3EC;}
-.xp-sec{margin-top:28px;border-top:1px dashed #F0DFD0;padding-top:18px;}
+.xp-sec{margin-top:26px;border-top:1px dashed #F0DFD0;padding-top:18px;}
 .xp-sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .xp-sec-head h4{margin:0;font-size:15px;letter-spacing:.06em;color:#3A241A;}
 .xp-sec-head button{border:0;background:transparent;color:#A8897A;font-family:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
 .edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 22px;}
-@media(max-width:760px){.edit-grid{grid-template-columns:1fr;}}
 .xp-modal{position:fixed;inset:0;z-index:70;background:rgba(30,17,10,.5);display:flex;align-items:flex-end;justify-content:center;}
 .xp-modal-panel{width:min(540px,100%);max-height:78vh;overflow:auto;background:#FFFCF9;border-radius:20px 20px 0 0;padding:20px 20px 32px;position:relative;}
 .xp-modal-panel h3{margin:0 0 4px;font-size:16px;letter-spacing:.06em;color:#3A241A;}
@@ -1540,13 +1552,20 @@ a{color:inherit;}
 .note-view .nv-text{font-size:14.5px;line-height:1.9;color:#4A3226;white-space:pre-wrap;word-break:break-word;}
 .note-view .nv-meta{margin-top:14px;padding-top:10px;border-top:1px dashed #F3E4D7;font-size:12px;color:#B39A8B;}
 @media(max-width:760px){
-.xp-cover{height:400px;}
-.xp-info{padding:0 18px 20px;}
-.xp-ava{width:80px;height:80px;font-size:26px;}
-.xp-name{font-size:21px;}
-.xp-stats{gap:18px;}
-.xp-sheet{padding:8px 16px 40px;}
+.edit-grid{grid-template-columns:1fr;}
+.xp{padding:10px 10px 100px;}
+.xp-page-head{padding:8px 0 14px;}
+.xp-page-head h2{font-size:21px;letter-spacing:.1em;}
+.xp-cover{height:136px;}
+.xp-info{padding:0 16px 18px;}
+.xp-head{margin-top:-40px;}
+.xp-ava{width:78px;height:78px;font-size:26px;}
+.xp-name{font-size:19px;}
+.xp-edit{height:30px;padding:0 12px;font-size:11.5px;}
+.xp-stats{gap:20px;}
+.xp-sheet{padding:4px 14px 22px;margin-top:12px;}
 .xp-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+.xp-cover-btn{height:26px;font-size:11px;right:9px;bottom:8px;}
 }
 
 /* ================= 别人主页（社区里点开） ================= */
@@ -1643,20 +1662,21 @@ a{color:inherit;}
 	</div>
 	<div class="xp-ov hide" id="userPage">
 		<div class="xp">
-			<div class="xp-cover">
-				<img class="xp-cover-img" id="upCover" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/pillow/banner.jpg" alt="封面">
-				<div class="xp-mask"></div>
-				<div class="xp-top">
-					<button class="xp-back" id="upBack" type="button" aria-label="返回">‹</button>
-					<span class="xp-brand">政瞳之家</span>
+			<div class="xp-card">
+				<div class="xp-cover">
+					<img class="xp-cover-img" id="upCover" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/pillow/banner.jpg" alt="封面">
+					<div class="xp-cover-shade"></div>
+					<div class="xp-top">
+						<button class="xp-back" id="upBack" type="button" aria-label="返回">‹</button>
+						<span class="xp-brand">政瞳之家</span>
+					</div>
 				</div>
 				<div class="xp-info">
 					<div class="xp-head">
 						<div class="xp-ava" id="upAva"><span>瞳</span></div>
 						<div class="xp-who">
 							<div class="xp-name" id="upName">—</div>
-							<div class="xp-sub">政瞳号：<span id="upId">—</span></div>
-							<div class="xp-sub">IP：湖南</div>
+							<div class="xp-sub">政瞳号 <span id="upId">—</span> · IP 湖南</div>
 						</div>
 					</div>
 					<div class="xp-stats">
@@ -1681,7 +1701,7 @@ a{color:inherit;}
 			</div>
 		</div>
 	</div>
-	<div class="dm hide" id="dmBox">
+		<div class="dm hide" id="dmBox">
 		<div class="dm-panel">
 			<div class="dm-head">
 				<div>
@@ -2084,6 +2104,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(UP.avatar){ var im=document.createElement('img'); im.src=UP.avatar; im.alt=name; im.onclick=function(){ window.open(UP.avatar,'_blank'); }; ava.appendChild(im); }
 		else { ava.textContent=String(name).slice(0,1); }
 		$('upName').textContent=name;
+		$('upCover').src=UP.cover||DEFAULT_COVER;
 		$('upId').textContent=idOf(UP.mail);
 		$('upBio').textContent=UP.sign||'还没有写简介';
 		$('upZodiac').textContent=UP.birth?zod(UP.birth):'星座未设置';
@@ -2103,7 +2124,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		$('upCnt').textContent=me.length;
 		if(!me.length){ grid.innerHTML='<div class="xp-none">TA 还没发过帖子</div>'; return; }
 		me.forEach(function(m){
-			var c=el('button','xp-card'); c.type='button';
+			var c=el('button','xp-card-item'); c.type='button';
 			if(m.img){ var im=el('img','xp-card-img'); im.src=m.img; im.alt=''; im.loading='lazy'; c.appendChild(im); }
 			else { var t=el('div','xp-card-txt'); t.textContent=(m.text||'一段视频').slice(0,80); c.appendChild(t); }
 			var body=el('div','xp-card-body');
@@ -2380,28 +2401,32 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <div class="page" id="mine">
 	<div class="ava-view hide" id="avaView"><img id="avaViewImg" alt="头像大图"></div>
 	<div class="xp">
-		<div class="xp-cover">
-			<img class="xp-cover-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="我的主页封面：两人并肩站着">
-			<div class="xp-mask"></div>
-			<div class="xp-top">
-				<span class="xp-brand">政瞳之家</span>
-				<button class="xp-edit" id="myEditOpen" type="button">编辑主页</button>
+		<div class="xp-page-head">
+			<h2>我的主页</h2>
+			<p>昵称、头像、背景图都在这儿改</p>
+		</div>
+		<div class="xp-card">
+			<div class="xp-cover" id="meCover">
+				<img class="xp-cover-img" id="meCoverImg" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="我的主页背景图">
+				<div class="xp-cover-shade"></div>
+				<button class="xp-cover-btn" id="meCoverBtn" type="button">✎ 修改背景图</button>
+				<input type="file" id="meCoverFile" accept="image/*" class="hide">
 			</div>
 			<div class="xp-info">
 				<div class="xp-head">
 					<div class="xp-ava" id="meAva"><span id="meAvaTxt">瞳</span></div>
 					<div class="xp-who">
 						<div class="xp-name" id="meName">未登录</div>
-						<div class="xp-sub">政瞳号：<span id="myId">—</span></div>
-						<div class="xp-sub">IP：湖南</div>
+						<div class="xp-sub">政瞳号 <span id="myId">—</span> · IP 湖南</div>
 					</div>
+					<button class="xp-edit" id="myEditOpen" type="button">编辑主页</button>
 				</div>
 				<div class="xp-stats">
 					<button type="button" id="stFollow"><b>0</b><span>关注</span></button>
 					<button type="button" id="stFans"><b>0</b><span>粉丝</span></button>
 					<div class="xp-st"><b id="stLikes">0</b><span>获赞与收藏</span></div>
 				</div>
-				<p class="xp-bio" id="meSignView">还没有简介，点右上角「编辑主页」写一句。</p>
+				<p class="xp-bio" id="meSignView">还没有简介，点「编辑主页」写一句。</p>
 				<div class="xp-tags">
 					<span class="xp-tag" id="tagZodiac">星座未设置</span>
 					<span class="xp-tag">湖南长沙</span>
@@ -2427,6 +2452,12 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 						<input type="file" id="meAvaFile" accept="image/*" class="hide">
 						<p class="me-msg" id="meOutMsg"></p>
 						<span id="meMail" class="hide">—</span>
+					</div>
+					<div class="me-block">
+						<h4>背景图</h4>
+						<p class="hint">点封面上的「修改背景图」就能换，横图效果最好。</p>
+						<button class="me-btn ghost" type="button" id="meCoverBtn2">修改背景图</button>
+						<p class="me-msg" id="meCoverMsg"></p>
 					</div>
 					<div class="me-block">
 						<h4>昵称</h4>
@@ -2498,6 +2529,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <script>
 (function(){
 	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+	var DEFAULT_COVER=HOST+'pillow/banner.jpg';
 	var USERS=HOST+'auth/users.json';
 	var SKEY='aylio_pillow_user';
 	var ME=null;
@@ -2542,8 +2574,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}
 		if($('myId')) $('myId').textContent=ME&&ME.mail?idOf(ME.mail):'—';
 		if($('tagMail')) $('tagMail').textContent=mail;
-		if($('meSignView')) $('meSignView').textContent=(ME&&ME.sign)||'还没有简介，点右上角「编辑主页」写一句。';
+		if($('meSignView')) $('meSignView').textContent=(ME&&ME.sign)||'还没有简介，点「编辑主页」写一句。';
 		if($('tagZodiac')) $('tagZodiac').textContent=(ME&&ME.birth)?zodiacOf(ME.birth):'星座未设置';
+		if($('meCoverImg')) $('meCoverImg').src=(ME&&ME.cover)||DEFAULT_COVER;
 	}
 	paint();
 
@@ -2616,7 +2649,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function isMinePost(m){ return (ME&&ME.mail && lower(m.uid)===lower(ME.mail)) || (!m.uid && m.who===(ME&&ME.name)); }
 	function hhmm2(ts){ var d=new Date(ts||Date.now()); function p(n){ return (n<10?'0':'')+n; } return (d.getMonth()+1)+'月'+d.getDate()+'日 '+p(d.getHours())+':'+p(d.getMinutes()); }
 	function cardOf(m){
-		var c=document.createElement('button'); c.className='xp-card'; c.type='button';
+		var c=document.createElement('button'); c.className='xp-card-item'; c.type='button';
 		if(m.img){ var im=document.createElement('img'); im.className='xp-card-img'; im.src=m.img; im.alt=''; im.loading='lazy'; c.appendChild(im); }
 		else { var t=document.createElement('div'); t.className='xp-card-txt'; t.textContent=(m.text||'一段视频').slice(0,80); c.appendChild(t); }
 		var body=document.createElement('div'); body.className='xp-card-body';
@@ -2673,6 +2706,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var users=res[0]||[], room=res[1]||[];
 			ALLPOSTS=room.filter(function(m){ return m&&m.id; }).map(function(m){ m.replyCount=(m.replies||[]).length; return m; });
 			MYREC=users.filter(function(u){ return lower(u.mail)===lower(ME.mail); })[0]||null;
+			if(MYREC){
+				ME.name=MYREC.name||ME.name; ME.avatar=MYREC.avatar||''; ME.cover=MYREC.cover||'';
+				ME.sign=MYREC.sign||''; ME.birth=MYREC.birth||'';
+				save(SKEY,JSON.stringify(ME)); paint();
+			}
 			MYPOSTS=ALLPOSTS.filter(isMinePost).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
 			MYREPLIES=[];
 			ALLPOSTS.forEach(function(m){ (m.replies||[]).forEach(function(r){ if((ME.mail&&lower(r.uid)===lower(ME.mail))||(!r.uid&&r.who===ME.name)) MYREPLIES.push({post:m,reply:r}); }); });
@@ -2774,6 +2812,38 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			});
 	});
 
+	/* ---------- 背景图：点封面 / 编辑里换图 ---------- */
+	function pickCover(){ if(!ME||!ME.mail){ msg('meCoverMsg','先登录再换背景图','err'); return; } $('meCoverFile').click(); }
+	$('meCover').onclick=pickCover;
+	$('meCoverBtn').onclick=function(e){ e.stopPropagation(); pickCover(); };
+	$('meCoverBtn2').onclick=pickCover;
+	$('meCoverFile').addEventListener('change',function(){
+		var f=$('meCoverFile').files&&$('meCoverFile').files[0]; $('meCoverFile').value='';
+		if(!f) return;
+		if(f.size>10*1024*1024){ msg('meCoverMsg','背景图请控制在 10MB 以内','err'); return; }
+		var name=f.name||'c.jpg', ext=((name.match(/\.[a-zA-Z0-9]+$/)||[''])[0]).toLowerCase()||'.jpg';
+		var key='cover/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+ext;
+		$('meCoverBtn').disabled=true; $('meCoverBtn2').disabled=true;
+		$('meCoverBtn').textContent='上传中…';
+		fetch(HOST+key,{method:'PUT',headers:{'Content-Type':f.type||'image/jpeg','Cache-Control':'public, max-age=31536000'},body:f})
+			.then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return HOST+key; })
+			.then(function(url){
+				return readUsers().then(function(list){
+					var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+					if(!u) throw new Error('没找到账号记录');
+					u.cover=url; return writeUsers(list).then(function(){ return url; });
+				});
+			})
+			.then(function(url){
+				ME.cover=url; save(SKEY,JSON.stringify(ME)); paint();
+				msg('meCoverMsg','背景图换好了','ok');
+				$('meCoverBtn').disabled=false; $('meCoverBtn2').disabled=false; $('meCoverBtn').textContent='✎ 修改背景图';
+			})
+			.catch(function(e){
+				$('meCoverBtn').disabled=false; $('meCoverBtn2').disabled=false; $('meCoverBtn').textContent='✎ 修改背景图';
+				msg('meCoverMsg',e.message||'背景图没换成','err');
+			});
+	});
 	$('meNameOpen').onclick=function(){ $('meNameBox').classList.toggle('hide'); if(!$('meNameBox').classList.contains('hide')) $('meNameIn').focus(); };
 	$('mePassOpen').onclick=function(){ $('mePassBox').classList.toggle('hide'); if(!$('mePassBox').classList.contains('hide')) $('meOldPass').focus(); };
 	$('meAva').onclick=function(){

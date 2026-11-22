@@ -1062,8 +1062,6 @@ body.modal-open{overflow:hidden;}
 							<option value="">-- 请选择 --</option>
 							<option value="想说的话">想说的话</option>
 							<option value="祝福">祝福</option>
-							<option value="合作约稿">合作约稿</option>
-							<option value="纠错指正">纠错指正</option>
 							<option value="其他">其他</option>
 						</select>
 					</label>
@@ -1073,14 +1071,13 @@ body.modal-open{overflow:hidden;}
 					</label>
 					<button class="submit-btn" type="submit">提交</button>
 				<p class="fb-window" id="fbWindow">正在确认开放时间…</p>
-					<p class="form-tip">提交后会唤起你的邮箱客户端，收件人已经填好，点「发送」即可送达。</p>
+					<p class="form-tip">写完直接点提交，内容会直接送到我们这边，不用打开邮箱客户端。</p>
 				</form>
 				<div class="form-done" id="formDone" hidden>
-					<p class="done-title">已经帮你把信件备好了</p>
-					<p class="done-text">邮件客户端里收件人是 <b>aylio-1010@foxmail.com</b>，检查一下点「发送」就能到我们这里。没弹出邮箱的话，用下面的按钮把内容复制走。</p>
+					<p class="done-title">留言已经收到</p>
+					<p class="done-text">我们已经在网站后台看到这条留言了。想补充点什么，点「再写一条」就行；也可以先复制一份留底。</p>
 					<div class="done-actions">
 						<button type="button" class="ghost-btn" id="copyBtn">复制留言内容</button>
-						<a class="ghost-btn" href="https://mail.qq.com" target="_blank" rel="noopener">打开网页邮箱</a>
 						<button type="button" class="ghost-btn" id="againBtn">再写一条</button>
 					</div>
 				</div>
@@ -2135,6 +2132,8 @@ body.modal-open{overflow:hidden;}
 <script>
 (function(){
 	var TO = 'aylio-1010@foxmail.com';
+	var MSGBASE = 'https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/msg/';
+	var MSGKEY = '1a93510507047761e6f61e5013f0dd69';
 	var form = document.getElementById('feedbackForm');
 	if(!form){return;}
 	var nameEl = document.getElementById('fbName');
@@ -2224,15 +2223,37 @@ body.modal-open{overflow:hidden;}
 			+ '\n—— 来自政瞳之家网站';
 		lastText = subject + '\n\n' + body;
 
-		var url = 'mailto:' + TO
-			+ '?subject=' + encodeURIComponent(subject)
-			+ '&body=' + encodeURIComponent(body);
-		try{
-			window.location.href = url;
-		}catch(err){}
-		form.style.display = 'none';
-		done.hidden = false;
-		done.scrollIntoView({behavior:'smooth', block:'center'});
+		var rec = {name:name, mail:mail, phone:phone, type:type, msg:msg, ts:Date.now()};
+		var fname = rec.ts + '-' + Math.random().toString(36).slice(2,7) + '.json';
+		var base = MSGBASE + MSGKEY + '/';
+		var oldTxt = submitBtn.textContent;
+		submitBtn.disabled = true;
+		submitBtn.textContent = '提交中…';
+		fetch(base + fname, {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec)})
+			.then(function(r){ if(!r.ok) throw new Error('保存失败 ' + r.status); })
+			.then(function(){
+				return fetch(base + 'index.json?t=' + Date.now(), {cache:'no-store'})
+					.then(function(r){ return r.ok ? r.json() : []; })
+					.catch(function(){ return []; })
+					.then(function(list){
+						var keep = (list || []).filter(function(x){ return x && x.f !== fname; });
+						keep.unshift({f:fname, name:rec.name, mail:rec.mail, phone:rec.phone, type:rec.type, msg:rec.msg, ts:rec.ts});
+						return fetch(base + 'index.json', {method:'PUT', headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}, body:JSON.stringify(keep)});
+					});
+			})
+			.then(function(){
+				form.style.display = 'none';
+				done.hidden = false;
+				done.scrollIntoView({behavior:'smooth', block:'center'});
+			})
+			.catch(function(err){
+				alert('没能提交上去：' + ((err && err.message) || '网络问题') + '，过一会儿再试一次。');
+			})
+			.finally(function(){
+				submitBtn.disabled = false;
+				submitBtn.textContent = oldTxt;
+				refreshWindow();
+			});
 	});
 
 	function copyText(text, btn){

@@ -864,7 +864,7 @@ body.modal-open{overflow:hidden;}
 		btn.disabled=true;
 		var c=mailcfg();
 		var payload=JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
-			template_params:{to_email:mail,code:pendCode,passcode:pendCode,time:'10 分钟',site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}});
+			template_params:{to_email:mail,code:pendCode,passcode:pendCode,time:'10 分钟',site_name:'政瞳之家 · 社区',note:'10 分钟内有效'}});
 		function send(){
 			return fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:payload})
 				.then(function(r){ if(!r.ok){ return r.text().then(function(t){ throw new Error(t||('HTTP '+r.status)); }); } });
@@ -936,7 +936,7 @@ body.modal-open{overflow:hidden;}
 			<ul class="nav">
 				<li><a href="#home" class="nav-link active" data-target="home">首页</a></li>
 				<li><a href="#menu" class="nav-link" data-target="menu">日常记录</a></li>
-				<li><a href="#pillow" class="nav-link" data-target="pillow">小枕头留言箱</a></li>
+				<li><a href="#pillow" class="nav-link" data-target="pillow">社区</a></li>
 				<li><a href="#contact" class="nav-link" data-target="contact">联系我们</a></li>
 			</ul>
 		</nav>
@@ -1304,14 +1304,14 @@ a{color:inherit;}
 		<div class="banner-text">
 			<div class="container">
 				<p class="banner-kicker">PILLOW BOX</p>
-				<h1>小枕头留言箱</h1>
+				<h1>社区</h1>
 				<p class="banner-sub">想说的话，随时放进来</p>
 			</div>
 		</div>
 	</section>
 	<section class="container">
 <div class="room"><div class="room-head">
-			<span>大家都能看到的留言</span>
+			<span>大家都在说</span>
 			<span class="who" id="whoBox"></span>
 			<span class="live"><i></i>自动刷新</span>
 		</div>
@@ -1456,7 +1456,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				service_id:c.serviceId,
 				template_id:c.templateId,
 				user_id:c.publicKey,
-				template_params:{to_email:mail, code:code, passcode:code, time:'10 分钟', site_name:'政瞳之家 · 小枕头留言箱', note:'10 分钟内有效'}
+				template_params:{to_email:mail, code:code, passcode:code, time:'10 分钟', site_name:'政瞳之家 · 社区', note:'10 分钟内有效'}
 			})
 		}).then(function(r){ if(!r.ok) throw new Error('mail '+r.status); });
 	}
@@ -3674,3 +3674,4 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 })();
 </script></body>
 </html>
+

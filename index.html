@@ -1375,6 +1375,31 @@ a{color:inherit;}
 #pillow .post.mine{border-color:#EFCDB4;background:#FFFDFB;}
 #pillow .post-head{display:flex;align-items:center;gap:11px;}
 #pillow .post-ava{width:42px;height:42px;flex:0 0 auto;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;}
+	#pillow .post-ava.can{cursor:pointer;transition:box-shadow .18s;}
+	#pillow .post-ava.can:hover{box-shadow:0 0 0 3px #F6DFCD;}
+	#pillow .room-search{display:flex;align-items:center;gap:10px;margin:0 0 14px;}
+	#pillow .room-search input{flex:1;height:46px;padding:0 44px 0 16px;border:1px solid #EAD3C1;border-radius:999px;font-size:14px;font-family:inherit;color:#4A3226;background:#fff;outline:none;box-shadow:0 4px 14px rgba(150,74,30,.05);}
+	#pillow .room-search input:focus{border-color:#BF5B2E;box-shadow:0 0 0 3px #FBEBDD;}
+	#pillow .room-search .sbtn{border:0;background:transparent;color:#A06443;font-size:12.5px;cursor:pointer;font-family:inherit;padding:0 4px;}
+	#pillow .user-hits{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;}
+	#pillow .user-hits .lead{width:100%;font-size:12px;color:#AC9184;}
+	#pillow .user-hit{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 5px;border:1px solid #EAD3C1;border-radius:999px;background:#fff;cursor:pointer;font:inherit;font-size:13px;color:#5A4234;}
+	#pillow .user-hit:hover{border-color:#BF5B2E;background:#FFF7F1;}
+	#pillow .user-hit .ph{width:26px;height:26px;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto;}
+	#pillow .user-hit .ph img{width:100%;height:100%;object-fit:cover;display:block;}
+	#pillow .search-none{background:#fff;border:1px solid #F2DDCB;border-radius:16px;padding:40px 20px;text-align:center;color:#B99584;font-size:13px;line-height:2;}
+	#pillow .ucard{position:fixed;inset:0;z-index:60;background:rgba(58,36,26,.42);display:flex;align-items:center;justify-content:center;padding:22px;}
+	#pillow .ucard-panel{width:min(350px,100%);max-height:84vh;overflow:auto;background:#FFFDFB;border-radius:20px;padding:26px 24px 20px;box-shadow:0 24px 60px rgba(80,40,20,.28);text-align:center;position:relative;}
+	#pillow .ucard-x{position:absolute;right:12px;top:10px;width:32px;height:32px;border:0;background:transparent;color:#B99584;font-size:20px;cursor:pointer;line-height:1;}
+	#pillow .ucard-ava{width:78px;height:78px;margin:0 auto 12px;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;cursor:pointer;}
+	#pillow .ucard-ava img{width:100%;height:100%;object-fit:cover;display:block;}
+	#pillow .ucard-name{margin:0;font-size:18px;font-weight:700;color:#3A241A;letter-spacing:.04em;}
+	#pillow .ucard-sign{margin:10px 0 0;font-size:13.5px;line-height:1.8;color:#7A5B49;white-space:pre-wrap;word-break:break-word;}
+	#pillow .ucard-lines{margin:16px 0 0;border-top:1px dashed #F3E4D7;padding-top:12px;display:grid;gap:8px;text-align:left;font-size:12.5px;color:#A8897A;}
+	#pillow .ucard-lines div{display:flex;justify-content:space-between;gap:12px;}
+	#pillow .ucard-lines b{color:#5A4234;font-weight:600;}
+	#pillow .ucard-btn{margin-top:16px;width:100%;height:42px;border:1px solid #EAD3C1;background:#FFF7F1;color:#A06443;border-radius:11px;font-size:13.5px;font-family:inherit;cursor:pointer;}
+	#pillow .ucard-btn:hover{border-color:#BF5B2E;color:#BF5B2E;}
 #pillow .post-ava img{width:100%;height:100%;object-fit:cover;display:block;}
 #pillow .post-meta{min-width:0;}
 #pillow .post-name{font-size:14.5px;font-weight:600;color:#3A241A;display:flex;align-items:center;gap:7px;}
@@ -1446,6 +1471,9 @@ a{color:inherit;}
 #mine .me-forgot{margin:6px 0 0;}
 #mine .me-forgot button{border:0;background:transparent;color:#B0704D;font-size:12.5px;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:3px;}
 #mine .me-msg.ok{color:#2E7D4F;}
+#mine .me-sign-line{margin:2px 0 0;font-size:13px;color:#A8897A;}
+#mine .me-sign-line b{color:#BF5B2E;font-weight:700;letter-spacing:.04em;}
+#mine .me-input[type=date]{cursor:pointer;}
 @media(max-width:760px){
 #mine .mine-wrap{grid-template-columns:1fr;}
 #mine .mine-card{padding:22px 18px;}
@@ -1467,6 +1495,25 @@ a{color:inherit;}
 			<span>社区 · 大家都在说</span>
 			<span class="online">在线 <b id="onlineNum">—</b> 人</span>
 			<span class="live"><i></i>自动刷新</span>
+		</div>
+		<div class="room-search">
+			<input id="pSearch" type="search" maxlength="30" placeholder="搜昵称、搜帖子里的字…">
+			<button class="sbtn" id="pSearchClear" type="button">清空</button>
+		</div>
+		<div class="user-hits hide" id="userHits"></div>
+		<div class="ucard hide" id="userCard">
+			<div class="ucard-panel">
+				<button class="ucard-x" id="ucardX" type="button" aria-label="关闭">×</button>
+				<div class="ucard-ava" id="ucardAva"><span>瞳</span></div>
+				<h3 class="ucard-name" id="ucardName">—</h3>
+				<p class="ucard-sign" id="ucardSign">还没有写签名</p>
+				<div class="ucard-lines">
+					<div><span>生日</span><b id="ucardBirth">还没填</b></div>
+					<div><span>星座</span><b id="ucardZodiac">—</b></div>
+					<div><span>在社区发过</span><b id="ucardPosts">0 帖</b></div>
+				</div>
+				<button class="ucard-btn" id="ucardFilter" type="button">只看 TA 发的帖子</button>
+			</div>
 		</div>
 		<div class="gate" id="gate">
 			<div class="gate-card">
@@ -1721,6 +1768,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}else{
 			box.textContent=String(name||'匿').slice(0,1);
 		}
+		if(name){
+			box.classList.add('can');
+			box.title='看看 '+name+' 的资料';
+			box.onclick=function(ev){ if(ev) ev.stopPropagation(); openUser(name); };
+		}
 		return box;
 	}
 	function bubble(m, floor){
@@ -1850,24 +1902,103 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		};
 		return card;
 	}
+	var LAST=[], QUERY='';
+	function zod(b){
+		if(!b) return '';
+		var p=String(b).split('-'), m=Number(p[1]), d=Number(p[2]); if(!m||!d) return '';
+		var st=[[1,20,'水瓶座'],[2,19,'双鱼座'],[3,21,'白羊座'],[4,20,'金牛座'],[5,21,'双子座'],[6,22,'巨蟹座'],[7,23,'狮子座'],[8,23,'处女座'],[9,23,'天秤座'],[10,24,'天蝎座'],[11,23,'射手座'],[12,22,'摩羯座']];
+		var cur='摩羯座';
+		for(var i=0;i<st.length;i++){ var c=st[i]; if(m>c[0]||(m===c[0]&&d>=c[1])) cur=c[2]; }
+		return cur;
+	}
+	function openUser(name){
+		name=name||'匿名';
+		var u=USERSMAP[String(name).toLowerCase()]||{name:name};
+		var ava=$('ucardAva'); ava.innerHTML='';
+		if(u.avatar){ var im=document.createElement('img'); im.src=u.avatar; im.alt=name; im.onclick=function(){ window.open(u.avatar,'_blank'); }; ava.appendChild(im); }
+		else { ava.textContent=String(name).slice(0,1); }
+		$('ucardName').textContent=name;
+		$('ucardSign').textContent=u.sign||'还没有写签名';
+		$('ucardBirth').textContent=u.birth||'还没填';
+		$('ucardZodiac').textContent=u.birth?zod(u.birth):'—';
+		$('ucardPosts').textContent=LAST.filter(function(m){ return (m.who||'')===name; }).length+' 帖';
+		$('ucardFilter').setAttribute('data-name',name);
+		$('userCard').classList.remove('hide');
+	}
+	function closeUser(){ $('userCard').classList.add('hide'); }
+	function hitUsers(q){
+		var out=[], seen={};
+		Object.keys(USERSMAP).forEach(function(k){
+			var u=USERSMAP[k]; if(!u||!u.name) return;
+			if(String(u.name).toLowerCase().indexOf(q)>=0 && !seen[u.name]){ seen[u.name]=1; out.push(u); }
+		});
+		LAST.forEach(function(m){ if(m.who && String(m.who).toLowerCase().indexOf(q)>=0 && !seen[m.who]){ seen[m.who]=1; out.push({name:m.who}); } });
+		return out.slice(0,8);
+	}
+	function paintHits(users){
+		var box=$('userHits'); if(!box) return;
+		box.innerHTML='';
+		if(!users.length){ box.classList.add('hide'); return; }
+		box.classList.remove('hide');
+		var lead=el('div','lead'); lead.textContent='找到 '+users.length+' 位成员，点头像或名字看资料';
+		box.appendChild(lead);
+		users.forEach(function(u){
+			var b=el('button','user-hit'); b.type='button';
+			var ph=el('span','ph');
+			if(u.avatar){ var im=document.createElement('img'); im.src=u.avatar; im.alt=u.name; ph.appendChild(im); }
+			else ph.textContent=String(u.name||'匿').slice(0,1);
+			b.appendChild(ph);
+			var nm=el('span'); nm.textContent=u.name; b.appendChild(nm);
+			b.onclick=function(){ openUser(u.name); };
+			box.appendChild(b);
+		});
+	}
 	function paint(list, animate){
-		if(!list.length){
-			msgsEl.innerHTML='<div class="empty">还没有帖子，第一楼留给你。</div>';
-			rendered={}; lastCount=0;
+		LAST=(list||[]).slice();
+		msgsEl.innerHTML='';
+		var q=(QUERY||'').trim().toLowerCase();
+		paintHits(q?hitUsers(q):[]);
+		var show=LAST.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+		if(q) show=show.filter(function(m){ return ((m.who||'')+' '+(m.text||'')+' '+(m.title||'')).toLowerCase().indexOf(q)>=0; });
+		if(!show.length){
+			if(q){ var d=el('div','search-none'); d.textContent='没搜到「'+QUERY.trim()+'」相关的帖子或成员，换个词试试。'; msgsEl.appendChild(d); }
+			else { msgsEl.innerHTML='<div class="empty">还没有帖子，第一楼留给你。</div>'; }
+			rendered={}; lastCount=LAST.length;
 			return;
 		}
-		var show=list.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
-		msgsEl.innerHTML='';
-		show.forEach(function(m, idx){ msgsEl.appendChild(bubble(m, show.length-idx)); });
+		show.forEach(function(m, idx){ msgsEl.appendChild(bubble(m, LAST.length-idx)); });
 		rendered={}; show.forEach(function(m){ rendered[m.id]=1; });
+		lastCount=LAST.length;
 		if(animate){ msgsEl.scrollIntoView({behavior:'smooth',block:'start'}); }
 	}
 	function refresh(){
 		readRoom().then(function(list){
 			list=dedupe(list||[]);
-			if(list.length!==lastCount){ lastCount=list.length; paint(list); }
+			if(list.length!==lastCount || QUERY){ paint(list); }
 		});
 	}
+	var pSearch=$('pSearch');
+	var searchTimer=null;
+	function applyQuery(v){
+		QUERY=v||'';
+		paint(LAST);
+	}
+	if(pSearch){
+		pSearch.addEventListener('input',function(){
+			clearTimeout(searchTimer);
+			var v=pSearch.value;
+			searchTimer=setTimeout(function(){ applyQuery(v); },260);
+		});
+		pSearch.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(searchTimer); applyQuery(pSearch.value); } });
+	}
+	if($('pSearchClear')) $('pSearchClear').onclick=function(){ if(pSearch) pSearch.value=''; applyQuery(''); };
+	if($('ucardX')) $('ucardX').onclick=closeUser;
+	if($('userCard')) $('userCard').onclick=function(e){ if(e.target===this) closeUser(); };
+	if($('ucardFilter')) $('ucardFilter').onclick=function(){
+		var nm=this.getAttribute('data-name')||'';
+		if(pSearch) pSearch.value=nm;
+		closeUser(); applyQuery(nm);
+	};
 	function post(msg){
 		return readRoom().then(function(list){
 			list=dedupe(list||[]);
@@ -2012,6 +2143,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 					<p class="me-msg" id="meNameMsg"></p>
 				</div>
 				<div class="me-block">
+					<h4>资料</h4>
+					<p class="hint">签名会显示在社区点头像的那张卡片上；生日点开选，选完自动出星座。</p>
+					<input class="me-input" id="meSignIn" maxlength="60" placeholder="写一句签名，最多 60 字">
+					<button class="me-btn ghost" id="meSignBtn" type="button">保存签名</button>
+					<p class="me-msg" id="meSignMsg"></p>
+					<p class="hint" style="margin:16px 0 8px">生日</p>
+					<input class="me-input" id="meBirth" type="date">
+					<p class="me-sign-line">星座：<b id="meZodiac">未设置</b></p>
+					<p class="me-msg" id="meBirthMsg"></p>
+				</div>
+				<div class="me-block">
 					<h4>密码</h4>
 					<p class="hint">点「修改密码」才需要填，改完下次用新密码登录。</p>
 					<button class="me-btn ghost" id="mePassOpen" type="button">修改密码</button>
@@ -2084,6 +2226,63 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}
 	}
 	paint();
+
+	/* ---------- 资料：签名 + 生日 + 星座 ---------- */
+	function zodiacOf(b){
+		if(!b) return '';
+		var p=String(b).split('-'); var m=Number(p[1]), d=Number(p[2]);
+		if(!m||!d) return '';
+		var starts=[[1,20,'水瓶座'],[2,19,'双鱼座'],[3,21,'白羊座'],[4,20,'金牛座'],[5,21,'双子座'],[6,22,'巨蟹座'],[7,23,'狮子座'],[8,23,'处女座'],[9,23,'天秤座'],[10,24,'天蝎座'],[11,23,'射手座'],[12,22,'摩羯座']];
+		var cur='摩羯座';
+		for(var i=0;i<starts.length;i++){
+			var c=starts[i];
+			if(m>c[0] || (m===c[0] && d>=c[1])) cur=c[2];
+		}
+		return cur;
+	}
+	function paintProf(){
+		$('meSignIn').value=(ME&&ME.sign)||'';
+		$('meBirth').value=(ME&&ME.birth)||'';
+		$('meZodiac').textContent=(ME&&ME.birth)?zodiacOf(ME.birth):'未设置';
+	}
+	paintProf();
+	var today=new Date(); var pad=function(n){ return (n<10?'0':'')+n; };
+	$('meBirth').max=today.getFullYear()+'-'+pad(today.getMonth()+1)+'-'+pad(today.getDate());
+	if(ME&&ME.mail){
+		readUsers().then(function(list){
+			var u=(list||[]).filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) return;
+			ME.sign=u.sign||''; ME.birth=u.birth||'';
+			save(SKEY,JSON.stringify(ME)); paintProf();
+		}).catch(function(){});
+	}
+	$('meSignBtn').onclick=function(){
+		if(!ME||!ME.mail){ msg('meSignMsg','先登录再写签名','err'); return; }
+		var s=$('meSignIn').value.trim().slice(0,60);
+		$('meSignBtn').disabled=true;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) throw new Error('没找到账号记录');
+			u.sign=s; return writeUsers(list);
+		}).then(function(){
+			ME.sign=s; save(SKEY,JSON.stringify(ME));
+			$('meSignBtn').disabled=false; msg('meSignMsg','签名存好了，社区点头像就能看到','ok');
+		}).catch(function(e){ $('meSignBtn').disabled=false; msg('meSignMsg',e.message||'没存上','err'); });
+	};
+	$('meBirth').onchange=function(){
+		if(!ME||!ME.mail){ msg('meBirthMsg','先登录再填生日','err'); return; }
+		var b=this.value;
+		$('meZodiac').textContent=b?zodiacOf(b):'未设置';
+		if(!b){ msg('meBirthMsg','生日清空了','ok'); return; }
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) throw new Error('没找到账号记录');
+			u.birth=b; return writeUsers(list);
+		}).then(function(){
+			ME.birth=b; save(SKEY,JSON.stringify(ME));
+			msg('meBirthMsg','生日存好了，星座是'+zodiacOf(b),'ok');
+		}).catch(function(e){ msg('meBirthMsg',e.message||'没存上','err'); });
+	};
 
 	$('meAvaBtn').onclick=function(){ if(!ME||!ME.mail){ msg('meOutMsg','先登录再改头像','err'); return; } $('meAvaFile').click(); };
 	$('meAvaFile').addEventListener('change',function(){

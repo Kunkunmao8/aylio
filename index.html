@@ -1103,6 +1103,8 @@ a{color:inherit;}
 #pillow .up{padding:0 16px;font-size:12px;color:#9C8275;min-height:16px;}
 #pillow .gate{padding:26px 18px 30px;border-top:1px solid #F7E8DC;background:#FFFCF9;}
 #pillow .gate-card{max-width:380px;margin:0 auto;}
+#pillow .gate-alt{max-width:380px;margin:14px auto 0;text-align:center;font-size:13px;}
+#pillow .gate-alt a{color:#BF5B2E;text-decoration:none;border-bottom:1px dashed #F0B992;}
 #pillow .gate h2{margin:0 0 6px;font-size:18px;letter-spacing:1px;}
 #pillow .gate-sub{margin:0 0 16px;font-size:12.5px;color:#A06443;line-height:1.7;}
 #pillow .tabs{display:flex;gap:8px;margin-bottom:14px;}
@@ -1187,12 +1189,13 @@ a{color:inherit;}
 					<p class="gmsg" id="regMsg"></p>
 				</div>
 			</div>
+			<p class="gate-alt"><a href="?open=1#pillow">不想注册，用昵称直接留言 →</a></p>
 		</div>
 	</div>
 	</section>
 </div>
 <script>
-var NEED_LOGIN = true;          /* 免登录版会改成 false */
+var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免登录版 */
 (function(){
 	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
 	var ROOM=HOST+'pillow/';

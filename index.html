@@ -750,8 +750,20 @@ body.modal-open{overflow:hidden;}
 .album-grid.chrono .album-links{margin-top:10px;}
 .album-grid.chrono .album-links a{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.45);}
 @media (hover:none){
-	.album-grid.chrono .album-info{position:static;opacity:1;transform:none;background:#fff;}
-	.album-grid.chrono .album-date,.album-grid.chrono .album-card h5,.album-grid.chrono .album-card p{color:inherit;}
+	.album-grid.chrono .album-card{overflow:visible;}
+	.album-grid.chrono .album-info{position:static!important;opacity:1!important;transform:none!important;background:#fff!important;pointer-events:auto!important;}
+	.album-grid.chrono .album-date,.album-grid.chrono .album-card h5,.album-grid.chrono .album-card p{color:inherit!important;}
+}
+/* 手机端兜底：不依赖 hover 能力检测，始终把日期/文案/抖音·B站·微博链接放到图片下方 */
+@media (max-width:900px){
+	.album-grid.chrono .album-card{overflow:visible;}
+	.album-grid.chrono .album-info{position:static!important;opacity:1!important;transform:none!important;background:#fff!important;pointer-events:auto!important;}
+	.album-grid.chrono .album-date{color:#C97B49!important;}
+	.album-grid.chrono .album-card h5{color:#3A241A!important;}
+	.album-grid.chrono .album-card p{color:#7A6157!important;}
+	.album-grid.chrono .album-links{display:flex!important;margin-top:12px;}
+	.album-grid.chrono .album-links a{background:#FBEBDD!important;color:#BF5B2E!important;border:1px solid #F0D5BF!important;pointer-events:auto!important;}
+	.album-grid.chrono .album-cover{height:auto;max-height:70vh;object-fit:contain;background:#FDF3E9;}
 }
 </style>
 <link rel="preconnect" href="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com" crossorigin>

@@ -1015,7 +1015,7 @@ body.modal-open{overflow:hidden;}
 				<span class="photo-plus">＋</span>
 				<span class="photo-addtxt">上传照片 / 视频</span>
 				<span class="photo-addsub">文件 · 相册 · 微信</span>
-				<input type="file" id="photoInput" accept="image/*,video/*" multiple hidden>
+				<input type="file" id="photoInput" class="photo-file" accept="image/*,video/*" multiple>
 			</label>
 		</div>
 		<p class="photo-hint" id="photoHint">点按钮会调用系统选择器：电脑上选文件，手机上可以直接从相册挑，在微信里打开也能从聊天记录选。<br>内容保存在当前这台设备上，换设备或清理浏览器数据后看不到；单个文件建议 200MB 以内。</p>
@@ -2330,6 +2330,11 @@ body.modal-open{overflow:hidden;}
 </script>
 <style>
 .photo-addsub{font-size:11px;letter-spacing:.5px;color:#B99584;}
+.photo-file{
+	position:absolute;left:0;top:0;width:100%;height:100%;
+	opacity:0;cursor:pointer;z-index:2;font-size:0;
+	-webkit-appearance:none;appearance:none;
+}
 .photo-status{
 	display:inline-flex;align-items:center;gap:7px;
 	margin:0 0 14px;
@@ -2350,6 +2355,7 @@ body.modal-open{overflow:hidden;}
 }
 .photo-wall.dragover{outline:2px dashed #BF5B2E;outline-offset:6px;border-radius:20px;}
 .photo-add{
+	position:relative;overflow:hidden;
 	aspect-ratio:1/1;
 	border:1.5px dashed #E3B594;
 	border-radius:18px;
@@ -2431,6 +2437,8 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 	var hint=document.getElementById('photoHint');
 	var statusEl=document.getElementById('photoStatus');
 	if(!wall||!input||!viewer||!bodyEl) return;
+	var IS_WX=/MicroMessenger/i.test(navigator.userAgent||'');
+	if(IS_WX){ try{ input.removeAttribute('accept'); }catch(e){} }   /* 微信里放开类型限制，否则有时只给拍照、进不去相册 */
 	var cloud=!!(CFG.bucket);
 	var COSBASE='https://'+CFG.bucket+'.cos.'+(CFG.region||'ap-guangzhou')+'.myqcloud.com';
 	var DIR=(CFG.dir||'photos');
@@ -2557,6 +2565,24 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 			img.src=u;
 		});
 	}
+	function toJpeg(file){
+		/* iPhone 的 HEIC 在多数浏览器里显示不出来，能解码就统一转成 JPG */
+		return new Promise(function(res,rej){
+			var img=new Image(), u=URL.createObjectURL(file);
+			img.onload=function(){
+				URL.revokeObjectURL(u);
+				var w=img.naturalWidth,h=img.naturalHeight,MAX=1600,k=Math.min(1,MAX/Math.max(w,h));
+				var c=document.createElement('canvas'); c.width=Math.round(w*k); c.height=Math.round(h*k);
+				c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+				c.toBlob(function(b){
+					if(!b) return rej(new Error('heic'));
+					res(new File([b], (file.name||'photo').replace(/\.[a-zA-Z0-9]+$/,'')+'.jpg', {type:'image/jpeg'}));
+				},'image/jpeg',0.9);
+			};
+			img.onerror=function(){ URL.revokeObjectURL(u); rej(new Error('heic')); };
+			img.src=u;
+		});
+	}
 	function cosUpload(file){
 		return shrinkImage(file).then(function(f){
 			var m=f.name.match(/\.[a-zA-Z0-9]+$/), ext=m?m[0].toLowerCase():'';
@@ -2676,24 +2702,48 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 	}
 
 	/* ---------- 上传 ---------- */
+	function guessType(f){
+		var t=(f.type||'').toLowerCase();
+		if(/^(image|video)\//.test(t)) return t;
+		var n=(f.name||'').toLowerCase();     /* 微信里选的照片有时 type 是空的，按扩展名兜底 */
+		var m=n.match(/\.([a-z0-9]+)$/);
+		if(!m) return '';
+		var e=m[1];
+		if(/^(jpe?g|png|gif|webp|bmp|heic|heif|avif)$/.test(e)) return 'image/'+(e==='jpg'?'jpeg':e);
+		if(/^(mp4|mov|m4v|webm|3gp|avi|mkv)$/.test(e)) return 'video/'+e;
+		return '';
+	}
 	function handleFiles(files){
 		if(!files.length) return;
 		var limitV=cloud?50*1024*1024:200*1024*1024;
 		var limitI=cloud?60*1024*1024:200*1024*1024;
+		var bad=[];
 		var list=files.filter(function(f){
-			if(!/^(image|video)\//.test(f.type)) return false;
-			if(/^video\//.test(f.type)&&f.size>limitV){ alert('视频请控制在 50MB 以内'); return false; }
-			if(/^image\//.test(f.type)&&f.size>limitI){ alert('这张图太大了，换一张再传'); return false; }
+			var t=guessType(f);
+			if(!t){ bad.push(f.name||'这个文件'); return false; }
+			if(/^video\//.test(t)&&f.size>limitV){ alert('视频请控制在 50MB 以内'); return false; }
+			if(/^image\//.test(t)&&f.size>limitI){ alert('这张图太大了，换一张再传'); return false; }
 			return true;
 		});
+		if(bad.length&&!list.length){ alert('这些文件不是照片或视频，换一个再试：\n'+bad.slice(0,3).join('\n')); return; }
 		if(!list.length) return;
-		var done=0, total=list.length, fail=0;
+		var done=0, total=list.length, fail=0, heicBad=0;
 		list.forEach(function(f){
-			var task = cloud ? cosUpload(f) : localAdd({id:Date.now()+done, type:f.type, name:f.name, blob:f});
-			task.then(function(){ done++; }).catch(function(){ fail++; done++; })
+			var t=guessType(f);
+			var prep = /heic|heif/.test(t)
+				? toJpeg(f)
+				: Promise.resolve(new File([f], f.name||('p'+Date.now()), {type:t}));
+			var task = prep.then(function(g){
+				return cloud ? cosUpload(g) : localAdd({id:Date.now()+done, type:t, name:g.name, blob:g});
+			});
+			task.then(function(){ done++; }).catch(function(e){
+				fail++; done++;
+				if(e&&e.message==='heic') heicBad++;
+			})
 			.finally(function(){
 				if(done===total){
-					if(fail) alert('有 '+fail+' 个文件没传上去，检查网络后重试');
+					if(heicBad) alert('这几张是 iPhone 的 HEIC 原图，先转成 JPG 再传');
+					else if(fail) alert('有 '+fail+' 个文件没传上去，检查网络后重试');
 					refresh();
 				}
 			});

@@ -2600,10 +2600,10 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 		b.className='photo-del'; b.type='button'; b.title='删除'; b.textContent='×';
 		b.addEventListener('click',function(ev){
 			ev.stopPropagation();
-			if(!confirm('删掉这一张？')) return;
+			if(!confirm(item.owner&&item.owner!==MYID?'删掉这张别人传的照片？':'删掉这一张？')) return;
 			(cloud?ghDel(item):localDel(item.id)).then(refresh);
 		});
-		if(cloud && item.owner && item.owner!==MYID){ b.style.display='none'; }
+		/* 照片墙的删除权限：所有人都能删（包括别人传的） */
 		box.appendChild(b);
 		return box;
 	}

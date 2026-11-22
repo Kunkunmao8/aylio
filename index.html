@@ -851,7 +851,7 @@ body.modal-open{overflow:hidden;}
 
 		<div class="section-head">
 			<h3 class="section-title">视频投稿</h3>
-			<span class="section-note">选文件上传，也可以粘贴链接</span>
+			<span class="section-note">选文件上传，也可以贴小红书 / B站 / 抖音的链接</span>
 		</div>
 		<div class="clip-box">
 			<form class="clip-form" id="clipForm">
@@ -876,7 +876,7 @@ body.modal-open{overflow:hidden;}
 					<p class="clip-file-name" id="clipFileName"></p>
 				</div>
 				<div class="clip-pane" id="clipPaneLink" hidden>
-					<input class="clip-url" id="clipUrl" placeholder="https:// 开头的视频链接，B站 / 抖音 / 微博 都行">
+					<input class="clip-url" id="clipUrl" placeholder="https:// 开头的视频链接，小红书 / B站 / 抖音 / 微博 都行">
 				</div>
 				<button type="submit" class="submit-btn" id="clipSubmit">发布</button>
 				<p class="clip-tip" id="clipTip"></p>
@@ -2469,37 +2469,39 @@ body.modal-open{overflow:hidden;}
 }
 .photo-viewer-dl.on{display:block;}
 
-/* ===== 视频投稿 ===== */
-.clip-box{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:26px;align-items:start;margin-top:8px;}
-.clip-list{order:1;}
-.clip-form{order:2;}
-.clip-form{background:#FFFBF6;border:1px solid #F0D6C2;border-radius:18px;padding:18px;}
-.clip-row{display:block;margin:0 0 12px;}
+/* ===== 视频投稿：横条表单在上，视频列表在下 ===== */
+.clip-box{display:block;margin-top:8px;}
+.clip-form{
+	display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 14px;
+	background:#FFFBF6;border:1px solid #F0D6C2;border-radius:18px;padding:16px 18px;
+}
+.clip-row{display:block;flex:1 1 200px;min-width:168px;margin:0;}
 .clip-row span{display:block;font-size:12.5px;letter-spacing:.5px;color:#A06443;margin-bottom:6px;}
 .clip-row input,.clip-url{
-	width:100%;box-sizing:border-box;padding:10px 12px;
+	width:100%;box-sizing:border-box;padding:10px 12px;height:42px;
 	border:1px solid #EAD3C1;border-radius:10px;background:#FFFDFB;
 	font-size:14px;color:#4A3226;font-family:inherit;outline:none;
 }
 .clip-row input:focus,.clip-url:focus{border-color:#BF5B2E;}
-.clip-tabs{display:flex;gap:8px;margin:4px 0 12px;}
+.clip-tabs{display:flex;gap:8px;margin:0;flex:0 0 auto;}
 .clip-tab{
-	flex:1;padding:8px 0;border:1px solid #EAD3C1;background:#FFFDFB;border-radius:10px;
+	flex:0 0 auto;padding:0 16px;height:42px;border:1px solid #EAD3C1;background:#FFFDFB;border-radius:10px;
 	font-size:13px;color:#A06443;cursor:pointer;font-family:inherit;
 }
 .clip-tab.on{background:#FDEFE3;border-color:#BF5B2E;color:#BF5B2E;font-weight:600;}
+.clip-pane{flex:1 1 280px;min-width:220px;}
 .clip-drop{
 	position:relative;overflow:hidden;
-	display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
-	height:104px;border:1.5px dashed #E3B594;border-radius:14px;background:#FFFDFB;
-	cursor:pointer;font-size:14px;color:#A06443;
+	display:flex;align-items:center;justify-content:center;gap:10px;
+	height:42px;padding:0 14px;border:1.5px dashed #E3B594;border-radius:12px;background:#FFFDFB;
+	cursor:pointer;font-size:13.5px;color:#A06443;
 }
 .clip-drop small{font-size:11.5px;color:#B99584;}
 .clip-drop input{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0;}
-.clip-file-name{margin:8px 0 0;font-size:12px;color:#9C8275;word-break:break-all;min-height:1px;}
-.clip-tip{margin:10px 0 0;font-size:12.5px;color:#9C8275;line-height:1.7;}
-.clip-form .submit-btn{width:100%;margin-top:6px;}
-.clip-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:start;}
+.clip-file-name{margin:6px 0 0;font-size:12px;color:#9C8275;word-break:break-all;}
+.clip-tip{flex:1 1 100%;margin:0;font-size:12.5px;color:#9C8275;line-height:1.7;}
+.clip-form .submit-btn{flex:0 0 auto;width:auto;padding:0 30px;height:42px;margin:0;}
+.clip-list{margin-top:20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-content:start;}
 .clip-card{
 	position:relative;background:#fff;border-radius:16px;overflow:hidden;
 	box-shadow:0 6px 20px rgba(150,74,30,.10);display:flex;flex-direction:column;
@@ -2518,10 +2520,17 @@ body.modal-open{overflow:hidden;}
 }
 .clip-empty{grid-column:1/-1;font-size:13px;color:#B99584;letter-spacing:.5px;padding:14px 2px;}
 @media(max-width:900px){
-	.clip-box{grid-template-columns:1fr;}
-	.clip-form{order:1;}
-	.clip-list{order:2;}
+	.clip-list{grid-template-columns:repeat(2,minmax(0,1fr));}
+	.clip-form .submit-btn{flex:1 1 100%;}
+}
+@media(max-width:600px){
 	.clip-list{grid-template-columns:1fr;}
+	.clip-form{flex-direction:column;align-items:stretch;}
+	.clip-row{flex:1 1 auto;min-width:0;}
+	.clip-tabs{flex:1 1 auto;}
+	.clip-tab{flex:1;}
+	.clip-pane{flex:1 1 auto;min-width:0;}
+	.clip-tip{flex:1 1 auto;}
 }
 @media(max-width:900px){.photo-wall{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}</style>

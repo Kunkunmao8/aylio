@@ -1139,6 +1139,7 @@ a{color:inherit;}
 	<section class="container">
 <div class="room"><div class="room-head">
 			<span>大家都能看到的留言</span>
+			<span class="who" id="whoBox"></span>
 			<span class="live"><i></i>自动刷新</span>
 		</div>
 		<div class="msgs" id="msgs"><div class="empty">还没有人留言，第一句留给你。</div></div>
@@ -1227,6 +1228,7 @@ var NEED_LOGIN = true;          /* 免登录版会改成 false */
 		return n || ('访客'+rand(4));
 	}
 	function paintWho(){
+		if(!whoBox) return;
 		whoBox.innerHTML='';
 		if(!NEED_LOGIN){
 			var s=el('span'); s.textContent='当前：'+(nickIn.value.trim()||'未命名'); whoBox.appendChild(s);

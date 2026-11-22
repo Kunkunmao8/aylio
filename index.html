@@ -1799,7 +1799,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var b=document.createElement('b'); b.textContent=(r.who||'匿名')+'：'; item.appendChild(b);
 			var tx=document.createElement('span'); tx.textContent=r.text||''; item.appendChild(tx);
 			var tm=el('span','rt'); tm.textContent=hhmm(r.ts); item.appendChild(tm);
-			if(canDel(r)){
+			if(canDel(r)||canDel(m)){
 				var rd=el('button','rdel'); rd.type='button'; rd.textContent='删除';
 				rd.onclick=function(){
 					if(!confirm('删掉这条回复？')) return;

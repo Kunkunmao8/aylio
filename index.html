@@ -2859,15 +2859,20 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	$('fansBox').onclick=function(e){ if(e.target===this) this.classList.add('hide'); };
 	$('noteX').onclick=function(){ $('noteBox').classList.add('hide'); };
 	$('noteBox').onclick=function(e){ if(e.target===this) this.classList.add('hide'); };
+	var editAnimTimer=null;
 	$('myEditOpen').onclick=function(){
 		var w=$('editWrap');
+		w.style.animation=''; w.style.transform='';
 		w.classList.remove('on','hide');
 		$('editMask').classList.remove('hide');
 		void w.offsetWidth;
 		w.classList.add('on');
 		w.scrollTop=0;
+		clearTimeout(editAnimTimer);
+		editAnimTimer=setTimeout(function(){ w.style.animation='none'; w.style.transform='translateX(0)'; },800);
 	};
 	function closeEdit(){
+		clearTimeout(editAnimTimer);
 		$('editWrap').classList.remove('on');
 		setTimeout(function(){ $('editWrap').classList.add('hide'); $('editMask').classList.add('hide'); },280);
 	}
@@ -4783,7 +4788,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 
 /* 编辑主页：从右侧滑入的卡片（用动画，避免 display:none 后过渡不触发） */
 .edit-drawer{transform:translateX(100%);transition:none;background:#FFFBF6;}
-.edit-drawer.on{animation:edSlide .32s cubic-bezier(.22,.7,.25,1) both;}
+.edit-drawer.on{transform:translateX(0);animation:edSlide .32s cubic-bezier(.22,.7,.25,1) both;}
 @keyframes edSlide{from{transform:translateX(100%);}to{transform:translateX(0);}}
 .edit-mask{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(46,26,15,.26)!important;}
 .dm{z-index:260;}

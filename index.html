@@ -848,7 +848,41 @@ body.modal-open{overflow:hidden;}
 				</tbody>
 			</table>
 		</div>
-		<p class="tip">这些不是工作记录，是我们自己一天天攒下来的。</p>
+
+		<div class="section-head">
+			<h3 class="section-title">视频投稿</h3>
+			<span class="section-note">选文件上传，也可以粘贴链接</span>
+		</div>
+		<div class="clip-box">
+			<form class="clip-form" id="clipForm">
+				<label class="clip-row">
+					<span>这段视频叫什么</span>
+					<input id="clipTitle" maxlength="40" placeholder="例如 那天在江边的十分钟">
+				</label>
+				<label class="clip-row">
+					<span>投稿人</span>
+					<input id="clipWho" maxlength="16" placeholder="怎么称呼你">
+				</label>
+				<div class="clip-tabs">
+					<button type="button" class="clip-tab on" data-mode="file">上传视频</button>
+					<button type="button" class="clip-tab" data-mode="link">粘贴链接</button>
+				</div>
+				<div class="clip-pane" id="clipPaneFile">
+					<label class="clip-drop">
+						<span>点这里选一段视频</span>
+						<small>mp4 / mov，单个 60MB 以内</small>
+						<input type="file" id="clipInput" accept="video/*">
+					</label>
+					<p class="clip-file-name" id="clipFileName"></p>
+				</div>
+				<div class="clip-pane" id="clipPaneLink" hidden>
+					<input class="clip-url" id="clipUrl" placeholder="https:// 开头的视频链接，B站 / 抖音 / 微博 都行">
+				</div>
+				<button type="submit" class="submit-btn" id="clipSubmit">发布</button>
+				<p class="clip-tip" id="clipTip"></p>
+			</form>
+			<div class="clip-list" id="clipList"></div>
+		</div>
 	</section>
 </div>
 <div class="page" id="feature">
@@ -2434,6 +2468,57 @@ body.modal-open{overflow:hidden;}
 	cursor:pointer;z-index:2;display:none;
 }
 .photo-viewer-dl.on{display:block;}
+
+/* ===== 视频投稿 ===== */
+.clip-box{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:26px;align-items:start;margin-top:8px;}
+.clip-form{background:#FFFBF6;border:1px solid #F0D6C2;border-radius:18px;padding:18px;}
+.clip-row{display:block;margin:0 0 12px;}
+.clip-row span{display:block;font-size:12.5px;letter-spacing:.5px;color:#A06443;margin-bottom:6px;}
+.clip-row input,.clip-url{
+	width:100%;box-sizing:border-box;padding:10px 12px;
+	border:1px solid #EAD3C1;border-radius:10px;background:#FFFDFB;
+	font-size:14px;color:#4A3226;font-family:inherit;outline:none;
+}
+.clip-row input:focus,.clip-url:focus{border-color:#BF5B2E;}
+.clip-tabs{display:flex;gap:8px;margin:4px 0 12px;}
+.clip-tab{
+	flex:1;padding:8px 0;border:1px solid #EAD3C1;background:#FFFDFB;border-radius:10px;
+	font-size:13px;color:#A06443;cursor:pointer;font-family:inherit;
+}
+.clip-tab.on{background:#FDEFE3;border-color:#BF5B2E;color:#BF5B2E;font-weight:600;}
+.clip-drop{
+	position:relative;overflow:hidden;
+	display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+	height:104px;border:1.5px dashed #E3B594;border-radius:14px;background:#FFFDFB;
+	cursor:pointer;font-size:14px;color:#A06443;
+}
+.clip-drop small{font-size:11.5px;color:#B99584;}
+.clip-drop input{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:0;}
+.clip-file-name{margin:8px 0 0;font-size:12px;color:#9C8275;word-break:break-all;min-height:1px;}
+.clip-tip{margin:10px 0 0;font-size:12.5px;color:#9C8275;line-height:1.7;}
+.clip-form .submit-btn{width:100%;margin-top:6px;}
+.clip-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:start;}
+.clip-card{
+	position:relative;background:#fff;border-radius:16px;overflow:hidden;
+	box-shadow:0 6px 20px rgba(150,74,30,.10);display:flex;flex-direction:column;
+}
+.clip-card video{width:100%;aspect-ratio:16/9;object-fit:cover;background:#1b120c;display:block;}
+.clip-link{
+	display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;
+	background:#FDEFE3;color:#BF5B2E;text-decoration:none;font-size:14px;letter-spacing:1px;
+}
+.clip-meta{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px;}
+.clip-name{font-size:14px;color:#3B2419;font-weight:600;word-break:break-all;}
+.clip-sub{font-size:11.5px;color:#B99584;}
+.clip-del{
+	position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;border:0;
+	background:rgba(28,17,11,.55);color:#FFF8F2;font-size:15px;line-height:26px;text-align:center;cursor:pointer;z-index:2;
+}
+.clip-empty{grid-column:1/-1;font-size:13px;color:#B99584;letter-spacing:.5px;padding:14px 2px;}
+@media(max-width:900px){
+	.clip-box{grid-template-columns:1fr;}
+	.clip-list{grid-template-columns:1fr;}
+}
 @media(max-width:900px){.photo-wall{grid-template-columns:repeat(3,minmax(0,1fr));}}
 @media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}</style>
 <!-- photoWall -->
@@ -2810,6 +2895,125 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 	setStatus();
 	refresh();
 	if(cloud) setInterval(function(){ if(!viewer.classList.contains('on')) refresh(); },15000);
+})();
+</script>
+<script>
+/* ===== 视频投稿：选文件上传 或 粘贴链接 ===== */
+(function(){
+	var CFG=window.AYLIO_CLOUD||{};
+	var form=document.getElementById('clipForm');
+	if(!CFG.bucket||!form) return;
+	var BASE='https://'+CFG.bucket+'.cos.'+(CFG.region||'ap-guangzhou')+'.myqcloud.com/clips/';
+	var MAN=BASE+'_index.json';
+	var listEl=document.getElementById('clipList'), tipEl=document.getElementById('clipTip');
+	var titleEl=document.getElementById('clipTitle'), whoEl=document.getElementById('clipWho');
+	var input=document.getElementById('clipInput'), urlEl=document.getElementById('clipUrl');
+	var nameEl=document.getElementById('clipFileName'), btn=document.getElementById('clipSubmit');
+	var paneFile=document.getElementById('clipPaneFile'), paneLink=document.getElementById('clipPaneLink');
+	var tabs=[].slice.call(document.querySelectorAll('.clip-tab'));
+	var mode='file', picked=null;
+
+	tabs.forEach(function(t){
+		t.addEventListener('click',function(){
+			mode=t.getAttribute('data-mode');
+			tabs.forEach(function(x){ x.classList.toggle('on',x===t); });
+			paneFile.hidden=(mode!=='file'); paneLink.hidden=(mode!=='link');
+		});
+	});
+	input.addEventListener('change',function(){
+		picked=(input.files&&input.files[0])||null;
+		nameEl.textContent=picked?('已选：'+picked.name):'';
+	});
+
+	function mid(){ try{ var v=localStorage.getItem('aylio_clip_id'); if(!v){ v='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); localStorage.setItem('aylio_clip_id',v); } return v; }catch(e){ return 'anon'; } }
+	function read(){ return fetch(MAN,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+	function write(rows){
+		return fetch(MAN,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(rows)})
+			.then(function(r){ if(!r.ok) throw new Error('存清单失败 '+r.status); });
+	}
+	function fmt(ts){ var d=new Date(ts||Date.now()); function p(n){ return (n<10?'0':'')+n; } return d.getFullYear()+'.'+p(d.getMonth()+1)+'.'+p(d.getDate()); }
+	function ctype(ext){
+		var m={'.mp4':'video/mp4','.m4v':'video/mp4','.mov':'video/quicktime','.webm':'video/webm','.avi':'video/x-msvideo','.mkv':'video/x-matroska'};
+		return m[ext]||'application/octet-stream';
+	}
+	function card(row){
+		var box=document.createElement('div'); box.className='clip-card';
+		if(row.type==='link'){
+			var a=document.createElement('a'); a.className='clip-link'; a.href=row.link; a.target='_blank'; a.rel='noopener'; a.textContent='打开链接看视频';
+			box.appendChild(a);
+		}else{
+			var v=document.createElement('video'); v.src=BASE+row.f; v.controls=true; v.playsInline=true; v.preload='metadata';
+			box.appendChild(v);
+		}
+		var meta=document.createElement('div'); meta.className='clip-meta';
+		var n=document.createElement('div'); n.className='clip-name'; n.textContent=row.title||'没有起名字的一段视频';
+		var s=document.createElement('div'); s.className='clip-sub'; s.textContent=(row.who?row.who+' · ':'')+fmt(row.ts);
+		meta.appendChild(n); meta.appendChild(s); box.appendChild(meta);
+		var del=document.createElement('button'); del.className='clip-del'; del.type='button'; del.title='删除'; del.textContent='×';
+		del.addEventListener('click',function(){
+			if(!confirm('删掉这条投稿？')) return;
+			read().then(function(rows){
+				var keep=rows.filter(function(r){ return !(r.f&&r.f===row.f)&&!(r.link&&r.link===row.link); });
+				return write(keep);
+			}).then(function(){
+				if(row.f){ try{ fetch(BASE+row.f,{method:'DELETE'}).catch(function(){}); }catch(e){} }
+				load();
+			});
+		});
+		box.appendChild(del);
+		return box;
+	}
+	function render(rows){
+		listEl.innerHTML='';
+		if(!rows.length){ var e=document.createElement('div'); e.className='clip-empty'; e.textContent='还没有人投稿，第一条留给你。'; listEl.appendChild(e); return; }
+		rows.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); }).forEach(function(r){ listEl.appendChild(card(r)); });
+	}
+	function load(){ read().then(render); }
+
+	form.addEventListener('submit',function(ev){
+		ev.preventDefault();
+		var title=titleEl.value.trim().slice(0,40), who=whoEl.value.trim().slice(0,16);
+		if(mode==='link'){
+			var link=(urlEl.value||'').trim();
+			if(!/^https?:\/\/[^\s]+$/i.test(link)){ alert('链接要以 http:// 或 https:// 开头'); return; }
+			btn.disabled=true; tipEl.textContent='正在发布…';
+			read().then(function(rows){
+				rows.push({type:'link',link:link,title:title,who:who,ts:Date.now(),id:mid()});
+				return write(rows);
+			}).then(function(){
+				btn.disabled=false; tipEl.textContent='已经发布，右边就能看到。';
+				urlEl.value=''; titleEl.value=''; whoEl.value='';
+				load();
+			}).catch(function(e){ btn.disabled=false; tipEl.textContent='没发出去：'+(e&&e.message||e); });
+			return;
+		}
+		if(!picked){ alert('先在上面选一段视频'); return; }
+		if(picked.size>60*1024*1024){ alert('视频请控制在 60MB 以内'); return; }
+		var ext=((picked.name||'').match(/\.[a-zA-Z0-9]+$/)||['.mp4'])[0].toLowerCase();
+		var fname=Date.now()+'-'+mid()+'-'+Math.random().toString(36).slice(2,6)+ext;
+		var xhr=new XMLHttpRequest();
+		xhr.open('PUT',BASE+fname,true);
+		xhr.setRequestHeader('Content-Type',ctype(ext));
+		xhr.setRequestHeader('Cache-Control','public, max-age=31536000');
+		xhr.upload.onprogress=function(e){ if(e.lengthComputable) tipEl.textContent='上传中 '+Math.round(e.loaded/e.total*100)+'%'; };
+		btn.disabled=true;
+		xhr.onload=function(){
+			if(xhr.status<200||xhr.status>=300){ btn.disabled=false; tipEl.textContent='上传失败（'+xhr.status+'），换一段再试'; return; }
+			read().then(function(rows){
+				rows.push({f:fname,type:'video',title:title,who:who,ts:Date.now(),id:mid()});
+				return write(rows);
+			}).then(function(){
+				btn.disabled=false; tipEl.textContent='上传完成，右边就能看到。';
+				input.value=''; picked=null; nameEl.textContent=''; titleEl.value=''; whoEl.value='';
+				load();
+			}).catch(function(e){ btn.disabled=false; tipEl.textContent='视频传上去了，但清单没存住：'+(e&&e.message||e); });
+		};
+		xhr.onerror=function(){ btn.disabled=false; tipEl.textContent='上传失败，检查网络后重试'; };
+		xhr.send(picked);
+	});
+
+	load();
+	setInterval(function(){ if(!document.hidden) load(); },30000);
 })();
 </script>
 <script>

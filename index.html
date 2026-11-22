@@ -853,26 +853,32 @@ body.modal-open{overflow:hidden;}
 		};
 	});
 
-	$('agSendCode').onclick=function(){
+	$('agSendCode').onclick=async function(){
 		var mail=$('agRMail').value.trim();
 		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ $('agCodeTip').textContent='先填一个像样的邮箱'; return; }
 		pendMail=mail;
 		pendCode=String(Math.floor(100000+Math.random()*900000));
 		if(!ready()){ $('agCodeTip').textContent='验证码：'+pendCode+'（还没接发信服务，先在页面显示）'; return; }
-		$('agCodeTip').textContent='正在发到 '+mail+' …';
-		$('agSendCode').disabled=true;
+		var tip=$('agCodeTip'), btn=$('agSendCode');
+		tip.textContent='正在发到 '+mail+' …';
+		btn.disabled=true;
 		var c=mailcfg();
-		fetch('https://api.emailjs.com/api/v1.0/email/send',{
-			method:'POST',headers:{'Content-Type':'application/json'},
-			body:JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
-				template_params:{to_email:mail,code:pendCode,site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}})
-		}).then(function(r){ if(!r.ok) throw new Error('mail '+r.status);
-			$('agSendCode').disabled=false;
-			$('agCodeTip').textContent='验证码已经发到 '+mail+'，去邮箱收一下（找不到看垃圾箱）';
-		}).catch(function(){
-			$('agSendCode').disabled=false;
-			$('agCodeTip').textContent='发信没成功，先在页面显示验证码：'+pendCode;
-		});
+		var payload=JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
+			template_params:{to_email:mail,code:pendCode,site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}});
+		function send(){
+			return fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:payload})
+				.then(function(r){ if(!r.ok){ return r.text().then(function(t){ throw new Error(t||('HTTP '+r.status)); }); } });
+		}
+		var okText='验证码已经发到 '+mail+'，去邮箱收一下（找不到看垃圾箱）';
+		var e1=null;
+		try{ await send(); tip.textContent=okText; }
+		catch(err){ e1=err; }
+		if(e1){
+			await new Promise(function(s){ setTimeout(s,4000); });
+			try{ await send(); tip.textContent=okText; }
+			catch(err2){ tip.textContent='发信没成功（'+(String(err2.message||err2).slice(0,70))+'），先显示验证码：'+pendCode; }
+		}
+		btn.disabled=false;
 	};
 
 	$('agDoReg').onclick=function(){

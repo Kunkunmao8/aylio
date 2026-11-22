@@ -1478,6 +1478,98 @@ a{color:inherit;}
 #mine .mine-wrap{grid-template-columns:1fr;}
 #mine .mine-card{padding:22px 18px;}
 }
+
+/* ================= 小红书式个人主页（我的 / 别人主页共用） ================= */
+.xp{max-width:1000px;margin:0 auto;padding:0 0 120px;}
+.xp-cover{position:relative;height:440px;overflow:hidden;background:#2A1B13;}
+.xp-cover-img{width:100%;height:100%;object-fit:cover;display:block;}
+.xp-mask{position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,11,7,.46),rgba(18,11,7,.08) 30%,rgba(18,11,7,.86) 100%);}
+.xp-top{position:absolute;top:0;left:0;right:0;z-index:3;display:flex;align-items:center;gap:14px;padding:18px 24px;}
+.xp-brand{color:#FFF3E9;font-size:12px;letter-spacing:.22em;text-shadow:0 2px 8px rgba(0,0,0,.5);}
+.xp-back{margin-left:0;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,240,228,.45);background:rgba(30,18,12,.35);color:#FFF6EE;font-size:18px;cursor:pointer;font-family:inherit;backdrop-filter:blur(6px);}
+.xp-edit{margin-left:auto;height:38px;padding:0 20px;border-radius:999px;border:1px solid rgba(255,240,228,.55);background:rgba(35,20,12,.35);color:#FFF6EE;font-size:13px;font-family:inherit;cursor:pointer;backdrop-filter:blur(6px);}
+.xp-edit:hover{background:rgba(192,94,42,.55);border-color:#F0C4A4;}
+.xp-info{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:0 30px 26px;color:#FFF6EE;}
+.xp-head{display:flex;align-items:flex-end;gap:18px;}
+.xp-ava{width:98px;height:98px;flex:0 0 auto;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;border:2px solid rgba(255,246,238,.9);cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.35);}
+.xp-ava img{width:100%;height:100%;object-fit:cover;display:block;}
+.xp-who{padding-bottom:4px;min-width:0;}
+.xp-name{font-size:25px;font-weight:700;letter-spacing:.02em;text-shadow:0 2px 10px rgba(0,0,0,.45);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.xp-sub{margin-top:6px;font-size:12.5px;color:#EBD5C6;}
+.xp-stats{display:flex;gap:26px;margin-top:18px;}
+.xp-stats button,.xp-stats .xp-st{border:0;background:transparent;color:#EBD5C6;font:inherit;font-family:inherit;padding:0;display:flex;align-items:baseline;gap:6px;}
+.xp-stats button{cursor:pointer;}
+.xp-stats b{font-size:17px;font-weight:700;color:#FFF6EE;}
+.xp-bio{margin:14px 0 0;font-size:13.5px;line-height:1.9;color:#F7E3D6;max-width:640px;white-space:pre-wrap;word-break:break-word;}
+.xp-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.xp-tag{font-size:12px;color:#FFE8D9;background:rgba(255,240,228,.14);border:1px solid rgba(255,240,228,.2);border-radius:999px;padding:4px 12px;}
+.xp-sheet{position:relative;margin-top:-22px;z-index:4;background:#FFFCF9;border-radius:22px 22px 0 0;padding:8px 24px 46px;box-shadow:0 -8px 26px rgba(40,20,10,.18);}
+.xp-tabs{display:flex;align-items:center;gap:26px;border-bottom:1px solid #F0DFD0;overflow-x:auto;}
+.xp-tabs button{border:0;background:transparent;font-family:inherit;font-size:14.5px;color:#A8897A;padding:12px 0 13px;cursor:pointer;position:relative;white-space:nowrap;}
+.xp-tabs button.on{color:#3A241A;font-weight:700;}
+.xp-tabs button.on:after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:-1px;width:22px;height:2.5px;border-radius:2px;background:#C05E2A;}
+.xp-tabs b{font-weight:400;font-size:12px;color:#B99584;margin-left:2px;}
+.xp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:20px;}
+.xp-card{background:#fff;border:1px solid #F0DFD0;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;text-align:left;font-family:inherit;padding:0;transition:transform .16s,box-shadow .16s;}
+.xp-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(150,74,30,.12);}
+.xp-card-img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#F6E3D4;}
+.xp-card-txt{aspect-ratio:4/5;padding:16px 14px;font-size:13.5px;line-height:1.8;color:#5A4234;background:#FDEFE3;overflow:hidden;}
+.xp-card-body{padding:8px 10px 12px;display:flex;flex-direction:column;gap:6px;flex:1;}
+.xp-card-title{font-size:13px;line-height:1.55;color:#3A241A;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.xp-card-meta{display:flex;justify-content:space-between;font-size:11.5px;color:#B39A8B;margin-top:auto;}
+.xp-none{grid-column:1/-1;text-align:center;color:#B99584;font-size:13px;padding:54px 0;line-height:2;}
+.xp-list{display:flex;flex-direction:column;gap:10px;padding:18px 0 4px;}
+.xp-row{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid #F2DDCB;border-radius:14px;padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit;width:100%;}
+.xp-row .ph{width:42px;height:42px;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex:0 0 auto;}
+.xp-row .ph img{width:100%;height:100%;object-fit:cover;display:block;}
+.xp-row .nm{font-size:13.5px;color:#3A241A;font-weight:600;}
+.xp-row .sb{font-size:11.5px;color:#AC9184;margin-top:3px;}
+.xp-row .go{margin-left:auto;font-size:12px;color:#BF5B2E;border:1px solid #F0C9AF;background:#FFF3EA;border-radius:999px;padding:5px 12px;flex:0 0 auto;}
+.xp-row .go.done{color:#A8897A;border-color:#E7D6C7;background:#FAF3EC;}
+.xp-sec{margin-top:28px;border-top:1px dashed #F0DFD0;padding-top:18px;}
+.xp-sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.xp-sec-head h4{margin:0;font-size:15px;letter-spacing:.06em;color:#3A241A;}
+.xp-sec-head button{border:0;background:transparent;color:#A8897A;font-family:inherit;font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px 22px;}
+@media(max-width:760px){.edit-grid{grid-template-columns:1fr;}}
+.xp-modal{position:fixed;inset:0;z-index:70;background:rgba(30,17,10,.5);display:flex;align-items:flex-end;justify-content:center;}
+.xp-modal-panel{width:min(540px,100%);max-height:78vh;overflow:auto;background:#FFFCF9;border-radius:20px 20px 0 0;padding:20px 20px 32px;position:relative;}
+.xp-modal-panel h3{margin:0 0 4px;font-size:16px;letter-spacing:.06em;color:#3A241A;}
+.xp-x{position:absolute;right:10px;top:8px;border:0;background:transparent;font-size:24px;color:#B99584;cursor:pointer;line-height:1;}
+.note-view .nv-img{width:100%;border-radius:12px;display:block;margin-bottom:12px;}
+.note-view .nv-text{font-size:14.5px;line-height:1.9;color:#4A3226;white-space:pre-wrap;word-break:break-word;}
+.note-view .nv-meta{margin-top:14px;padding-top:10px;border-top:1px dashed #F3E4D7;font-size:12px;color:#B39A8B;}
+@media(max-width:760px){
+.xp-cover{height:400px;}
+.xp-info{padding:0 18px 20px;}
+.xp-ava{width:80px;height:80px;font-size:26px;}
+.xp-name{font-size:21px;}
+.xp-stats{gap:18px;}
+.xp-sheet{padding:8px 16px 40px;}
+.xp-grid{grid-template-columns:repeat(2,1fr);gap:12px;}
+}
+
+/* ================= 别人主页（社区里点开） ================= */
+.xp-ov{position:fixed;inset:0;z-index:62;background:#FFFCF9;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.xp-ov .xp{padding-bottom:40px;}
+
+/* ================= 私信 ================= */
+.dm{position:fixed;inset:0;z-index:68;background:rgba(30,17,10,.45);display:flex;align-items:flex-end;justify-content:center;}
+.dm-panel{width:min(460px,100%);height:min(78vh,640px);background:#FFFCF9;border-radius:20px 20px 0 0;display:flex;flex-direction:column;overflow:hidden;}
+.dm-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #F3E4D7;}
+.dm-head .t{font-size:14.5px;font-weight:700;color:#3A241A;letter-spacing:.04em;}
+.dm-head .s{font-size:11.5px;color:#B39A8B;margin-top:2px;}
+.dm-x{margin-left:auto;border:0;background:transparent;font-size:22px;color:#B99584;cursor:pointer;line-height:1;}
+.dm-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;background:#FFF9F4;}
+.dm-msg{max-width:76%;padding:9px 12px;border-radius:12px;font-size:13.5px;line-height:1.65;word-break:break-word;}
+.dm-msg.them{background:#fff;border:1px solid #F2E2D3;color:#4A3226;align-self:flex-start;border-bottom-left-radius:4px;}
+.dm-msg.me{background:#C05E2A;color:#FFF8F2;align-self:flex-end;border-bottom-right-radius:4px;}
+.dm-msg .tm{display:block;font-size:10.5px;opacity:.7;margin-top:4px;}
+.dm-foot{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #F3E4D7;background:#FFFDFB;}
+.dm-foot input{flex:1;height:42px;padding:0 14px;border:1px solid #EAD3C1;border-radius:10px;font-size:13.5px;font-family:inherit;color:#4A3226;background:#fff;outline:none;}
+.dm-foot input:focus{border-color:#BF5B2E;}
+.dm-foot button{height:42px;padding:0 18px;border:0;border-radius:10px;background:#C05E2A;color:#fff;font-size:13.5px;font-family:inherit;cursor:pointer;}
+.dm-empty{margin:auto;color:#B99584;font-size:12.5px;text-align:center;line-height:2;}
 </style>
 <div class="page" id="pillow">
 	<section class="banner">
@@ -1501,20 +1593,6 @@ a{color:inherit;}
 			<button class="sbtn" id="pSearchClear" type="button">清空</button>
 		</div>
 		<div class="user-hits hide" id="userHits"></div>
-		<div class="ucard hide" id="userCard">
-			<div class="ucard-panel">
-				<button class="ucard-x" id="ucardX" type="button" aria-label="关闭">×</button>
-				<div class="ucard-ava" id="ucardAva"><span>瞳</span></div>
-				<h3 class="ucard-name" id="ucardName">—</h3>
-				<p class="ucard-sign" id="ucardSign">还没有写签名</p>
-				<div class="ucard-lines">
-					<div><span>生日</span><b id="ucardBirth">还没填</b></div>
-					<div><span>星座</span><b id="ucardZodiac">—</b></div>
-					<div><span>在社区发过</span><b id="ucardPosts">0 帖</b></div>
-				</div>
-				<button class="ucard-btn" id="ucardFilter" type="button">只看 TA 发的帖子</button>
-			</div>
-		</div>
 		<div class="gate" id="gate">
 			<div class="gate-card">
 				<h2>先登录，再发帖</h2>
@@ -1562,6 +1640,62 @@ a{color:inherit;}
 		</div>
 		<div class="up" id="upTip"></div>
 
+	</div>
+	<div class="xp-ov hide" id="userPage">
+		<div class="xp">
+			<div class="xp-cover">
+				<img class="xp-cover-img" id="upCover" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/pillow/banner.jpg" alt="封面">
+				<div class="xp-mask"></div>
+				<div class="xp-top">
+					<button class="xp-back" id="upBack" type="button" aria-label="返回">‹</button>
+					<span class="xp-brand">政瞳之家</span>
+				</div>
+				<div class="xp-info">
+					<div class="xp-head">
+						<div class="xp-ava" id="upAva"><span>瞳</span></div>
+						<div class="xp-who">
+							<div class="xp-name" id="upName">—</div>
+							<div class="xp-sub">政瞳号：<span id="upId">—</span></div>
+							<div class="xp-sub">IP：湖南</div>
+						</div>
+					</div>
+					<div class="xp-stats">
+						<div class="xp-st"><b id="upFollowing">0</b><span>关注</span></div>
+						<div class="xp-st"><b id="upFans">0</b><span>粉丝</span></div>
+						<div class="xp-st"><b id="upLikes">0</b><span>获赞</span></div>
+					</div>
+					<p class="xp-bio" id="upBio">还没有写简介</p>
+					<div class="xp-tags">
+						<span class="xp-tag" id="upZodiac">星座未设置</span>
+						<span class="xp-tag">湖南长沙</span>
+					</div>
+					<div class="up-acts">
+						<button class="up-follow" id="upFollow" type="button">关注</button>
+						<button class="up-dm" id="upDm" type="button">私信</button>
+					</div>
+				</div>
+			</div>
+			<div class="xp-sheet">
+				<div class="xp-tabs"><button type="button" class="on">笔记 <b id="upCnt">0</b></button></div>
+				<div class="xp-grid" id="upGrid"></div>
+			</div>
+		</div>
+	</div>
+	<div class="dm hide" id="dmBox">
+		<div class="dm-panel">
+			<div class="dm-head">
+				<div>
+					<div class="t" id="dmWho">私信</div>
+					<div class="s">只有你们两个人能看到</div>
+				</div>
+				<button class="dm-x" id="dmX" type="button">×</button>
+			</div>
+			<div class="dm-body" id="dmBody"></div>
+			<div class="dm-foot">
+				<input id="dmIn" maxlength="200" placeholder="说点什么…">
+				<button id="dmSend" type="button">发送</button>
+			</div>
+		</div>
 	</div>
 	</section>
 </div>
@@ -1760,6 +1894,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 	function likeSet(){ try{ return JSON.parse(load('aylio_likes')||'[]')||[]; }catch(e){ return []; } }
 	function isLiked(id){ return likeSet().indexOf(id)>=0; }
+	function favSet(){ try{ return JSON.parse(load('aylio_favs')||'[]')||[]; }catch(e){ return []; } }
+	function isFav(id){ return favSet().indexOf(id)>=0; }
 	function avatarBox(name){
 		var box=el('div','post-ava');
 		var u=USERSMAP[String(name||'').toLowerCase()];
@@ -1819,6 +1955,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			paintLike();
 		};
 		acts.appendChild(likeBtn);
+
+		var favBtn=el('button');
+		favBtn.type='button';
+		function paintFav(){ var on=isFav(m.id); favBtn.classList.toggle('on',on); favBtn.textContent=(on?'⭐ 已收藏':'⭐ 收藏'); }
+		paintFav();
+		favBtn.onclick=function(){
+			var F=favSet(), i=F.indexOf(m.id);
+			if(i>=0) F.splice(i,1); else F.push(m.id);
+			save('aylio_favs',JSON.stringify(F)); paintFav();
+		};
+		acts.appendChild(favBtn);
 
 		var replyBtn=el('button');
 		replyBtn.type='button';
@@ -1911,21 +2058,132 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		for(var i=0;i<st.length;i++){ var c=st[i]; if(m>c[0]||(m===c[0]&&d>=c[1])) cur=c[2]; }
 		return cur;
 	}
+	var UP={}, DMURL='', DMT=null, dmTimer=null, ALLUSERS=[], MYREC=null;
+	function idOf(mail){
+		var s=String(mail||'').toLowerCase(), h=5381;
+		for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0;
+		return String((h>>>0)%90000000+10000000);
+	}
+	function lower(x){ return String(x||'').toLowerCase(); }
+	function followList(u){ return (u&&u.following)||[]; }
+	function isFollowingMail(mail){ return followList(MYREC).map(lower).indexOf(lower(mail))>=0; }
+	function fansOf(u){ var m=lower(u&&u.mail); if(!m) return []; return ALLUSERS.filter(function(x){ return followList(x).map(lower).indexOf(m)>=0; }); }
+	function likesOf(name){ return LAST.filter(function(m){ return (m.who||'')===name; }).reduce(function(s,m){ return s+(m.likes||0); },0); }
+	function paintFollowBtn(){
+		var b=$('upFollow'); if(!b) return;
+		if(!UP||!UP.mail || lower(UP.mail)===lower(ME.mail) && ME.mail){ b.textContent='编辑主页'; b.classList.remove('on'); return; }
+		if(isFollowingMail(UP.mail)){ b.textContent='已关注'; b.classList.add('on'); }
+		else if(UP && followList(UP).map(lower).indexOf(lower(ME.mail))>=0 && ME.mail){ b.textContent='回关'; b.classList.remove('on'); }
+		else { b.textContent='关注'; b.classList.remove('on'); }
+	}
 	function openUser(name){
 		name=name||'匿名';
-		var u=USERSMAP[String(name).toLowerCase()]||{name:name};
-		var ava=$('ucardAva'); ava.innerHTML='';
-		if(u.avatar){ var im=document.createElement('img'); im.src=u.avatar; im.alt=name; im.onclick=function(){ window.open(u.avatar,'_blank'); }; ava.appendChild(im); }
+		UP=USERSMAP[lower(name)]||{name:name};
+		UP.name=UP.name||name;
+		var ava=$('upAva'); ava.innerHTML='';
+		if(UP.avatar){ var im=document.createElement('img'); im.src=UP.avatar; im.alt=name; im.onclick=function(){ window.open(UP.avatar,'_blank'); }; ava.appendChild(im); }
 		else { ava.textContent=String(name).slice(0,1); }
-		$('ucardName').textContent=name;
-		$('ucardSign').textContent=u.sign||'还没有写签名';
-		$('ucardBirth').textContent=u.birth||'还没填';
-		$('ucardZodiac').textContent=u.birth?zod(u.birth):'—';
-		$('ucardPosts').textContent=LAST.filter(function(m){ return (m.who||'')===name; }).length+' 帖';
-		$('ucardFilter').setAttribute('data-name',name);
-		$('userCard').classList.remove('hide');
+		$('upName').textContent=name;
+		$('upId').textContent=idOf(UP.mail);
+		$('upBio').textContent=UP.sign||'还没有写简介';
+		$('upZodiac').textContent=UP.birth?zod(UP.birth):'星座未设置';
+		$('upFollowing').textContent=followList(UP).length;
+		$('upFans').textContent=fansOf(UP).length;
+		$('upLikes').textContent=likesOf(name);
+		paintFollowBtn();
+		renderUpGrid(name);
+		$('userPage').classList.remove('hide');
+		document.body.style.overflow='hidden';
+		$('userPage').scrollTop=0;
 	}
-	function closeUser(){ $('userCard').classList.add('hide'); }
+	function renderUpGrid(name){
+		var grid=$('upGrid'); if(!grid) return;
+		grid.innerHTML='';
+		var me=LAST.filter(function(m){ return (m.who||'')===name; }).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+		$('upCnt').textContent=me.length;
+		if(!me.length){ grid.innerHTML='<div class="xp-none">TA 还没发过帖子</div>'; return; }
+		me.forEach(function(m){
+			var c=el('button','xp-card'); c.type='button';
+			if(m.img){ var im=el('img','xp-card-img'); im.src=m.img; im.alt=''; im.loading='lazy'; c.appendChild(im); }
+			else { var t=el('div','xp-card-txt'); t.textContent=(m.text||'一段视频').slice(0,80); c.appendChild(t); }
+			var body=el('div','xp-card-body');
+			var tt=el('div','xp-card-title'); tt.textContent=m.text?m.text.slice(0,40):'视频投稿';
+			var mt=el('div','xp-card-meta');
+			var a=el('span'); a.textContent=m.video?'视频':'图文';
+			var b=el('span'); b.textContent='♥ '+(m.likes||0);
+			mt.appendChild(a); mt.appendChild(b); body.appendChild(tt); body.appendChild(mt); c.appendChild(body);
+			c.onclick=function(){ closeUserPage(); if(m.img) window.open(m.img,'_blank'); };
+			grid.appendChild(c);
+		});
+	}
+	function closeUserPage(){ $('userPage').classList.add('hide'); document.body.style.overflow=''; }
+	function toggleFollow(force){
+		if(!ME.mail){ alert('先登录再关注'); return; }
+		if(!UP||!UP.mail){ alert('TA 还没有注册账号，暂时不能关注'); return; }
+		var b=$('upFollow'); b.disabled=true;
+		var on = (typeof force==='boolean') ? force : !isFollowingMail(UP.mail);
+		readUsers().then(function(list){
+			var idx=-1;
+			for(var i=0;i<list.length;i++){ if(lower(list[i].mail)===lower(ME.mail)){ idx=i; break; } }
+			if(idx<0) throw new Error('没找到你的账号，重新登录一下');
+			var u=list[idx];
+			var arr=followList(u).map(lower), j=arr.indexOf(lower(UP.mail));
+			if(on && j<0) u.following=followList(u).concat([lower(UP.mail)]);
+			if(!on && j>=0) u.following=followList(u).filter(function(x){ return lower(x)!==lower(UP.mail); });
+			return writeUsers(list).then(function(){ MYREC=u; });
+		}).then(function(){
+			b.disabled=false; paintFollowBtn();
+			$('upFollowing').textContent=followList(UP).length;
+			$('upFans').textContent=fansOf(UP).length;
+		}).catch(function(e){ b.disabled=false; alert(e.message||'没关注上'); });
+	}
+	function convKey(a,b){
+		var s=[lower(a),lower(b)].sort().join('|'), h=5381;
+		for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0;
+		return 'dm/'+(h>>>0).toString(36)+'-'+s.length.toString(36)+'.json';
+	}
+	function dmRender(list){
+		var body=$('dmBody'); if(!body) return;
+		body.innerHTML='';
+		var arr=(list||[]).sort(function(a,b){ return (a.ts||0)-(b.ts||0); });
+		if(!arr.length){ body.innerHTML='<div class="dm-empty">还没有消息，先说第一句吧</div>'; return; }
+		arr.forEach(function(m){
+			var mine=lower(m.from)===lower(ME.mail);
+			var b=el('div','dm-msg '+(mine?'me':'them'));
+			b.textContent=m.text||'';
+			var tm=el('span','tm'); tm.textContent=hhmm(m.ts);
+			b.appendChild(tm); body.appendChild(b);
+		});
+		body.scrollTop=body.scrollHeight;
+	}
+	function dmLoad(){
+		if(!DMURL) return;
+		fetch(DMURL,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }).then(dmRender);
+	}
+	function openDm(u){
+		if(!ME.mail){ alert('先登录再私信'); return; }
+		if(!u||!u.mail){ alert('TA 还没有注册账号，暂时不能私信'); return; }
+		DMT=u; DMURL=HOST+convKey(ME.mail,u.mail);
+		$('dmWho').textContent='私信 · '+(u.name||'');
+		$('dmBody').innerHTML='<div class="dm-empty">正在读消息…</div>';
+		$('dmBox').classList.remove('hide');
+		dmLoad();
+		clearInterval(dmTimer); dmTimer=setInterval(dmLoad,3000);
+	}
+	function closeDm(){ $('dmBox').classList.add('hide'); clearInterval(dmTimer); dmTimer=null; }
+	function sendDm(){
+		var inp=$('dmIn'), t=(inp.value||'').trim();
+		if(!t) return;
+		if(!DMURL) return;
+		var btn=$('dmSend'); btn.disabled=true; inp.value='';
+		fetch(DMURL,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; })
+			.then(function(list){
+				var arr=(list||[]).slice(-200);
+				arr.push({from:lower(ME.mail),name:ME.name||'',text:t.slice(0,200),ts:Date.now()});
+				return fetch(DMURL,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(arr)});
+			}).then(function(r){ if(r&&!r.ok) throw new Error('消息没发出去 '+r.status); btn.disabled=false; dmLoad(); })
+			.catch(function(e){ btn.disabled=false; alert(e.message||'消息没发出去'); });
+	}
 	function hitUsers(q){
 		var out=[], seen={};
 		Object.keys(USERSMAP).forEach(function(k){
@@ -1992,13 +2250,15 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		pSearch.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(searchTimer); applyQuery(pSearch.value); } });
 	}
 	if($('pSearchClear')) $('pSearchClear').onclick=function(){ if(pSearch) pSearch.value=''; applyQuery(''); };
-	if($('ucardX')) $('ucardX').onclick=closeUser;
-	if($('userCard')) $('userCard').onclick=function(e){ if(e.target===this) closeUser(); };
-	if($('ucardFilter')) $('ucardFilter').onclick=function(){
-		var nm=this.getAttribute('data-name')||'';
-		if(pSearch) pSearch.value=nm;
-		closeUser(); applyQuery(nm);
+	if($('upBack')) $('upBack').onclick=closeUserPage;
+	if($('upFollow')) $('upFollow').onclick=function(){
+		if(ME.mail && UP && lower(UP.mail)===lower(ME.mail)){ closeUserPage(); location.hash='#mine'; return; }
+		toggleFollow();
 	};
+	if($('upDm')) $('upDm').onclick=function(){ openDm(UP); };
+	if($('dmX')) $('dmX').onclick=closeDm;
+	if($('dmSend')) $('dmSend').onclick=sendDm;
+	if($('dmIn')) $('dmIn').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); sendDm(); } });
 	function post(msg){
 		return readRoom().then(function(list){
 			list=dedupe(list||[]);
@@ -2070,8 +2330,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var nick=load('aylio_pillow_nick'); if(nick) nickIn.value=nick;
 	function loadUsersMap(){
 		readUsers().then(function(list){
-			USERSMAP={};
-			(list||[]).forEach(function(u){ if(u&&u.name) USERSMAP[String(u.name).toLowerCase()]=u; });
+			USERSMAP={}; ALLUSERS=[];
+			(list||[]).forEach(function(u){
+				if(!u) return;
+				ALLUSERS.push(u);
+				if(u.name) USERSMAP[String(u.name).toLowerCase()]=u;
+				if(ME.mail && lower(u.mail)===lower(ME.mail)){ MYREC=u; if(u.name) ME.name=u.name; if(u.avatar) ME.avatar=u.avatar; }
+			});
+			if(!$('userPage').classList.contains('hide')) paintFollowBtn();
 		});
 	}
 	loadUsersMap();
@@ -2111,79 +2377,122 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 
 <div class="page" id="mine">
 	<div class="ava-view hide" id="avaView"><img id="avaViewImg" alt="头像大图"></div>
-	<section class="banner">
-		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="我的页面横幅：两人并肩站着">
-		<div class="banner-text">
-			<div class="container">
-				<p class="banner-kicker">MY PAGE</p>
-				<h1>我的</h1>
-				<p class="banner-sub">头像、昵称、密码，都在这一页改</p>
+	<div class="xp">
+		<div class="xp-cover">
+			<img class="xp-cover-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="我的主页封面：两人并肩站着">
+			<div class="xp-mask"></div>
+			<div class="xp-top">
+				<span class="xp-brand">政瞳之家</span>
+				<button class="xp-edit" id="myEditOpen" type="button">编辑主页</button>
+			</div>
+			<div class="xp-info">
+				<div class="xp-head">
+					<div class="xp-ava" id="meAva"><span id="meAvaTxt">瞳</span></div>
+					<div class="xp-who">
+						<div class="xp-name" id="meName">未登录</div>
+						<div class="xp-sub">政瞳号：<span id="myId">—</span></div>
+						<div class="xp-sub">IP：湖南</div>
+					</div>
+				</div>
+				<div class="xp-stats">
+					<button type="button" id="stFollow"><b>0</b><span>关注</span></button>
+					<button type="button" id="stFans"><b>0</b><span>粉丝</span></button>
+					<div class="xp-st"><b id="stLikes">0</b><span>获赞与收藏</span></div>
+				</div>
+				<p class="xp-bio" id="meSignView">还没有简介，点右上角「编辑主页」写一句。</p>
+				<div class="xp-tags">
+					<span class="xp-tag" id="tagZodiac">星座未设置</span>
+					<span class="xp-tag">湖南长沙</span>
+					<span class="xp-tag" id="tagMail">未登录</span>
+				</div>
 			</div>
 		</div>
-	</section>
-	<section class="container">
-		<div class="mine-wrap">
-			<div class="mine-card">
-				<div class="me-ava" id="meAva"><span id="meAvaTxt">瞳</span><i class="cam">✎</i></div>
-				<p class="me-name" id="meName">未登录</p>
-				<p class="me-mail" id="meMail">—</p>
-				<span class="me-badge" id="meBadge">社区成员</span>
-				<button class="me-ava-btn" type="button" id="meAvaBtn">更换头像</button>
-				<input type="file" id="meAvaFile" accept="image/*" class="hide">
+		<div class="xp-sheet">
+			<div class="xp-tabs" id="myTabs">
+				<button type="button" class="on" data-tab="notes">笔记 <b id="cntNotes">0</b></button>
+				<button type="button" data-tab="replies">评论 <b id="cntReplies">0</b></button>
+				<button type="button" data-tab="favs">收藏 <b id="cntFavs">0</b></button>
+				<button type="button" data-tab="liked">赞过 <b id="cntLiked">0</b></button>
 			</div>
-			<div class="mine-col">
-				<div class="me-block">
-					<h4>昵称</h4>
-					<p class="hint">现在叫：<span id="meNameView">—</span>，社区里显示这个名字。</p>
-					<button class="me-btn ghost" id="meNameOpen" type="button">修改昵称</button>
-					<div id="meNameBox" class="hide" style="margin-top:12px">
-						<input class="me-input" id="meNameIn" maxlength="10" placeholder="给自己起个名字">
-						<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
+			<div class="xp-grid" id="myGrid"></div>
+			<div class="xp-sec hide" id="editWrap">
+				<div class="xp-sec-head"><h4>编辑主页</h4><button type="button" id="myEditClose">收起</button></div>
+				<div class="edit-grid">
+					<div class="me-block">
+						<h4>头像</h4>
+						<p class="hint">点左上角圆形头像可以看大图；这里换一张。</p>
+						<button class="me-btn ghost" type="button" id="meAvaBtn">更换头像</button>
+						<input type="file" id="meAvaFile" accept="image/*" class="hide">
+						<p class="me-msg" id="meOutMsg"></p>
+						<span id="meMail" class="hide">—</span>
 					</div>
-					<p class="me-msg" id="meNameMsg"></p>
-				</div>
-				<div class="me-block">
-					<h4>资料</h4>
-					<p class="hint">签名会显示在社区点头像的那张卡片上；生日点开选，选完自动出星座。</p>
-					<input class="me-input" id="meSignIn" maxlength="60" placeholder="写一句签名，最多 60 字">
-					<button class="me-btn ghost" id="meSignBtn" type="button">保存签名</button>
-					<p class="me-msg" id="meSignMsg"></p>
-					<p class="hint" style="margin:16px 0 8px">生日</p>
-					<input class="me-input" id="meBirth" type="date">
-					<p class="me-sign-line">星座：<b id="meZodiac">未设置</b></p>
-					<p class="me-msg" id="meBirthMsg"></p>
-				</div>
-				<div class="me-block">
-					<h4>密码</h4>
-					<p class="hint">点「修改密码」才需要填，改完下次用新密码登录。</p>
-					<button class="me-btn ghost" id="mePassOpen" type="button">修改密码</button>
-					<div id="mePassBox" class="hide" style="margin-top:12px">
-						<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
-						<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
-						<button class="me-btn" id="mePassBtn" type="button">确认修改</button>
-					</div>
-					<p class="me-msg" id="mePassMsg"></p>
-					<p class="me-forgot"><button type="button" id="meForgotBtn">忘记现在的密码？用邮箱验证码重设</button></p>
-					<div id="meResetBox" class="hide" style="margin-top:10px">
-						<input class="me-input" id="meRCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
-						<input class="me-input" id="meRPass" type="password" placeholder="新密码，至少 6 位">
-						<div class="me-row">
-							<button class="me-btn" id="meRSend" type="button">获取验证码</button>
-							<button class="me-btn" id="meRSave" type="button">重设密码</button>
+					<div class="me-block">
+						<h4>昵称</h4>
+						<p class="hint">现在叫：<span id="meNameView">—</span>，社区里显示这个名字。</p>
+						<button class="me-btn ghost" id="meNameOpen" type="button">修改昵称</button>
+						<div id="meNameBox" class="hide" style="margin-top:12px">
+							<input class="me-input" id="meNameIn" maxlength="16" placeholder="给自己起个名字">
+							<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
 						</div>
-						<p class="me-msg" id="meRMsg"></p>
+						<p class="me-msg" id="meNameMsg"></p>
 					</div>
-				</div>
-				<div class="me-block">
-					<h4>账号</h4>
-					<p class="hint">当前登录邮箱：<span id="meMail2">—</span></p>
-					<button class="me-btn ghost" id="meOut" type="button">退出登录</button>
-					<p class="me-msg" id="meOutMsg"></p>
+					<div class="me-block">
+						<h4>简介与生日</h4>
+						<p class="hint">简介就是主页上那段自我介绍；生日点开选，选完自动出星座。</p>
+						<input class="me-input" id="meSignIn" maxlength="60" placeholder="写一句简介，最多 60 字">
+						<button class="me-btn ghost" id="meSignBtn" type="button">保存简介</button>
+						<p class="me-msg" id="meSignMsg"></p>
+						<p class="hint" style="margin:16px 0 8px">生日</p>
+						<input class="me-input" id="meBirth" type="date">
+						<p class="me-sign-line">星座：<b id="meZodiac">未设置</b></p>
+						<p class="me-msg" id="meBirthMsg"></p>
+					</div>
+					<div class="me-block">
+						<h4>密码</h4>
+						<p class="hint">点「修改密码」才需要填，改完下次用新密码登录。</p>
+						<button class="me-btn ghost" id="mePassOpen" type="button">修改密码</button>
+						<div id="mePassBox" class="hide" style="margin-top:12px">
+							<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
+							<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
+							<button class="me-btn" id="mePassBtn" type="button">确认修改</button>
+						</div>
+						<p class="me-msg" id="mePassMsg"></p>
+						<p class="me-forgot"><button type="button" id="meForgotBtn">忘记现在的密码？用邮箱验证码重设</button></p>
+						<div id="meResetBox" class="hide" style="margin-top:10px">
+							<input class="me-input" id="meRCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
+							<input class="me-input" id="meRPass" type="password" placeholder="新密码，至少 6 位">
+							<div class="me-row">
+								<button class="me-btn" id="meRSend" type="button">获取验证码</button>
+								<button class="me-btn" id="meRSave" type="button">重设密码</button>
+							</div>
+							<p class="me-msg" id="meRMsg"></p>
+						</div>
+					</div>
+					<div class="me-block">
+						<h4>账号</h4>
+						<p class="hint">当前登录邮箱：<span id="meMail2">—</span></p>
+						<button class="me-btn ghost" id="meOut" type="button">退出登录</button>
+						<p class="me-msg" id="meOutMsg2"></p>
+					</div>
 				</div>
 			</div>
 		</div>
-	</section>
+	</div>
+	<div class="xp-modal hide" id="fansBox">
+		<div class="xp-modal-panel">
+			<button class="xp-x" id="fansX" type="button">×</button>
+			<h3 id="fansTitle">粉丝</h3>
+			<div class="xp-list" id="fansList"></div>
+		</div>
+	</div>
+	<div class="xp-modal hide" id="noteBox">
+		<div class="xp-modal-panel">
+			<button class="xp-x" id="noteX" type="button">×</button>
+			<div id="noteBody"></div>
+		</div>
+	</div>
 </div>
+
 <script>
 (function(){
 	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
@@ -2206,6 +2515,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function writeUsers(u){ return fetch(USERS,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(u)}).then(function(r){ if(!r.ok) throw new Error('账号表写入失败 '+r.status); }); }
 	function msg(id,text,type){ var p=$(id); p.className='me-msg'+(type?' '+type:''); p.textContent=text||''; }
 
+	function idOf(mail){
+		var s=String(mail||'').toLowerCase(), h=5381;
+		for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0;
+		return String((h>>>0)%90000000+10000000);
+	}
 	function paint(){
 		var name=(ME&&ME.name)||'未登录';
 		var mail=(ME&&ME.mail)||'—';
@@ -2224,6 +2538,10 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}else{
 			$('meAvaTxt').style.display='';
 		}
+		if($('myId')) $('myId').textContent=ME&&ME.mail?idOf(ME.mail):'—';
+		if($('tagMail')) $('tagMail').textContent=mail;
+		if($('meSignView')) $('meSignView').textContent=(ME&&ME.sign)||'还没有简介，点右上角「编辑主页」写一句。';
+		if($('tagZodiac')) $('tagZodiac').textContent=(ME&&ME.birth)?zodiacOf(ME.birth):'星座未设置';
 	}
 	paint();
 
@@ -2253,7 +2571,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var u=(list||[]).filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
 			if(!u) return;
 			ME.sign=u.sign||''; ME.birth=u.birth||'';
-			save(SKEY,JSON.stringify(ME)); paintProf();
+			save(SKEY,JSON.stringify(ME)); paintProf(); paint(); refreshMine();
 		}).catch(function(){});
 	}
 	$('meSignBtn').onclick=function(){
@@ -2265,7 +2583,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			if(!u) throw new Error('没找到账号记录');
 			u.sign=s; return writeUsers(list);
 		}).then(function(){
-			ME.sign=s; save(SKEY,JSON.stringify(ME));
+			ME.sign=s; save(SKEY,JSON.stringify(ME)); paint();
 			$('meSignBtn').disabled=false; msg('meSignMsg','签名存好了，社区点头像就能看到','ok');
 		}).catch(function(e){ $('meSignBtn').disabled=false; msg('meSignMsg',e.message||'没存上','err'); });
 	};
@@ -2279,10 +2597,152 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			if(!u) throw new Error('没找到账号记录');
 			u.birth=b; return writeUsers(list);
 		}).then(function(){
-			ME.birth=b; save(SKEY,JSON.stringify(ME));
+			ME.birth=b; save(SKEY,JSON.stringify(ME)); paint();
 			msg('meBirthMsg','生日存好了，星座是'+zodiacOf(b),'ok');
 		}).catch(function(e){ msg('meBirthMsg',e.message||'没存上','err'); });
 	};
+
+	/* ---------- 主页：笔记 / 评论 / 收藏 / 赞过 / 关注 / 粉丝 ---------- */
+	var ROOM=HOST+'pillow/_index.json';
+	var ALLPOSTS=[], MYPOSTS=[], MYREPLIES=[], MYREC=null, MYTAB='notes', FANS=[], FOLLOWING=[], PEOPLE_KIND='fans';
+	function readRoom(){ return fetch(ROOM,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+	function lower(x){ return String(x||'').toLowerCase(); }
+	function followList(u){ return (u&&u.following)||[]; }
+	function myFollowSet(){ return followList(MYREC).map(lower); }
+	function favIds(){ try{ return JSON.parse(localStorage.getItem('aylio_favs')||'[]')||[]; }catch(e){ return []; } }
+	function likeIds(){ try{ return JSON.parse(localStorage.getItem('aylio_likes')||'[]')||[]; }catch(e){ return []; } }
+	function isMinePost(m){ return (ME&&ME.mail && lower(m.uid)===lower(ME.mail)) || (!m.uid && m.who===(ME&&ME.name)); }
+	function hhmm2(ts){ var d=new Date(ts||Date.now()); function p(n){ return (n<10?'0':'')+n; } return (d.getMonth()+1)+'月'+d.getDate()+'日 '+p(d.getHours())+':'+p(d.getMinutes()); }
+	function cardOf(m){
+		var c=document.createElement('button'); c.className='xp-card'; c.type='button';
+		if(m.img){ var im=document.createElement('img'); im.className='xp-card-img'; im.src=m.img; im.alt=''; im.loading='lazy'; c.appendChild(im); }
+		else { var t=document.createElement('div'); t.className='xp-card-txt'; t.textContent=(m.text||'一段视频').slice(0,80); c.appendChild(t); }
+		var body=document.createElement('div'); body.className='xp-card-body';
+		var ti=document.createElement('div'); ti.className='xp-card-title'; ti.textContent=(m.text||'视频投稿').slice(0,40);
+		var mt=document.createElement('div'); mt.className='xp-card-meta';
+		var a=document.createElement('span'); a.textContent=m.video?'视频':'图文';
+		var b=document.createElement('span'); b.textContent='♥ '+(m.likes||0);
+		mt.appendChild(a); mt.appendChild(b); body.appendChild(ti); body.appendChild(mt); c.appendChild(body);
+		c.onclick=function(){ openNote(m); };
+		return c;
+	}
+	function openNote(m){
+		var body=$('noteBody'); body.className='note-view'; body.innerHTML='';
+		if(m.img){ var im=document.createElement('img'); im.className='nv-img'; im.src=m.img; im.alt=''; body.appendChild(im); }
+		if(m.video){ var v=document.createElement('video'); v.className='nv-img'; v.src=m.video; v.controls=true; body.appendChild(v); }
+		var tx=document.createElement('div'); tx.className='nv-text'; tx.textContent=m.text||'（没有文字，只有这段视频）'; body.appendChild(tx);
+		var meta=document.createElement('div'); meta.className='nv-meta'; meta.textContent=(m.who||'')+' · '+hhmm2(m.ts)+' · ♥ '+(m.likes||0)+(m.replyCount?' · 评论 '+m.replyCount:'');
+		body.appendChild(meta); $('noteBox').classList.remove('hide');
+	}
+	function replyRow(x){
+		var row=document.createElement('button'); row.type='button'; row.className='xp-row';
+		var ph=document.createElement('span'); ph.className='ph'; ph.textContent=String(x.post.who||'匿').slice(0,1);
+		row.appendChild(ph);
+		var info=document.createElement('div'); info.style.minWidth='0';
+		var nm=document.createElement('div'); nm.className='nm'; nm.textContent='我：'+x.reply.text;
+		var sb=document.createElement('div'); sb.className='sb'; sb.textContent='回复了 '+x.post.who+' 的帖子 · '+hhmm2(x.reply.ts);
+		info.appendChild(nm); info.appendChild(sb); row.appendChild(info);
+		row.onclick=function(){ openNote(x.post); };
+		return row;
+	}
+	function renderMineTab(){
+		var grid=$('myGrid'); if(!grid) return;
+		grid.innerHTML='';
+		if(MYTAB==='replies'){
+			if(!MYREPLIES.length){ grid.innerHTML='<div class="xp-none">还没有在别人帖子下评论过</div>'; return; }
+			var wrap=document.createElement('div'); wrap.className='xp-list'; wrap.style.gridColumn='1/-1';
+			MYREPLIES.slice().sort(function(a,b){ return (b.reply.ts||0)-(a.reply.ts||0); }).forEach(function(x){ wrap.appendChild(replyRow(x)); });
+			grid.appendChild(wrap); return;
+		}
+		var list=[];
+		if(MYTAB==='notes') list=MYPOSTS;
+		else if(MYTAB==='favs') list=ALLPOSTS.filter(function(m){ return favIds().indexOf(m.id)>=0; });
+		else if(MYTAB==='liked') list=ALLPOSTS.filter(function(m){ return likeIds().indexOf(m.id)>=0; });
+		list=list.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+		if(!list.length){
+			grid.innerHTML='<div class="xp-none">'+(MYTAB==='notes'?'还没有笔记，去社区发一条吧':'这里还是空的')+'</div>';
+			return;
+		}
+		list.forEach(function(m){ grid.appendChild(cardOf(m)); });
+	}
+	function refreshMine(){
+		if(!ME||!ME.mail){ renderMineTab(); return; }
+		Promise.all([readUsers(), readRoom()]).then(function(res){
+			var users=res[0]||[], room=res[1]||[];
+			ALLPOSTS=room.filter(function(m){ return m&&m.id; }).map(function(m){ m.replyCount=(m.replies||[]).length; return m; });
+			MYREC=users.filter(function(u){ return lower(u.mail)===lower(ME.mail); })[0]||null;
+			MYPOSTS=ALLPOSTS.filter(isMinePost).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+			MYREPLIES=[];
+			ALLPOSTS.forEach(function(m){ (m.replies||[]).forEach(function(r){ if((ME.mail&&lower(r.uid)===lower(ME.mail))||(!r.uid&&r.who===ME.name)) MYREPLIES.push({post:m,reply:r}); }); });
+			FANS=users.filter(function(u){ return followList(u).map(lower).indexOf(lower(ME.mail))>=0; });
+			var fset=myFollowSet();
+			FOLLOWING=users.filter(function(u){ return fset.indexOf(lower(u.mail))>=0; });
+			var likes=MYPOSTS.reduce(function(s,m){ return s+(m.likes||0); },0);
+			$('stFollow').querySelector('b').textContent=FOLLOWING.length;
+			$('stFans').querySelector('b').textContent=FANS.length;
+			$('stLikes').textContent=likes+favIds().length;
+			$('cntNotes').textContent=MYPOSTS.length;
+			$('cntReplies').textContent=MYREPLIES.length;
+			$('cntFavs').textContent=favIds().length;
+			$('cntLiked').textContent=likeIds().length;
+			renderMineTab();
+		}).catch(function(){ renderMineTab(); });
+	}
+	function peopleRow(u,canFollowBack){
+		var row=document.createElement('button'); row.type='button'; row.className='xp-row';
+		var ph=document.createElement('span'); ph.className='ph';
+		if(u.avatar){ var im=document.createElement('img'); im.src=u.avatar; im.alt=''; ph.appendChild(im); } else ph.textContent=String(u.name||'匿').slice(0,1);
+		row.appendChild(ph);
+		var info=document.createElement('div'); info.style.minWidth='0';
+		var nm=document.createElement('div'); nm.className='nm'; nm.textContent=u.name||'匿名';
+		var sb=document.createElement('div'); sb.className='sb'; sb.textContent=(u.sign||'还没有写简介');
+		info.appendChild(nm); info.appendChild(sb); row.appendChild(info);
+		var btn=document.createElement('span'); btn.className='go';
+		if(canFollowBack && lower(u.mail)){
+			if(myFollowSet().indexOf(lower(u.mail))>=0){ btn.className='go done'; btn.textContent='已关注'; }
+			else { btn.textContent='回关'; btn.onclick=function(ev){ ev.stopPropagation(); toggleMyFollow(lower(u.mail)); }; }
+		} else btn.textContent=myFollowSet().indexOf(lower(u.mail))>=0?'已关注':'关注';
+		row.appendChild(btn);
+		return row;
+	}
+	function showPeople(kind){
+		PEOPLE_KIND=kind;
+		var arr=(kind==='fans')?FANS:FOLLOWING;
+		$('fansTitle').textContent=kind==='fans'?'粉丝 ('+arr.length+')':'关注 ('+arr.length+')';
+		var list=$('fansList'); list.innerHTML='';
+		if(!arr.length){ list.innerHTML='<div class="xp-none">'+(kind==='fans'?'还没有粉丝，多发帖吧':'还没有关注别人')+'</div>'; }
+		arr.forEach(function(u){ list.appendChild(peopleRow(u, kind==='fans')); });
+		$('fansBox').classList.remove('hide');
+	}
+	function toggleMyFollow(mail){
+		if(!ME||!ME.mail) return;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return lower(x.mail)===lower(ME.mail); })[0];
+			if(!u) throw new Error('先登录');
+			var arr=followList(u).map(lower), i=arr.indexOf(lower(mail));
+			if(i>=0) u.following=followList(u).filter(function(x){ return lower(x)!==lower(mail); });
+			else u.following=followList(u).concat([lower(mail)]);
+			return writeUsers(list).then(function(){ MYREC=u; });
+		}).then(function(){ refreshMine(); setTimeout(function(){ if(!$('fansBox').classList.contains('hide')) showPeople(PEOPLE_KIND); },600); })
+			.catch(function(e){ alert(e.message||'没关注上'); });
+	}
+	$('myTabs').addEventListener('click',function(e){
+		var b=e.target.closest('button[data-tab]'); if(!b) return;
+		MYTAB=b.getAttribute('data-tab');
+		[].slice.call($('myTabs').querySelectorAll('button')).forEach(function(x){ x.classList.toggle('on',x===b); });
+		renderMineTab();
+	});
+	$('stFollow').onclick=function(){ showPeople('following'); };
+	$('stFans').onclick=function(){ showPeople('fans'); };
+	$('fansX').onclick=function(){ $('fansBox').classList.add('hide'); };
+	$('fansBox').onclick=function(e){ if(e.target===this) this.classList.add('hide'); };
+	$('noteX').onclick=function(){ $('noteBox').classList.add('hide'); };
+	$('noteBox').onclick=function(e){ if(e.target===this) this.classList.add('hide'); };
+	$('myEditOpen').onclick=function(){ $('editWrap').classList.remove('hide'); $('editWrap').scrollIntoView({behavior:'smooth',block:'start'}); };
+	$('myEditClose').onclick=function(){ $('editWrap').classList.add('hide'); };
+	refreshMine();
+	window.addEventListener('hashchange',function(){ if(/#mine/.test(location.hash)) refreshMine(); });
+	document.addEventListener('visibilitychange',function(){ if(!document.hidden && /#mine/.test(location.hash)) refreshMine(); });
 
 	$('meAvaBtn').onclick=function(){ if(!ME||!ME.mail){ msg('meOutMsg','先登录再改头像','err'); return; } $('meAvaFile').click(); };
 	$('meAvaFile').addEventListener('change',function(){

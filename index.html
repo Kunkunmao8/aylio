@@ -1105,7 +1105,7 @@ body.modal-open{overflow:hidden;}
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" controls playsinline preload="metadata">
+			<video id="meetVideo" controls playsinline preload="none">
 				<source src="video/v2_h264.mp4" type="video/mp4">
 					<source src="video/v2.mp4.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
@@ -1182,7 +1182,7 @@ body.modal-open{overflow:hidden;}
 		<p class="album-subtitle">共同出镜的那些瞬间</p>
 		
 		<div class="album-main-player">
-			<video id="collabMainVideo" controls playsinline preload="metadata">
+			<video id="collabMainVideo" controls playsinline preload="none">
 				<source src="video/v1_h264.mp4" type="video/mp4">
 					<source src="video/v1.mp4.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
@@ -1301,7 +1301,7 @@ body.modal-open{overflow:hidden;}
 		<p class="album-subtitle">把普通的一天拍成纪念</p>
 		
 		<div class="album-main-player">
-			<video id="vlogMainVideo" controls playsinline preload="metadata">
+			<video id="vlogMainVideo" controls playsinline preload="none">
 				<source src="video/v3_h264.mp4" type="video/mp4">
 					<source src="video/v3.mp4.mp4" type="video/mp4">
 			</video>
@@ -2689,5 +2689,13 @@ window.AYLIO_CLOUD = { provider: "github", owner: "Kunkunmao8", repo: "aylio-pho
 	if(cloud) setInterval(function(){ if(!viewer.classList.contains('on')) refresh(); },15000);
 })();
 </script>
-</body>
+<script>
+/* aylio_lazy_init: 首屏之外的图片延迟加载，省流量提速 */
+(function(){
+	if(!('loading' in document.createElement('img'))) return;
+	document.querySelectorAll('img').forEach(function(i){
+		if(!i.hasAttribute('loading') && !i.getAttribute('fetchpriority')) i.loading='lazy';
+	});
+})();
+</script></body>
 </html>

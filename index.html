@@ -1423,6 +1423,9 @@ a{color:inherit;}
 #mine .mine-card{background:#fff;border:1px solid #F1DDCC;border-radius:18px;padding:26px 20px 22px;text-align:center;box-shadow:0 8px 24px rgba(150,74,30,.06);}
 #mine .me-ava{width:92px;height:92px;border-radius:50%;margin:0 auto 14px;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;position:relative;}
 #mine .me-ava img{width:100%;height:100%;object-fit:cover;}
+		#mine .me-ava{cursor:pointer;}
+		.ava-view{position:fixed;inset:0;z-index:1200;background:rgba(40,22,14,.72);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+		.ava-view img{max-width:min(520px,86vw);max-height:78vh;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.45);object-fit:contain;background:#fff;}
 #mine .me-ava .cam{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:#C05E2A;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
 #mine .me-name{font-size:18px;font-weight:700;color:#3A241A;}
 #mine .me-mail{margin-top:6px;font-size:12.5px;color:#A8897A;word-break:break-all;}
@@ -1816,7 +1819,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			}
 			repWrap.appendChild(item);
 		});
-		var box=el('div','reply-box');
+		var box=el('div','reply-box hide');
 		var rin=document.createElement('input');
 		rin.type='text'; rin.placeholder='回复 '+(m.who||'这条帖子')+'…'; rin.maxLength=200;
 		box.appendChild(rin);
@@ -1843,7 +1846,10 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		box.appendChild(rbtn);
 		repWrap.appendChild(box);
 		card.appendChild(repWrap);
-		replyBtn.onclick=function(){ rin.focus(); };
+		replyBtn.onclick=function(){
+			box.classList.toggle('hide');
+			if(!box.classList.contains('hide')) rin.focus();
+		};
 		return card;
 	}
 	function paint(list, animate){
@@ -1933,9 +1939,15 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var saved=load('aylio_pillow_user');
 	if(saved){ try{ ME=JSON.parse(saved)||{mail:'',name:'',avatar:''}; }catch(e){ ME={mail:'',name:'',avatar:''}; } }
 	var nick=load('aylio_pillow_nick'); if(nick) nickIn.value=nick;
-	readUsers().then(function(list){
-		(list||[]).forEach(function(u){ if(u&&u.name) USERSMAP[String(u.name).toLowerCase()]=u; });
-	});
+	function loadUsersMap(){
+		readUsers().then(function(list){
+			USERSMAP={};
+			(list||[]).forEach(function(u){ if(u&&u.name) USERSMAP[String(u.name).toLowerCase()]=u; });
+		});
+	}
+	loadUsersMap();
+	window.addEventListener('hashchange',function(){ if(/#pillow/.test(location.hash)) loadUsersMap(); });
+	document.addEventListener('visibilitychange',function(){ if(!document.hidden) loadUsersMap(); });
 
 	showComposer();
 	refresh();
@@ -1945,6 +1957,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 </script>
 
 <div class="page" id="mine">
+	<div class="ava-view hide" id="avaView"><img id="avaViewImg" alt="头像大图"></div>
 	<section class="banner">
 		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="我的页面横幅：两人并肩站着">
 		<div class="banner-text">
@@ -1968,17 +1981,23 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			<div class="mine-col">
 				<div class="me-block">
 					<h4>昵称</h4>
-					<p class="hint">社区里显示的名字，最多 10 个字，改完立刻生效。</p>
-					<input class="me-input" id="meNameIn" maxlength="10" placeholder="给自己起个名字">
-					<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
+					<p class="hint">现在叫：<span id="meNameView">—</span>，社区里显示这个名字。</p>
+					<button class="me-btn ghost" id="meNameOpen" type="button">修改昵称</button>
+					<div id="meNameBox" class="hide" style="margin-top:12px">
+						<input class="me-input" id="meNameIn" maxlength="10" placeholder="给自己起个名字">
+						<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
+					</div>
 					<p class="me-msg" id="meNameMsg"></p>
 				</div>
 				<div class="me-block">
 					<h4>密码</h4>
-					<p class="hint">先填现在的密码，再填新密码。改完下次用新密码登录。</p>
-					<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
-					<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
-					<button class="me-btn" id="mePassBtn" type="button">修改密码</button>
+					<p class="hint">点「修改密码」才需要填，改完下次用新密码登录。</p>
+					<button class="me-btn ghost" id="mePassOpen" type="button">修改密码</button>
+					<div id="mePassBox" class="hide" style="margin-top:12px">
+						<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
+						<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
+						<button class="me-btn" id="mePassBtn" type="button">确认修改</button>
+					</div>
 					<p class="me-msg" id="mePassMsg"></p>
 					<p class="me-forgot"><button type="button" id="meForgotBtn">忘记现在的密码？用邮箱验证码重设</button></p>
 					<div id="meResetBox" class="hide" style="margin-top:10px">
@@ -2030,6 +2049,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		$('meMail').textContent=mail;
 		$('meMail2').textContent=mail;
 		$('meNameIn').value=(ME&&ME.name)||'';
+		$('meNameView').textContent=name;
 		$('meAvaTxt').textContent=String(name||'瞳').slice(0,1);
 		var box=$('meAva');
 		var old=box.querySelector('img'); if(old) old.remove();
@@ -2071,6 +2091,15 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			});
 	});
 
+	$('meNameOpen').onclick=function(){ $('meNameBox').classList.toggle('hide'); if(!$('meNameBox').classList.contains('hide')) $('meNameIn').focus(); };
+	$('mePassOpen').onclick=function(){ $('mePassBox').classList.toggle('hide'); if(!$('mePassBox').classList.contains('hide')) $('meOldPass').focus(); };
+	$('meAva').onclick=function(){
+		if(!ME||!ME.avatar) return;
+		$('avaViewImg').src=ME.avatar;
+		$('avaView').classList.remove('hide');
+	};
+	$('avaView').onclick=function(){ this.classList.add('hide'); };
+
 	$('meNameBtn').onclick=function(){
 		if(!ME||!ME.mail){ msg('meNameMsg','先登录再改昵称','err'); return; }
 		var nn=$('meNameIn').value.trim();
@@ -2083,6 +2112,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).then(function(){
 			ME.name=nn; save(SKEY,JSON.stringify(ME)); paint();
 			msg('meNameMsg','昵称改好了','ok');
+			$('meNameBox').classList.add('hide');
 			$('meNameBtn').disabled=false;
 		}).catch(function(e){
 			$('meNameBtn').disabled=false; msg('meNameMsg',e.message||'没改成','err');
@@ -2107,6 +2137,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).then(function(){
 			$('meOldPass').value=''; $('meNewPass').value='';
 			$('mePassBtn').disabled=false;
+			$('mePassBox').classList.add('hide');
 			msg('mePassMsg','密码改好了，下次用新密码登录','ok');
 		}).catch(function(e){
 			$('mePassBtn').disabled=false; msg('mePassMsg',e.message||'没改成','err');

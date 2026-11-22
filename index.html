@@ -2684,25 +2684,36 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 })();
 </script>
 <script>
-/* aylio_lazy_init: 首屏之外的图片延迟加载，省流量提速（自带实现，兼容所有浏览器） */
+/* aylio_lazy_init: 首屏之外的图片延迟加载，省流量提速（不依赖原生 lazy，兼容所有浏览器） */
 (function(){
-	if(!('IntersectionObserver' in window)) return;
-	var obs=new IntersectionObserver(function(list){
-		list.forEach(function(en){
-			if(!en.isIntersecting) return;
-			var img=en.target, s=img.getAttribute('data-src');
-			if(s){ img.setAttribute('src', s); img.removeAttribute('data-src'); }
-			obs.unobserve(img);
-		});
-	},{rootMargin:'800px 0px'});
-	[].slice.call(document.querySelectorAll('img')).forEach(function(img){
+	var imgs=[].slice.call(document.querySelectorAll('img'));
+	imgs.forEach(function(img){
 		var s=img.getAttribute('src');
 		if(!s || /^data:/.test(s)) return;
 		img.removeAttribute('loading');
 		img.setAttribute('data-src', s);
 		img.removeAttribute('src');
-		obs.observe(img);
 	});
+	var pending=imgs.filter(function(i){ return i.getAttribute('data-src'); });
+	function load(){
+		if(!pending.length) return;
+		var vh=window.innerHeight||document.documentElement.clientHeight;
+		pending=pending.filter(function(img){
+			var r=img.getBoundingClientRect();
+			if(r.top < vh+800 && r.bottom > -800){
+				img.setAttribute('src', img.getAttribute('data-src'));
+				img.removeAttribute('data-src');
+				return false;
+			}
+			return true;
+		});
+	}
+	load();
+	var tk=null;
+	function soon(){ if(tk) return; tk=setTimeout(function(){ tk=null; load(); },150); }
+	window.addEventListener('scroll', soon, {passive:true});
+	window.addEventListener('resize', soon);
+	setInterval(load, 1200);
 })();
 </script></body>
 </html>

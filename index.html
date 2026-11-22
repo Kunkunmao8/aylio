@@ -2994,7 +2994,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 				rows.push({type:'link',link:link,title:title,who:who,ts:Date.now(),id:mid()});
 				return write(rows);
 			}).then(function(){
-				btn.disabled=false; tipEl.textContent='已经发布，右边就能看到。';
+				btn.disabled=false; tipEl.textContent='已经发布，下面就能看到，别人也能看到。';
 				urlEl.value=''; titleEl.value=''; whoEl.value='';
 				load();
 			}).catch(function(e){ btn.disabled=false; tipEl.textContent='没发出去：'+(e&&e.message||e); });
@@ -3016,7 +3016,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 				rows.push({f:fname,type:'video',title:title,who:who,ts:Date.now(),id:mid()});
 				return write(rows);
 			}).then(function(){
-				btn.disabled=false; tipEl.textContent='上传完成，右边就能看到。';
+				btn.disabled=false; tipEl.textContent='上传完成，下面就能看到，别人也能看到。';
 				input.value=''; picked=null; nameEl.textContent=''; titleEl.value=''; whoEl.value='';
 				load();
 			}).catch(function(e){ btn.disabled=false; tipEl.textContent='视频传上去了，但清单没存住：'+(e&&e.message||e); });

@@ -1110,7 +1110,7 @@ body.modal-open{overflow:hidden;}
 					<source src="video/v2.mp4.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
-			<p class="video-tip">视频没能加载：请确认网页与 video 文件夹在同一个目录下。</p>
+			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
 		</div>
 		<div class="link-btn-group">
 			<a href="https://video.weibo.com/show?fid=1034:5346626991226920" target="_blank" rel="noopener">查看回放</a>
@@ -1187,7 +1187,7 @@ body.modal-open{overflow:hidden;}
 					<source src="video/v1.mp4.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
-			<p class="video-tip">视频没能加载：请确认网页与 video 文件夹在同一个目录下。</p>
+			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
 		</div>
 		<p class="album-main-meta">2026.07.02</p>
 		<p class="album-main-desc">“命运的红线将我们紧紧缠绕”</p>
@@ -1305,7 +1305,7 @@ body.modal-open{overflow:hidden;}
 				<source src="video/v3_h264.mp4" type="video/mp4">
 					<source src="video/v3.mp4.mp4" type="video/mp4">
 			</video>
-			<p class="video-tip"></p>
+			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
 		</div>
 		<p class="album-main-meta">2026.06.07</p>
 		<p class="album-main-desc">“记录我们一起走过的日常”</p>
@@ -2123,12 +2123,13 @@ body.modal-open{overflow:hidden;}
 
 	/* 视频加载失败时给出提示，而不是一片黑 */
 	document.querySelectorAll("video").forEach(function (v) {
-		var tip = v.parentElement.querySelector(".video-tip");
+		var tip = v.parentElement && v.parentElement.querySelector(".video-tip");
+		var srcs = v.querySelectorAll("source"), bad = 0, total = srcs.length || 1;
 		var fail = function () { if (tip) { tip.classList.add("show"); } };
-		v.addEventListener("error", fail);
-		v.querySelectorAll("source").forEach(function (s) {
-			s.addEventListener("error", fail);
-		});
+		var ok = function () { if (tip) { tip.classList.remove("show"); } };
+		v.addEventListener("loadeddata", ok);
+		v.addEventListener("error", function () { if (bad >= total) fail(); });
+		srcs.forEach(function (s) { s.addEventListener("error", function () { bad++; if (bad >= total) fail(); }); });
 	});
 })();
 </script>

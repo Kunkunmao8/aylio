@@ -851,7 +851,7 @@ body.modal-open{overflow:hidden;}
 
 		<div class="section-head">
 			<h3 class="section-title">视频投稿</h3>
-			<span class="section-note">选文件上传，也可以粘贴小红书 / B站 / 微博的链接</span>
+			<span class="section-note">选文件上传，也可以粘贴小红书 / B站 / 抖音 / 微博的链接</span>
 		</div>
 		<div class="clip-box">
 			<form class="clip-form" id="clipForm">
@@ -876,7 +876,7 @@ body.modal-open{overflow:hidden;}
 					<p class="clip-file-name" id="clipFileName"></p>
 				</div>
 				<div class="clip-pane" id="clipPaneLink" hidden>
-					<input class="clip-url" id="clipUrl" placeholder="https:// 开头的视频链接，小红书 / B站 / 微博 都行">
+					<input class="clip-url" id="clipUrl" placeholder="https:// 开头的视频链接，小红书 / B站 / 抖音 / 微博 都行">
 				</div>
 				<button type="submit" class="submit-btn" id="clipSubmit">发布</button>
 				<p class="clip-tip" id="clipTip"></p>
@@ -3026,7 +3026,8 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 	});
 
 	load();
-	setInterval(function(){ if(!document.hidden) load(); },30000);
+	setInterval(function(){ if(!document.hidden) load(); },15000);   /* 别人投的稿，最多 15 秒就出现在列表里 */
+	document.addEventListener('visibilitychange',function(){ if(!document.hidden) load(); });
 })();
 </script>
 <script>

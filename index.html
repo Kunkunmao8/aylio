@@ -819,6 +819,7 @@ body.modal-open{overflow:hidden;}
 	var sess=null;
 	try{ sess=JSON.parse(localStorage.getItem('aylio_pillow_user')||'null'); }catch(e){}
 	if(sess&&sess.mail){ g.parentNode.removeChild(g); return; }
+	document.documentElement.style.overflow='hidden';
 
 	var U='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/auth/users.json';
 	var CFG=window.AYLIO_MAIL||{};

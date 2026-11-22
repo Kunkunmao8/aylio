@@ -839,8 +839,8 @@ body.modal-open{overflow:hidden;}
 	}
 	function readUsers(){ return fetch(U,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
 	function writeUsers(u){ return fetch(U,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(u)}).then(function(r){ if(!r.ok) throw new Error('账号表写入失败 '+r.status); }); }
-	function done(mail,name){
-		localStorage.setItem('aylio_pillow_user',JSON.stringify({mail:mail,name:name}));
+	function done(mail,name,avatar){
+		localStorage.setItem('aylio_pillow_user',JSON.stringify({mail:mail,name:name,avatar:avatar||''}));
 		location.reload();
 	}
 
@@ -911,17 +911,17 @@ body.modal-open{overflow:hidden;}
 		if(!mail||!pass){ msg.textContent='邮箱和密码都要填'; return; }
 		msg.textContent='正在登录…';
 		$('agDoLogin').disabled=true;
-		var uname='';
+		var uname='', uava='';
 		readUsers().then(function(list){
 			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===mail.toLowerCase(); })[0];
 			if(!u) throw new Error('没找到这个邮箱，先注册一下');
-			uname=u.name;
+			uname=u.name; uava=u.avatar||'';
 			return hashPass(mail,pass).then(function(ph){
 				if(ph!==u.ph) throw new Error('密码不对');
 			});
 		}).then(function(){
 			msg.textContent='登录成功，正在进门…';
-			done(mail,uname);
+			done(mail,uname,uava);
 		}).catch(function(e){
 			$('agDoLogin').disabled=false;
 			msg.textContent=e.message||'登录失败';
@@ -938,6 +938,7 @@ body.modal-open{overflow:hidden;}
 				<li><a href="#menu" class="nav-link" data-target="menu">日常记录</a></li>
 				<li><a href="#pillow" class="nav-link" data-target="pillow">社区</a></li>
 				<li><a href="#contact" class="nav-link" data-target="contact">联系我们</a></li>
+				<li><a href="#mine" class="nav-link" data-target="mine">我的</a></li>
 			</ul>
 		</nav>
 	</div>
@@ -1294,9 +1295,78 @@ a{color:inherit;}
 #pillow .nickbar input:focus{border-color:#BF5B2E;}
 @media(max-width:600px){#pillow .hero img{height:230px;}
 #pillow .hero-txt h1{font-size:20px;letter-spacing:2px;}
-#pillow .msgs{height:52vh;padding:14px;}
-#pillow .bub{max-width:84%;}
 #pillow .bar-tip{display:none;}}
+
+/* ================= 贴吧 / 豆瓣式帖子流 ================= */
+#pillow .room{background:transparent;border:0;box-shadow:none;border-radius:0;overflow:visible;}
+#pillow .room-head{padding:0 0 14px;border:0;background:transparent;align-items:baseline;}
+#pillow .room-head>span:first-child{font-size:21px;font-weight:700;letter-spacing:.06em;color:#3A241A;}
+#pillow .room-head .who{margin-left:auto;font-size:12.5px;}
+#pillow .room-head .live{font-size:12px;}
+#pillow .msgs{height:auto;max-height:none;overflow:visible;padding:0;background:transparent;display:block;}
+#pillow .empty{background:#fff;border:1px solid #F2DDCB;border-radius:16px;padding:52px 20px;margin:0;}
+#pillow .gate{margin:0 0 16px;padding:22px 18px 20px;border:1px solid #F2DDCB;border-radius:16px;background:#fff;box-shadow:0 8px 24px rgba(150,74,30,.06);}
+#pillow .post{background:#fff;border:1px solid #F1DDCC;border-radius:16px;padding:16px 18px 11px;margin-bottom:14px;box-shadow:0 6px 20px rgba(150,74,30,.05);}
+#pillow .post.mine{border-color:#EFCDB4;background:#FFFDFB;}
+#pillow .post-head{display:flex;align-items:center;gap:11px;}
+#pillow .post-ava{width:42px;height:42px;flex:0 0 auto;border-radius:50%;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;}
+#pillow .post-ava img{width:100%;height:100%;object-fit:cover;display:block;}
+#pillow .post-meta{min-width:0;}
+#pillow .post-name{font-size:14.5px;font-weight:600;color:#3A241A;display:flex;align-items:center;gap:7px;}
+#pillow .post-name em{font-style:normal;font-size:11px;color:#BF5B2E;border:1px solid #F0C9AF;background:#FFF3EA;border-radius:6px;padding:0 5px;line-height:16px;}
+#pillow .post-sub{font-size:12px;color:#AC9184;margin-top:3px;}
+#pillow .post-floor{margin-left:auto;font-size:11.5px;color:#C0AA9B;letter-spacing:.04em;}
+#pillow .post-body{margin:12px 0 0;font-size:15px;line-height:1.8;color:#4A3226;white-space:pre-wrap;word-break:break-word;}
+#pillow .post-media{margin-top:10px;}
+#pillow .post-media img,#pillow .post-media video{width:100%;max-height:560px;object-fit:cover;border-radius:12px;background:#1b120c;display:block;cursor:zoom-in;}
+#pillow .post-media video{cursor:default;}
+#pillow .post-acts{display:flex;align-items:center;gap:22px;margin-top:12px;padding-top:10px;border-top:1px dashed #F3E4D7;font-size:13px;color:#A8897A;}
+#pillow .post-acts button{border:0;background:transparent;color:inherit;font:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:0;}
+#pillow .post-acts button.on{color:#C05E2A;font-weight:600;}
+#pillow .post-acts .badge{opacity:.75;}
+#pillow .composer{position:fixed;left:0;right:0;bottom:0;z-index:40;padding:10px max(16px,calc((100vw - 900px)/2 + 16px));background:rgba(255,252,249,.97);backdrop-filter:blur(10px);border-top:1px solid #F0D8C6;flex-wrap:nowrap;}
+#pillow .composer .txt-in{height:44px;border-radius:12px;font-size:14.5px;}
+#pillow .composer .mini{height:44px;border-radius:12px;}
+#pillow .composer .send{height:44px;border-radius:12px;}
+#pillow .page-pad{height:86px;}
+#pillow .container{padding-bottom:120px;}
+@media(max-width:600px){
+#pillow .room-head>span:first-child{font-size:18px;}
+#pillow .post{padding:14px 14px 10px;}
+#pillow .composer{gap:6px;}
+#pillow .composer .mini{padding:0 10px;font-size:12px;}
+#pillow .composer .send{padding:0 14px;font-size:13px;}
+}
+
+/* ================= 我的 ================= */
+#mine .mine-wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start;}
+#mine .mine-card{background:#fff;border:1px solid #F1DDCC;border-radius:18px;padding:26px 20px 22px;text-align:center;box-shadow:0 8px 24px rgba(150,74,30,.06);}
+#mine .me-ava{width:92px;height:92px;border-radius:50%;margin:0 auto 14px;overflow:hidden;background:#F6E3D4;color:#BF5B2E;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;position:relative;}
+#mine .me-ava img{width:100%;height:100%;object-fit:cover;}
+#mine .me-ava .cam{position:absolute;right:-2px;bottom:-2px;width:28px;height:28px;border-radius:50%;background:#C05E2A;color:#fff;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;}
+#mine .me-name{font-size:18px;font-weight:700;color:#3A241A;}
+#mine .me-mail{margin-top:6px;font-size:12.5px;color:#A8897A;word-break:break-all;}
+#mine .me-badge{display:inline-block;margin-top:12px;font-size:11.5px;color:#BF5B2E;border:1px solid #F0C9AF;background:#FFF3EA;border-radius:999px;padding:3px 10px;}
+#mine .me-ava-btn{margin-top:14px;width:100%;height:40px;border:1px solid #EAD3C1;background:#FFFDFB;color:#A06443;border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit;}
+#mine .me-ava-btn:hover{border-color:#BF5B2E;color:#BF5B2E;}
+#mine .mine-col{display:flex;flex-direction:column;gap:16px;}
+#mine .me-block{background:#fff;border:1px solid #F1DDCC;border-radius:16px;padding:20px 22px;box-shadow:0 6px 20px rgba(150,74,30,.05);}
+#mine .me-block h4{margin:0 0 4px;font-size:15px;letter-spacing:.03em;color:#3A241A;}
+#mine .me-block .hint{margin:0 0 14px;font-size:12px;color:#A8897A;line-height:1.7;}
+#mine .me-input{width:100%;height:44px;padding:0 13px;border:1px solid #EAD3C1;border-radius:10px;font-size:14px;font-family:inherit;color:#4A3226;background:#FFFCF9;outline:none;margin-bottom:10px;}
+#mine .me-input:focus{border-color:#BF5B2E;background:#fff;}
+#mine .me-row{display:flex;gap:10px;}
+#mine .me-row .me-input{margin-bottom:10px;}
+#mine .me-btn{height:44px;padding:0 22px;border:0;border-radius:10px;background:#C05E2A;color:#fff;font-size:14px;letter-spacing:.05em;cursor:pointer;font-family:inherit;}
+#mine .me-btn[disabled]{opacity:.6;cursor:default;}
+#mine .me-btn.ghost{background:#FFF7F1;border:1px solid #EAD3C1;color:#A06443;}
+#mine .me-msg{margin:8px 0 0;font-size:12.5px;min-height:18px;color:#9C8275;}
+#mine .me-msg.err{color:#C0392B;}
+#mine .me-msg.ok{color:#2E7D4F;}
+@media(max-width:760px){
+#mine .mine-wrap{grid-template-columns:1fr;}
+#mine .mine-card{padding:22px 18px;}
+}
 </style>
 <div class="page" id="pillow">
 	<section class="banner">
@@ -1311,14 +1381,14 @@ a{color:inherit;}
 	</section>
 	<section class="container">
 <div class="room"><div class="room-head">
-			<span>大家都在说</span>
+			<span>社区 · 大家都在说</span>
 			<span class="who" id="whoBox"></span>
 			<span class="live"><i></i>自动刷新</span>
 		</div>
 		<div class="gate" id="gate">
 			<div class="gate-card">
-				<h2>先登录，再留言</h2>
-				<p class="gate-sub">用邮箱注册一个账号，注册完就能在这个箱子里说话、发图片和视频。没登录也能看大家留言。</p>
+				<h2>先登录，再发帖</h2>
+				<p class="gate-sub">用邮箱注册一个账号，注册完就能在社区发帖、传图片和视频。没登录也能看大家的帖子。</p>
 				<div class="tabs">
 					<button type="button" class="on" data-t="login">登录</button>
 					<button type="button" data-t="reg">注册</button>
@@ -1353,10 +1423,10 @@ a{color:inherit;}
 		</div>
 
 		<div class="composer hide" id="composer">
-			<input class="txt-in" id="txt" placeholder="写点什么…" maxlength="500">
+			<input class="txt-in" id="txt" placeholder="开个新帖，说点什么…" maxlength="500">
 			<button class="mini" id="btnImg" type="button" title="发图片">图片</button>
 			<button class="mini" id="btnVid" type="button" title="发视频">视频</button>
-			<button class="send" id="btnSend" type="button">发送</button>
+			<button class="send" id="btnSend" type="button">发布</button>
 			<input type="file" id="fileImg" accept="image/*" class="hide">
 			<input type="file" id="fileVid" accept="video/*" class="hide">
 		</div>
@@ -1385,8 +1455,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var whoBox=document.getElementById('whoBox');
 
 	var rendered={}, lastCount=-1, polling=null;
-	var ME={mail:'',name:''};
+	var ME={mail:'',name:'',avatar:''};
 	var mineIds=[];
+	var USERSMAP={};
 
 	function $(id){ return document.getElementById(id); }
 	function el(t,c){ var n=document.createElement(t); if(c) n.className=c; return n; }
@@ -1549,41 +1620,86 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(out.length>MAXMSG) out=out.slice(out.length-MAXMSG);
 		return out;
 	}
-	function bubble(m){
+	function likeSet(){ try{ return JSON.parse(load('aylio_likes')||'[]')||[]; }catch(e){ return []; } }
+	function isLiked(id){ return likeSet().indexOf(id)>=0; }
+	function avatarBox(name){
+		var box=el('div','post-ava');
+		var u=USERSMAP[String(name||'').toLowerCase()];
+		if(u&&u.avatar){
+			var im=document.createElement('img'); im.src=u.avatar; im.alt=name||'头像'; box.appendChild(im);
+		}else{
+			box.textContent=String(name||'匿').slice(0,1);
+		}
+		return box;
+	}
+	function bubble(m, floor){
 		var mine=mineIds.indexOf(m.id)>=0;
-		var row=el('div','row'+(mine?' mine':''));
-		var bub=el('div','bub');
-		var head=el('div','bhead');
-		head.textContent=(mine?'我':(m.who||'匿名'))+' · '+hhmm(m.ts);
-		bub.appendChild(head);
-		if(m.text){ var t=el('div','txt'); t.textContent=m.text; bub.appendChild(t); }
+		var card=el('div','post'+(mine?' mine':''));
+		var head=el('div','post-head');
+		head.appendChild(avatarBox(m.who));
+		var meta=el('div','post-meta');
+		var nm=el('div','post-name');
+		nm.textContent=(m.who||'匿名');
+		if(mine){ var tag=el('em'); tag.textContent='我'; nm.appendChild(tag); }
+		meta.appendChild(nm);
+		var sub=el('div','post-sub');
+		sub.textContent=(floor?'#'+floor+'楼 · ':'')+hhmm(m.ts)+' · 来自社区';
+		meta.appendChild(sub);
+		head.appendChild(meta);
+		card.appendChild(head);
+
+		if(m.text){ var t=el('div','post-body'); t.textContent=m.text; card.appendChild(t); }
 		if(m.img){
-			var im=el('img','media'); im.src=m.img; im.alt='图片';
+			var wrap=el('div','post-media');
+			var im=el('img'); im.src=m.img; im.alt='图片'; im.loading='lazy';
 			im.onclick=function(){ window.open(m.img,'_blank'); };
-			bub.appendChild(im);
+			wrap.appendChild(im); card.appendChild(wrap);
 		}
 		if(m.video){
-			var v=document.createElement('video'); v.className='media'; v.src=m.video;
-			v.controls=true; v.playsInline=true; v.preload='metadata';
-			bub.appendChild(v);
+			var wrap2=el('div','post-media');
+			var v=document.createElement('video'); v.src=m.video; v.controls=true; v.playsInline=true; v.preload='metadata';
+			wrap2.appendChild(v); card.appendChild(wrap2);
 		}
-		row.appendChild(bub);
-		return row;
+
+		var acts=el('div','post-acts');
+		var likeBtn=el('button');
+		function paintLike(){
+			var on=isLiked(m.id);
+			likeBtn.classList.toggle('on',on);
+			likeBtn.textContent=(on?'👍 已赞':'👍 赞');
+		}
+		likeBtn.type='button'; paintLike();
+		likeBtn.onclick=function(){
+			var L=likeSet(), i=L.indexOf(m.id);
+			if(i>=0) L.splice(i,1); else L.push(m.id);
+			save('aylio_likes',JSON.stringify(L));
+			paintLike();
+		};
+		acts.appendChild(likeBtn);
+
+		var copyBtn=el('button');
+		copyBtn.type='button'; copyBtn.textContent='🔗 复制链接';
+		copyBtn.onclick=function(){
+			var url=location.origin+location.pathname+'#pillow';
+			function ok(){ copyBtn.textContent='已复制'; setTimeout(function(){ copyBtn.textContent='🔗 复制链接'; },1600); }
+			if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(ok,function(){}); }
+			else{ ok(); }
+		};
+		acts.appendChild(copyBtn);
+		card.appendChild(acts);
+		return card;
 	}
 	function paint(list, animate){
 		if(!list.length){
-			msgsEl.innerHTML='<div class="empty">还没有人留言，第一句留给你。</div>';
+			msgsEl.innerHTML='<div class="empty">还没有帖子，第一楼留给你。</div>';
 			rendered={}; lastCount=0;
 			return;
 		}
-		var empty=msgsEl.querySelector('.empty'); if(empty) empty.remove();
-		var nearBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 90;
-		var added=0;
-		list.forEach(function(m){
-			if(rendered[m.id]) return;
-			rendered[m.id]=1; msgsEl.appendChild(bubble(m)); added++;
-		});
-		if(added && (nearBottom || animate)) msgsEl.scrollTop=msgsEl.scrollHeight;
+		var show=list.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+		msgsEl.innerHTML='';
+		show.forEach(function(m, idx){ msgsEl.appendChild(bubble(m, show.length-idx)); });
+		rendered={}; show.forEach(function(m){ rendered[m.id]=1; });
+		if(animate){ msgsEl.scrollIntoView({behavior:'smooth',block:'start'}); }
 	}
 	function refresh(){
 		readRoom().then(function(list){
@@ -1658,13 +1774,182 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 
 	/* ---------- 启动 ---------- */
 	var saved=load('aylio_pillow_user');
-	if(saved){ try{ ME=JSON.parse(saved)||{mail:'',name:''}; }catch(e){ ME={mail:'',name:''}; } }
+	if(saved){ try{ ME=JSON.parse(saved)||{mail:'',name:'',avatar:''}; }catch(e){ ME={mail:'',name:'',avatar:''}; } }
 	var nick=load('aylio_pillow_nick'); if(nick) nickIn.value=nick;
+	readUsers().then(function(list){
+		(list||[]).forEach(function(u){ if(u&&u.name) USERSMAP[String(u.name).toLowerCase()]=u; });
+	});
 
 	showComposer();
 	refresh();
 	polling=setInterval(function(){ if(!document.hidden) refresh(); },2500);
 	document.addEventListener('visibilitychange',function(){ if(!document.hidden) refresh(); });
+})();
+</script>
+
+<div class="page" id="mine">
+	<section class="banner">
+		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="我的页面横幅：两人并肩站着">
+		<div class="banner-text">
+			<div class="container">
+				<p class="banner-kicker">MY PAGE</p>
+				<h1>我的</h1>
+				<p class="banner-sub">头像、昵称、密码，都在这一页改</p>
+			</div>
+		</div>
+	</section>
+	<section class="container">
+		<div class="mine-wrap">
+			<div class="mine-card">
+				<div class="me-ava" id="meAva"><span id="meAvaTxt">瞳</span><i class="cam">✎</i></div>
+				<p class="me-name" id="meName">未登录</p>
+				<p class="me-mail" id="meMail">—</p>
+				<span class="me-badge" id="meBadge">社区成员</span>
+				<button class="me-ava-btn" type="button" id="meAvaBtn">更换头像</button>
+				<input type="file" id="meAvaFile" accept="image/*" class="hide">
+			</div>
+			<div class="mine-col">
+				<div class="me-block">
+					<h4>昵称</h4>
+					<p class="hint">社区里显示的名字，最多 10 个字，改完立刻生效。</p>
+					<input class="me-input" id="meNameIn" maxlength="10" placeholder="给自己起个名字">
+					<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
+					<p class="me-msg" id="meNameMsg"></p>
+				</div>
+				<div class="me-block">
+					<h4>密码</h4>
+					<p class="hint">先填现在的密码，再填新密码。改完下次用新密码登录。</p>
+					<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
+					<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
+					<button class="me-btn" id="mePassBtn" type="button">修改密码</button>
+					<p class="me-msg" id="mePassMsg"></p>
+				</div>
+				<div class="me-block">
+					<h4>账号</h4>
+					<p class="hint">当前登录邮箱：<span id="meMail2">—</span></p>
+					<button class="me-btn ghost" id="meOut" type="button">退出登录</button>
+					<p class="me-msg" id="meOutMsg"></p>
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+<script>
+(function(){
+	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+	var USERS=HOST+'auth/users.json';
+	var SKEY='aylio_pillow_user';
+	var ME=null;
+	try{ ME=JSON.parse(localStorage.getItem(SKEY)||'null'); }catch(e){ ME=null; }
+
+	function $(id){ return document.getElementById(id); }
+	function save(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+	function buf2hex(b){ var a=new Uint8Array(b), s=''; for(var i=0;i<a.length;i++) s+=('0'+a[i].toString(16)).slice(-2); return s; }
+	function hashPass(mail,pass){
+		var s=(mail||'').trim().toLowerCase()+':'+pass+':aylio-pillow';
+		if(window.crypto&&crypto.subtle&&crypto.subtle.digest){
+			return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(buf2hex);
+		}
+		var h=5381; for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0; return Promise.resolve('w'+Math.abs(h));
+	}
+	function readUsers(){ return fetch(USERS,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
+	function writeUsers(u){ return fetch(USERS,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(u)}).then(function(r){ if(!r.ok) throw new Error('账号表写入失败 '+r.status); }); }
+	function msg(id,text,type){ var p=$(id); p.className='me-msg'+(type?' '+type:''); p.textContent=text||''; }
+
+	function paint(){
+		var name=(ME&&ME.name)||'未登录';
+		var mail=(ME&&ME.mail)||'—';
+		$('meName').textContent=name;
+		$('meMail').textContent=mail;
+		$('meMail2').textContent=mail;
+		$('meNameIn').value=(ME&&ME.name)||'';
+		$('meAvaTxt').textContent=String(name||'瞳').slice(0,1);
+		var box=$('meAva');
+		var old=box.querySelector('img'); if(old) old.remove();
+		if(ME&&ME.avatar){
+			var im=document.createElement('img'); im.src=ME.avatar; im.alt=name;
+			box.insertBefore(im,$('meAvaTxt'));
+			$('meAvaTxt').style.display='none';
+		}else{
+			$('meAvaTxt').style.display='';
+		}
+	}
+	paint();
+
+	$('meAvaBtn').onclick=function(){ if(!ME||!ME.mail){ msg('meOutMsg','先登录再改头像','err'); return; } $('meAvaFile').click(); };
+	$('meAvaFile').addEventListener('change',function(){
+		var f=$('meAvaFile').files&&$('meAvaFile').files[0]; $('meAvaFile').value='';
+		if(!f) return;
+		if(f.size>8*1024*1024){ msg('meOutMsg','头像请控制在 8MB 以内','err'); return; }
+		var name=f.name||'a.jpg', ext=((name.match(/\.[a-zA-Z0-9]+$/)||[''])[0]).toLowerCase()||'.jpg';
+		var key='avatar/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+ext;
+		$('meAvaBtn').disabled=true; $('meAvaBtn').textContent='上传中…';
+		fetch(HOST+key,{method:'PUT',headers:{'Content-Type':f.type||'image/jpeg','Cache-Control':'public, max-age=31536000'},body:f})
+			.then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return HOST+key; })
+			.then(function(url){
+				return readUsers().then(function(list){
+					var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+					if(!u) throw new Error('没找到账号记录');
+					u.avatar=url; return writeUsers(list).then(function(){ return url; });
+				});
+			})
+			.then(function(url){
+				ME.avatar=url; save(SKEY,JSON.stringify(ME)); paint();
+				msg('meOutMsg','头像换好了','ok');
+				$('meAvaBtn').disabled=false; $('meAvaBtn').textContent='更换头像';
+			})
+			.catch(function(e){
+				$('meAvaBtn').disabled=false; $('meAvaBtn').textContent='更换头像';
+				msg('meOutMsg',e.message||'头像没换成','err');
+			});
+	});
+
+	$('meNameBtn').onclick=function(){
+		if(!ME||!ME.mail){ msg('meNameMsg','先登录再改昵称','err'); return; }
+		var nn=$('meNameIn').value.trim();
+		if(!nn){ msg('meNameMsg','昵称不能空着','err'); return; }
+		$('meNameBtn').disabled=true;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) throw new Error('没找到账号记录');
+			u.name=nn; return writeUsers(list);
+		}).then(function(){
+			ME.name=nn; save(SKEY,JSON.stringify(ME)); paint();
+			msg('meNameMsg','昵称改好了','ok');
+			$('meNameBtn').disabled=false;
+		}).catch(function(e){
+			$('meNameBtn').disabled=false; msg('meNameMsg',e.message||'没改成','err');
+		});
+	};
+
+	$('mePassBtn').onclick=function(){
+		if(!ME||!ME.mail){ msg('mePassMsg','先登录再改密码','err'); return; }
+		var op=$('meOldPass').value, np=$('meNewPass').value;
+		if(!op||!np){ msg('mePassMsg','两个密码都要填','err'); return; }
+		if(np.length<6){ msg('mePassMsg','新密码至少 6 位','err'); return; }
+		$('mePassBtn').disabled=true;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) throw new Error('没找到账号记录');
+			return hashPass(u.mail||ME.mail,op).then(function(ph){
+				if(ph!==u.ph) throw new Error('现在的密码不对');
+				return hashPass(u.mail||ME.mail,np).then(function(nh){
+					u.ph=nh; return writeUsers(list);
+				});
+			});
+		}).then(function(){
+			$('meOldPass').value=''; $('meNewPass').value='';
+			$('mePassBtn').disabled=false;
+			msg('mePassMsg','密码改好了，下次用新密码登录','ok');
+		}).catch(function(e){
+			$('mePassBtn').disabled=false; msg('mePassMsg',e.message||'没改成','err');
+		});
+	};
+
+	$('meOut').onclick=function(){
+		if(!confirm('确定退出登录？')) return;
+		save(SKEY,''); location.reload();
+	};
 })();
 </script>
 

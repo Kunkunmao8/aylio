@@ -864,7 +864,7 @@ body.modal-open{overflow:hidden;}
 		btn.disabled=true;
 		var c=mailcfg();
 		var payload=JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
-			template_params:{to_email:mail,code:pendCode,site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}});
+			template_params:{to_email:mail,code:pendCode,passcode:pendCode,time:'10 分钟',site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}});
 		function send(){
 			return fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:payload})
 				.then(function(r){ if(!r.ok){ return r.text().then(function(t){ throw new Error(t||('HTTP '+r.status)); }); } });
@@ -1456,7 +1456,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				service_id:c.serviceId,
 				template_id:c.templateId,
 				user_id:c.publicKey,
-				template_params:{to_email:mail, code:code, site_name:'政瞳之家 · 小枕头留言箱', note:'10 分钟内有效'}
+				template_params:{to_email:mail, code:code, passcode:code, time:'10 分钟', site_name:'政瞳之家 · 小枕头留言箱', note:'10 分钟内有效'}
 			})
 		}).then(function(r){ if(!r.ok) throw new Error('mail '+r.status); });
 	}

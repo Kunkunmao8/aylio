@@ -822,11 +822,12 @@ body.modal-open{overflow:hidden;}
 	document.documentElement.style.overflow='hidden';
 
 	var U='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/auth/users.json';
-	var CFG=window.AYLIO_MAIL||{};
+	var CFG={};
+	function mailcfg(){ return window.AYLIO_MAIL||{}; }
 	var pendCode='', pendMail='';
 
 	function $(id){ return document.getElementById(id); }
-	function ready(){ return !!(CFG.serviceId&&CFG.templateId&&CFG.publicKey); }
+	function ready(){ var c=mailcfg(); return !!(c.serviceId&&c.templateId&&c.publicKey); }
 	function buf2hex(b){ var a=new Uint8Array(b), s=''; for(var i=0;i<a.length;i++) s+=('0'+a[i].toString(16)).slice(-2); return s; }
 	function hashPass(mail,pass){
 		var s=(mail||'').trim().toLowerCase()+':'+pass+':aylio-pillow';
@@ -860,9 +861,10 @@ body.modal-open{overflow:hidden;}
 		if(!ready()){ $('agCodeTip').textContent='验证码：'+pendCode+'（还没接发信服务，先在页面显示）'; return; }
 		$('agCodeTip').textContent='正在发到 '+mail+' …';
 		$('agSendCode').disabled=true;
+		var c=mailcfg();
 		fetch('https://api.emailjs.com/api/v1.0/email/send',{
 			method:'POST',headers:{'Content-Type':'application/json'},
-			body:JSON.stringify({service_id:CFG.serviceId,template_id:CFG.templateId,user_id:CFG.publicKey,
+			body:JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
 				template_params:{to_email:mail,code:pendCode,site_name:'政瞳之家 · 小枕头留言箱',note:'10 分钟内有效'}})
 		}).then(function(r){ if(!r.ok) throw new Error('mail '+r.status);
 			$('agSendCode').disabled=false;
@@ -1437,16 +1439,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		};
 	});
 
-	var MAILCFG = window.AYLIO_MAIL || {};
-	function mailReady(){ return !!(MAILCFG.serviceId && MAILCFG.templateId && MAILCFG.publicKey); }
+	function mc(){ return window.AYLIO_MAIL || {}; }
+	function mailReady(){ var c=mc(); return !!(c.serviceId && c.templateId && c.publicKey); }
 	function sendMailCode(mail, code){
+		var c=mc();
 		return fetch('https://api.emailjs.com/api/v1.0/email/send',{
 			method:'POST',
 			headers:{'Content-Type':'application/json'},
 			body:JSON.stringify({
-				service_id:MAILCFG.serviceId,
-				template_id:MAILCFG.templateId,
-				user_id:MAILCFG.publicKey,
+				service_id:c.serviceId,
+				template_id:c.templateId,
+				user_id:c.publicKey,
 				template_params:{to_email:mail, code:code, site_name:'政瞳之家 · 小枕头留言箱', note:'10 分钟内有效'}
 			})
 		}).then(function(r){ if(!r.ok) throw new Error('mail '+r.status); });

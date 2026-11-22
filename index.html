@@ -1011,6 +1011,7 @@ body.modal-open{overflow:hidden;}
 	</div>
 </header>
 <div class="page active" id="home">
+	<div class="pg-head"><h2>首页</h2><p>孙政 × 吕思瞳 · 把日常过成可以回看的样子</p></div>
 	<section class="banner">
 		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/feature-banner13.jpg.jpg" alt="首页横幅：蛋糕前的两个人">
 		<div class="banner-text">
@@ -1161,6 +1162,7 @@ body.modal-open{overflow:hidden;}
 	</section>
 </div>
 <div class="page" id="menu">
+	<div class="pg-head"><h2>日常记录</h2><p>一顿饭、一段路，都算数</p></div>
 	<section class="banner">
 		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/menu-banner12.jpg.jpg" alt="日常记录横幅：餐桌上的两个人">
 		<div class="banner-text">
@@ -1591,6 +1593,7 @@ a{color:inherit;}
 .dm-empty{margin:auto;color:#B99584;font-size:12.5px;text-align:center;line-height:2;}
 </style>
 <div class="page" id="pillow">
+	<div class="pg-head"><h2>社区</h2><p>大家都在说 · 想发什么就发什么</p></div>
 	<section class="banner">
 		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/pillow/banner.jpg" alt="演唱会舞台前，两个人蹲在应援灯海前合影">
 		<div class="banner-text">
@@ -1609,7 +1612,8 @@ a{color:inherit;}
 		</div>
 		<div class="room-search">
 			<input id="pSearch" type="search" maxlength="30" placeholder="搜昵称、搜帖子里的字…">
-			<button class="sbtn" id="pSearchClear" type="button">清空</button>
+			<button class="sbtn" id="pSearchGo" type="button">搜索</button>
+			<button class="sbtn ghost" id="pSearchClear" type="button">清空</button>
 		</div>
 		<div class="user-hits hide" id="userHits"></div>
 		<div class="gate" id="gate">
@@ -1676,7 +1680,7 @@ a{color:inherit;}
 						<div class="xp-ava" id="upAva"><span>瞳</span></div>
 						<div class="xp-who">
 							<div class="xp-name" id="upName">—</div>
-							<div class="xp-sub">政瞳号 <span id="upId">—</span> · IP 湖南</div>
+							<div class="xp-sub">政瞳号 <span id="upId">—</span></div>
 						</div>
 					</div>
 					<div class="xp-stats">
@@ -1686,8 +1690,8 @@ a{color:inherit;}
 					</div>
 					<p class="xp-bio" id="upBio">还没有写简介</p>
 					<div class="xp-tags">
-						<span class="xp-tag" id="upZodiac">星座未设置</span>
-						<span class="xp-tag">湖南长沙</span>
+						<span class="xp-tag hide" id="upZodiac"></span>
+						<span class="xp-tag hide" id="upCity"></span>
 					</div>
 					<div class="up-acts">
 						<button class="up-follow" id="upFollow" type="button">关注</button>
@@ -1696,7 +1700,7 @@ a{color:inherit;}
 				</div>
 			</div>
 			<div class="xp-sheet">
-				<div class="xp-tabs"><button type="button" class="on">笔记 <b id="upCnt">0</b></button></div>
+				<div class="xp-tabs"><button type="button" class="on">帖子 <b id="upCnt">0</b></button></div>
 				<div class="xp-grid" id="upGrid"></div>
 			</div>
 		</div>
@@ -1706,7 +1710,7 @@ a{color:inherit;}
 			<div class="dm-head">
 				<div>
 					<div class="t" id="dmWho">私信</div>
-					<div class="s">只有你们两个人能看到</div>
+					<div class="s" id="dmHint">只有你们两个人能看到</div>
 				</div>
 				<button class="dm-x" id="dmX" type="button">×</button>
 			</div>
@@ -1977,17 +1981,6 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		};
 		acts.appendChild(likeBtn);
 
-		var favBtn=el('button');
-		favBtn.type='button';
-		function paintFav(){ var on=isFav(m.id); favBtn.classList.toggle('on',on); favBtn.textContent=(on?'⭐ 已收藏':'⭐ 收藏'); }
-		paintFav();
-		favBtn.onclick=function(){
-			var F=favSet(), i=F.indexOf(m.id);
-			if(i>=0) F.splice(i,1); else F.push(m.id);
-			save('aylio_favs',JSON.stringify(F)); paintFav();
-		};
-		acts.appendChild(favBtn);
-
 		var replyBtn=el('button');
 		replyBtn.type='button';
 		replyBtn.textContent='💬 回复'+(m.replies&&m.replies.length?' '+m.replies.length:'');
@@ -2092,10 +2085,12 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function likesOf(name){ return LAST.filter(function(m){ return (m.who||'')===name; }).reduce(function(s,m){ return s+(m.likes||0); },0); }
 	function paintFollowBtn(){
 		var b=$('upFollow'); if(!b) return;
-		if(!UP||!UP.mail || lower(UP.mail)===lower(ME.mail) && ME.mail){ b.textContent='编辑主页'; b.classList.remove('on'); return; }
-		if(isFollowingMail(UP.mail)){ b.textContent='已关注'; b.classList.add('on'); }
-		else if(UP && followList(UP).map(lower).indexOf(lower(ME.mail))>=0 && ME.mail){ b.textContent='回关'; b.classList.remove('on'); }
-		else { b.textContent='关注'; b.classList.remove('on'); }
+		var dm=$('upDm');
+		var self=!!(ME.mail && UP && UP.mail && lower(UP.mail)===lower(ME.mail));
+		if(self){ b.textContent='编辑主页'; b.classList.remove('on'); if(dm) dm.style.display='none'; return; }
+		if(isFollowingMail(UP.mail)){ b.textContent='已关注'; b.classList.add('on'); if(dm) dm.style.display=''; }
+		else if(UP && followList(UP).map(lower).indexOf(lower(ME.mail))>=0 && ME.mail){ b.textContent='回关'; b.classList.remove('on'); if(dm) dm.style.display='none'; }
+		else { b.textContent='关注'; b.classList.remove('on'); if(dm) dm.style.display='none'; }
 	}
 	function openUser(name){
 		name=name||'匿名';
@@ -2105,10 +2100,20 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(UP.avatar){ var im=document.createElement('img'); im.src=UP.avatar; im.alt=name; im.onclick=function(){ window.open(UP.avatar,'_blank'); }; ava.appendChild(im); }
 		else { ava.textContent=String(name).slice(0,1); }
 		$('upName').textContent=name;
-		$('upCover').src=UP.cover||DEFAULT_COVER;
+		var upc=$('upCover');
+		upc.src=UP.cover||DEFAULT_COVER;
+		upc.onload=function(){
+			var portrait=this.naturalHeight>this.naturalWidth*1.12;
+			this.parentNode.classList.toggle('is-portrait',portrait);
+			this.parentNode.style.setProperty('--cover','url("'+this.src+'")');
+			this.style.objectPosition=portrait?'center 18%':'center 66%';
+		};
+		if(upc.complete&&upc.naturalWidth) upc.onload();
 		$('upId').textContent=idOf(UP.mail);
 		$('upBio').textContent=UP.sign||'还没有写简介';
-		$('upZodiac').textContent=UP.birth?zod(UP.birth):'星座未设置';
+		var zz=UP.birth?zod(UP.birth):"";
+		var ztag=$('upZodiac'); if(ztag){ ztag.textContent=zz; ztag.classList.toggle('hide',!zz); }
+		var ctag=$('upCity'); if(ctag){ var cc=UP.city||""; ctag.textContent=cc; ctag.classList.toggle('hide',!cc); }
 		$('upFollowing').textContent=followList(UP).length;
 		$('upFans').textContent=fansOf(UP).length;
 		$('upLikes').textContent=likesOf(name);
@@ -2182,11 +2187,38 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 	function dmLoad(){
 		if(!DMURL) return;
-		fetch(DMURL,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }).then(dmRender);
+		fetch(DMURL,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }).then(function(list){ dmRender(list); syncDmHint(list); });
+	}
+	var DM_MUTUAL=false, DM_SENT=0, DM_MAX=3;
+	function freshUser(u){
+		if(!u) return null;
+		var hit=ALLUSERS.filter(function(x){ return lower(x.mail)===lower(u.mail); })[0];
+		return hit||u;
+	}
+	function isMutualWith(u){
+		u=freshUser(u); if(!u||!u.mail||!ME.mail) return false;
+		return isFollowingMail(u.mail) && followList(u).map(lower).indexOf(lower(ME.mail))>=0;
+	}
+	function syncDmHint(list){
+		var u=freshUser(DMT)||DMT;
+		DM_MUTUAL=isMutualWith(u);
+		DM_SENT=((list||[]).filter(function(m){ return lower(m.from)===lower(ME.mail); })).length;
+		var left=DM_MUTUAL?999:Math.max(0,DM_MAX-DM_SENT);
+		var hint=$('dmHint');
+		if(hint){
+			if(DM_MUTUAL) hint.textContent='你们已经互相关注，可以一直聊';
+			else if(left>0) hint.textContent='还没互关，最多能发 3 条 · 还剩 '+left+' 条';
+			else hint.textContent='3 条已经发完了，等 TA 回关就能继续聊';
+		}
+		var inp=$('dmIn'), btn=$('dmSend');
+		var blocked=!DM_MUTUAL && left<=0;
+		if(inp){ inp.disabled=blocked; inp.placeholder=blocked?'等 TA 回关后再发…':'说点什么…'; }
+		if(btn) btn.disabled=blocked;
 	}
 	function openDm(u){
 		if(!ME.mail){ alert('先登录再私信'); return; }
 		if(!u||!u.mail){ alert('TA 还没有注册账号，暂时不能私信'); return; }
+		if(!isFollowingMail(u.mail)){ alert('先点「关注」，关注之后才能给 TA 发私信'); return; }
 		DMT=u; DMURL=HOST+convKey(ME.mail,u.mail);
 		$('dmWho').textContent='私信 · '+(u.name||'');
 		$('dmBody').innerHTML='<div class="dm-empty">正在读消息…</div>';
@@ -2199,6 +2231,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		var inp=$('dmIn'), t=(inp.value||'').trim();
 		if(!t) return;
 		if(!DMURL) return;
+		if(!DM_MUTUAL && DM_SENT>=DM_MAX){ alert('还没互关，3 条已经发完了，等 TA 回关就能继续聊'); return; }
 		var btn=$('dmSend'); btn.disabled=true; inp.value='';
 		fetch(DMURL,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; })
 			.then(function(list){
@@ -2274,6 +2307,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		pSearch.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); clearTimeout(searchTimer); applyQuery(pSearch.value); } });
 	}
 	if($('pSearchClear')) $('pSearchClear').onclick=function(){ if(pSearch) pSearch.value=''; applyQuery(''); };
+	if($('pSearchGo')) $('pSearchGo').onclick=function(){ clearTimeout(searchTimer); if(pSearch) pSearch.focus(); applyQuery(pSearch?pSearch.value:''); };
 	if($('upBack')) $('upBack').onclick=closeUserPage;
 	if($('upFollow')) $('upFollow').onclick=function(){
 		if(ME.mail && UP && lower(UP.mail)===lower(ME.mail)){ closeUserPage(); location.hash='#mine'; return; }
@@ -2404,7 +2438,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="xp">
 		<div class="xp-page-head">
 			<h2>我的主页</h2>
-			<p>昵称、头像、背景图都在这儿改</p>
+			<p>把生活写进这张卡片里</p>
 			<button class="xp-edit" id="myEditOpen" type="button">编辑主页</button>
 		</div>
 		<div class="xp-card">
@@ -2419,96 +2453,104 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 					<div class="xp-ava" id="meAva"><span id="meAvaTxt">瞳</span></div>
 					<div class="xp-who">
 						<div class="xp-name" id="meName">未登录</div>
-						<div class="xp-sub">政瞳号 <span id="myId">—</span> · IP 湖南</div>
+						<div class="xp-sub">政瞳号 <span id="myId">—</span></div>
 					</div>
 				</div>
 				<div class="xp-stats">
 					<button type="button" id="stFollow"><b>0</b><span>关注</span></button>
 					<button type="button" id="stFans"><b>0</b><span>粉丝</span></button>
-					<div class="xp-st"><b id="stLikes">0</b><span>获赞与收藏</span></div>
+					<div class="xp-st"><b id="stLikes">0</b><span>获赞</span></div>
 				</div>
 				<p class="xp-bio" id="meSignView">还没有简介，点「编辑主页」写一句。</p>
 				<div class="xp-tags">
-					<span class="xp-tag" id="tagZodiac">星座未设置</span>
-					<span class="xp-tag">湖南长沙</span>
-					<span class="xp-tag" id="tagMail">未登录</span>
+					<span class="xp-tag hide" id="tagZodiac"></span>
+					<span class="xp-tag hide" id="tagCity"></span>
+				</div>
+				<div class="xp-life">
+					<span>今天发生了什么，想留下来吗？</span>
+					<button type="button" class="xp-share" id="myShareBtn">＋ 分享生活</button>
 				</div>
 			</div>
 		</div>
 		<div class="xp-sheet">
 			<div class="xp-tabs" id="myTabs">
-				<button type="button" class="on" data-tab="notes">笔记 <b id="cntNotes">0</b></button>
+				<button type="button" class="on" data-tab="posts">帖子 <b id="cntPosts">0</b></button>
 				<button type="button" data-tab="replies">评论 <b id="cntReplies">0</b></button>
-				<button type="button" data-tab="favs">收藏 <b id="cntFavs">0</b></button>
 				<button type="button" data-tab="liked">赞过 <b id="cntLiked">0</b></button>
 			</div>
 			<div class="xp-grid" id="myGrid"></div>
-			<div class="xp-sec hide" id="editWrap">
-				<div class="xp-sec-head"><h4>编辑主页</h4><button type="button" id="myEditClose">收起</button></div>
-				<div class="edit-grid">
-					<div class="me-block">
-						<h4>头像</h4>
-						<p class="hint">点左上角圆形头像可以看大图；这里换一张。</p>
-						<button class="me-btn ghost" type="button" id="meAvaBtn">更换头像</button>
-						<input type="file" id="meAvaFile" accept="image/*" class="hide">
-						<p class="me-msg" id="meOutMsg"></p>
-						<span id="meMail" class="hide">—</span>
 					</div>
-					<div class="me-block">
-						<h4>背景图</h4>
-						<p class="hint">点封面上的「修改背景图」就能换，横图效果最好。</p>
-						<button class="me-btn ghost" type="button" id="meCoverBtn2">修改背景图</button>
-						<p class="me-msg" id="meCoverMsg"></p>
-					</div>
-					<div class="me-block">
-						<h4>昵称</h4>
-						<p class="hint">现在叫：<span id="meNameView">—</span>，社区里显示这个名字。</p>
-						<button class="me-btn ghost" id="meNameOpen" type="button">修改昵称</button>
-						<div id="meNameBox" class="hide" style="margin-top:12px">
-							<input class="me-input" id="meNameIn" maxlength="16" placeholder="给自己起个名字">
-							<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
-						</div>
-						<p class="me-msg" id="meNameMsg"></p>
-					</div>
-					<div class="me-block">
-						<h4>简介与生日</h4>
-						<p class="hint">简介就是主页上那段自我介绍；生日点开选，选完自动出星座。</p>
-						<input class="me-input" id="meSignIn" maxlength="60" placeholder="写一句简介，最多 60 字">
-						<button class="me-btn ghost" id="meSignBtn" type="button">保存简介</button>
-						<p class="me-msg" id="meSignMsg"></p>
-						<p class="hint" style="margin:16px 0 8px">生日</p>
-						<input class="me-input" id="meBirth" type="date">
-						<p class="me-sign-line">星座：<b id="meZodiac">未设置</b></p>
-						<p class="me-msg" id="meBirthMsg"></p>
-					</div>
-					<div class="me-block">
-						<h4>密码</h4>
-						<p class="hint">点「修改密码」才需要填，改完下次用新密码登录。</p>
-						<button class="me-btn ghost" id="mePassOpen" type="button">修改密码</button>
-						<div id="mePassBox" class="hide" style="margin-top:12px">
-							<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
-							<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
-							<button class="me-btn" id="mePassBtn" type="button">确认修改</button>
-						</div>
-						<p class="me-msg" id="mePassMsg"></p>
-						<p class="me-forgot"><button type="button" id="meForgotBtn">忘记现在的密码？用邮箱验证码重设</button></p>
-						<div id="meResetBox" class="hide" style="margin-top:10px">
-							<input class="me-input" id="meRCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
-							<input class="me-input" id="meRPass" type="password" placeholder="新密码，至少 6 位">
-							<div class="me-row">
-								<button class="me-btn" id="meRSend" type="button">获取验证码</button>
-								<button class="me-btn" id="meRSave" type="button">重设密码</button>
-							</div>
-							<p class="me-msg" id="meRMsg"></p>
-						</div>
-					</div>
-					<div class="me-block">
-						<h4>账号</h4>
-						<p class="hint">当前登录邮箱：<span id="meMail2">—</span></p>
-						<button class="me-btn ghost" id="meOut" type="button">退出登录</button>
-						<p class="me-msg" id="meOutMsg2"></p>
-					</div>
+	</div>
+	<div class="edit-mask hide" id="editMask"></div>
+	<div class="edit-drawer hide" id="editWrap">
+		<div class="edit-head"><h3>编辑主页</h3><button type="button" class="edit-x" id="myEditClose">×</button></div>
+		<p class="edit-lead">点一行就能改，不点就保持原样。没填的项不会显示在主页上。</p>
+		<div class="ed-list">
+			<div class="ed-row">
+				<div class="ed-line"><span class="ed-k">头像</span><span class="ed-v" id="edAvaV">—</span><button class="ed-go" type="button" id="meAvaBtn" style="border:0;background:none;font-family:inherit;cursor:pointer;padding:0;">更换 ›</button></div>
+				<input type="file" id="meAvaFile" accept="image/*" class="hide">
+				<p class="me-msg" id="meOutMsg"></p>
+				<span id="meMail" class="hide">—</span>
+			</div>
+			<div class="ed-row">
+				<div class="ed-line"><span class="ed-k">背景图</span><span class="ed-v">横图效果最好</span><button class="ed-go" type="button" id="meCoverBtn2" style="border:0;background:none;font-family:inherit;cursor:pointer;padding:0;">修改 ›</button></div>
+				<p class="me-msg" id="meCoverMsg"></p>
+			</div>
+			<div class="ed-row">
+				<button class="ed-line" type="button" id="meNameOpen"><span class="ed-k">昵称</span><span class="ed-v" id="meNameView">—</span><span class="ed-go">修改 ›</span></button>
+				<div id="meNameBox" class="ed-open hide">
+					<input class="me-input" id="meNameIn" maxlength="16" placeholder="给自己起个名字">
+					<button class="me-btn" id="meNameBtn" type="button">保存昵称</button>
 				</div>
+				<p class="me-msg" id="meNameMsg"></p>
+			</div>
+			<div class="ed-row">
+				<button class="ed-line" type="button" id="meSignOpen"><span class="ed-k">简介</span><span class="ed-v" id="edSignV">未填写</span><span class="ed-go">写一句 ›</span></button>
+				<div id="meSignBox" class="ed-open hide">
+					<input class="me-input" id="meSignIn" maxlength="60" placeholder="写一句简介，最多 60 字">
+					<button class="me-btn" id="meSignBtn" type="button">保存简介</button>
+				</div>
+				<p class="me-msg" id="meSignMsg"></p>
+			</div>
+			<div class="ed-row">
+				<button class="ed-line" type="button" id="meCityOpen"><span class="ed-k">所在地</span><span class="ed-v" id="edCityV">未填写</span><span class="ed-go">设置 ›</span></button>
+				<div id="meCityBox" class="ed-open hide">
+					<input class="me-input" id="meCityIn" maxlength="20" placeholder="比如 湖南长沙，不填不显示">
+					<button class="me-btn" id="meCityBtn" type="button">保存所在地</button>
+				</div>
+				<p class="me-msg" id="meCityMsg"></p>
+			</div>
+			<div class="ed-row">
+				<button class="ed-line" type="button" id="meBirthOpen"><span class="ed-k">生日</span><span class="ed-v" id="edBirthV">未填写</span><span class="ed-go">设置 ›</span></button>
+				<div id="meBirthBox" class="ed-open hide">
+					<input class="me-input" id="meBirth" type="date">
+					<p class="ed-note">星座：<b id="meZodiac">未设置</b>，生日不填就不显示。</p>
+					<button class="me-btn ghost" id="meBirthSave" type="button">保存生日</button>
+				</div>
+				<p class="me-msg" id="meBirthMsg"></p>
+			</div>
+			<div class="ed-row">
+				<button class="ed-line" type="button" id="mePassOpen"><span class="ed-k">密码</span><span class="ed-v">要改才点开</span><span class="ed-go">修改 ›</span></button>
+				<div id="mePassBox" class="ed-open hide">
+					<input class="me-input" id="meOldPass" type="password" placeholder="现在的密码" autocomplete="current-password">
+					<input class="me-input" id="meNewPass" type="password" placeholder="新密码，至少 6 位" autocomplete="new-password">
+					<button class="me-btn" id="mePassBtn" type="button">确认修改</button>
+				</div>
+				<p class="me-msg" id="mePassMsg"></p>
+				<p class="me-forgot"><button type="button" id="meForgotBtn">忘记现在的密码？用邮箱验证码重设</button></p>
+				<div id="meResetBox" class="hide" style="margin-top:10px">
+					<input class="me-input" id="meRCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
+					<input class="me-input" id="meRPass" type="password" placeholder="新密码，至少 6 位">
+					<div class="me-row">
+						<button class="me-btn" id="meRSend" type="button">获取验证码</button>
+						<button class="me-btn" id="meRSave" type="button">重设密码</button>
+					</div>
+					<p class="me-msg" id="meRMsg"></p>
+				</div>
+			</div>
+			<div class="ed-row">
+				<div class="ed-line"><span class="ed-k">账号</span><span class="ed-v" id="meMail2">—</span><button class="ed-go" type="button" id="meOut" style="border:0;background:none;font-family:inherit;cursor:pointer;padding:0;">退出 ›</button></div>
+				<p class="me-msg" id="meOutMsg2"></p>
 			</div>
 		</div>
 	</div>
@@ -2530,7 +2572,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <script>
 (function(){
 	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
-	var DEFAULT_COVER=HOST+'pillow/banner.jpg';
+	var DEFAULT_COVER=HOST+'img/5.jpg.jpg';
 	var USERS=HOST+'auth/users.json';
 	var SKEY='aylio_pillow_user';
 	var ME=null;
@@ -2555,6 +2597,16 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		for(var i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))|0;
 		return String((h>>>0)%90000000+10000000);
 	}
+	function coverFit(img){
+		if(!img) return;
+		function run(){
+			var portrait=img.naturalHeight>img.naturalWidth*1.12;
+			if(img.parentNode){ img.parentNode.classList.toggle('is-portrait',portrait); img.parentNode.style.setProperty('--cover','url("'+img.src+'")'); }
+			img.style.objectPosition=portrait?'center 18%':'center 66%';
+		}
+		img.onload=run;
+		if(img.complete&&img.naturalWidth) run();
+	}
 	function paint(){
 		var name=(ME&&ME.name)||'未登录';
 		var mail=(ME&&ME.mail)||'—';
@@ -2576,8 +2628,20 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if($('myId')) $('myId').textContent=ME&&ME.mail?idOf(ME.mail):'—';
 		if($('tagMail')) $('tagMail').textContent=mail;
 		if($('meSignView')) $('meSignView').textContent=(ME&&ME.sign)||'还没有简介，点「编辑主页」写一句。';
-		if($('tagZodiac')) $('tagZodiac').textContent=(ME&&ME.birth)?zodiacOf(ME.birth):'星座未设置';
-		if($('meCoverImg')) $('meCoverImg').src=(ME&&ME.cover)||DEFAULT_COVER;
+		if($('edSignV')) $('edSignV').textContent=(ME&&ME.sign)||'未填写';
+		if($('edCityV')) $('edCityV').textContent=(ME&&ME.city)||'未填写';
+		if($('edBirthV')) $('edBirthV').textContent=(ME&&ME.birth)?String(ME.birth).replace(/-/g,'.'):'未填写';
+		if($('edAvaV')) $('edAvaV').textContent=(ME&&ME.avatar)?'已设置':'默认头像';
+		if($('meMail2')) $('meMail2').textContent=mail;
+		if($('tagZodiac')){
+			var zz=(ME&&ME.birth)?zodiacOf(ME.birth):'';
+			$('tagZodiac').textContent=zz; $('tagZodiac').classList.toggle('hide',!zz);
+		}
+		if($('tagCity')){
+			var cc=(ME&&ME.city)||'';
+			$('tagCity').textContent=cc; $('tagCity').classList.toggle('hide',!cc);
+		}
+		if($('meCoverImg')){ $('meCoverImg').src=(ME&&ME.cover)||DEFAULT_COVER; coverFit($('meCoverImg')); }
 	}
 	paint();
 
@@ -2597,7 +2661,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function paintProf(){
 		$('meSignIn').value=(ME&&ME.sign)||'';
 		$('meBirth').value=(ME&&ME.birth)||'';
+		if($('meCityIn')) $('meCityIn').value=(ME&&ME.city)||'';
 		$('meZodiac').textContent=(ME&&ME.birth)?zodiacOf(ME.birth):'未设置';
+		if($('edSignV')) $('edSignV').textContent=(ME&&ME.sign)||'未填写';
+		if($('edCityV')) $('edCityV').textContent=(ME&&ME.city)||'未填写';
+		if($('edBirthV')) $('edBirthV').textContent=(ME&&ME.birth)?String(ME.birth).replace(/-/g,'.'):'未填写';
 	}
 	paintProf();
 	var today=new Date(); var pad=function(n){ return (n<10?'0':'')+n; };
@@ -2606,7 +2674,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		readUsers().then(function(list){
 			var u=(list||[]).filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
 			if(!u) return;
-			ME.sign=u.sign||''; ME.birth=u.birth||'';
+			ME.sign=u.sign||''; ME.birth=u.birth||''; ME.city=u.city||'';
 			save(SKEY,JSON.stringify(ME)); paintProf(); paint(); refreshMine();
 		}).catch(function(){});
 	}
@@ -2620,7 +2688,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			u.sign=s; return writeUsers(list);
 		}).then(function(){
 			ME.sign=s; save(SKEY,JSON.stringify(ME)); paint();
-			$('meSignBtn').disabled=false; msg('meSignMsg','签名存好了，社区点头像就能看到','ok');
+			$('meSignBtn').disabled=false; $('meSignBox').classList.add('hide'); msg('meSignMsg','签名存好了，社区点头像就能看到','ok');
 		}).catch(function(e){ $('meSignBtn').disabled=false; msg('meSignMsg',e.message||'没存上','err'); });
 	};
 	$('meBirth').onchange=function(){
@@ -2638,9 +2706,23 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(e){ msg('meBirthMsg',e.message||'没存上','err'); });
 	};
 
-	/* ---------- 主页：笔记 / 评论 / 收藏 / 赞过 / 关注 / 粉丝 ---------- */
+	$('meCityBtn').onclick=function(){
+		if(!ME||!ME.mail){ msg('meCityMsg','先登录再填所在地','err'); return; }
+		var city=$('meCityIn').value.trim().slice(0,20);
+		$('meCityBtn').disabled=true;
+		readUsers().then(function(list){
+			var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
+			if(!u) throw new Error('没找到账号记录');
+			u.city=city; return writeUsers(list);
+		}).then(function(){
+			ME.city=city; save(SKEY,JSON.stringify(ME)); paint(); paintProf();
+			$('meCityBtn').disabled=false; msg('meCityMsg',city?'所在地存好了':'所在地已清空，主页不显示','ok');
+		}).catch(function(e){ $('meCityBtn').disabled=false; msg('meCityMsg',e.message||'没存上','err'); });
+	};
+
+	/* ---------- 主页：帖子 / 评论 / 赞过 / 关注 / 粉丝 ---------- */
 	var ROOM=HOST+'pillow/_index.json';
-	var ALLPOSTS=[], MYPOSTS=[], MYREPLIES=[], MYREC=null, MYTAB='notes', FANS=[], FOLLOWING=[], PEOPLE_KIND='fans';
+	var ALLPOSTS=[], MYPOSTS=[], MYREPLIES=[], MYREC=null, MYTAB='posts', FANS=[], FOLLOWING=[], PEOPLE_KIND='fans';
 	function readRoom(){ return fetch(ROOM,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; }); }
 	function lower(x){ return String(x||'').toLowerCase(); }
 	function followList(u){ return (u&&u.following)||[]; }
@@ -2691,12 +2773,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			grid.appendChild(wrap); return;
 		}
 		var list=[];
-		if(MYTAB==='notes') list=MYPOSTS;
-		else if(MYTAB==='favs') list=ALLPOSTS.filter(function(m){ return favIds().indexOf(m.id)>=0; });
+		if(MYTAB==='posts') list=MYPOSTS;
 		else if(MYTAB==='liked') list=ALLPOSTS.filter(function(m){ return likeIds().indexOf(m.id)>=0; });
 		list=list.slice().sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
 		if(!list.length){
-			grid.innerHTML='<div class="xp-none">'+(MYTAB==='notes'?'还没有笔记，去社区发一条吧':'这里还是空的')+'</div>';
+			grid.innerHTML='<div class="xp-none">'+(MYTAB==='posts'?'还没有帖子，去社区发一条吧':'这里还是空的')+'</div>';
 			return;
 		}
 		list.forEach(function(m){ grid.appendChild(cardOf(m)); });
@@ -2709,7 +2790,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			MYREC=users.filter(function(u){ return lower(u.mail)===lower(ME.mail); })[0]||null;
 			if(MYREC){
 				ME.name=MYREC.name||ME.name; ME.avatar=MYREC.avatar||''; ME.cover=MYREC.cover||'';
-				ME.sign=MYREC.sign||''; ME.birth=MYREC.birth||'';
+				ME.sign=MYREC.sign||''; ME.birth=MYREC.birth||''; ME.city=MYREC.city||''; ME.city=MYREC.city||'';
 				save(SKEY,JSON.stringify(ME)); paint();
 			}
 			MYPOSTS=ALLPOSTS.filter(isMinePost).sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
@@ -2721,10 +2802,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var likes=MYPOSTS.reduce(function(s,m){ return s+(m.likes||0); },0);
 			$('stFollow').querySelector('b').textContent=FOLLOWING.length;
 			$('stFans').querySelector('b').textContent=FANS.length;
-			$('stLikes').textContent=likes+favIds().length;
-			$('cntNotes').textContent=MYPOSTS.length;
+			$('stLikes').textContent=likes;
+			$('cntPosts').textContent=MYPOSTS.length;
 			$('cntReplies').textContent=MYREPLIES.length;
-			$('cntFavs').textContent=favIds().length;
 			$('cntLiked').textContent=likeIds().length;
 			renderMineTab();
 		}).catch(function(){ renderMineTab(); });
@@ -2779,8 +2859,28 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	$('fansBox').onclick=function(e){ if(e.target===this) this.classList.add('hide'); };
 	$('noteX').onclick=function(){ $('noteBox').classList.add('hide'); };
 	$('noteBox').onclick=function(e){ if(e.target===this) this.classList.add('hide'); };
-	$('myEditOpen').onclick=function(){ $('editWrap').classList.remove('hide'); $('editWrap').scrollIntoView({behavior:'smooth',block:'start'}); };
-	$('myEditClose').onclick=function(){ $('editWrap').classList.add('hide'); };
+	$('myEditOpen').onclick=function(){
+		var w=$('editWrap');
+		w.classList.remove('on','hide');
+		$('editMask').classList.remove('hide');
+		void w.offsetWidth;
+		w.classList.add('on');
+		w.scrollTop=0;
+	};
+	function closeEdit(){
+		$('editWrap').classList.remove('on');
+		setTimeout(function(){ $('editWrap').classList.add('hide'); $('editMask').classList.add('hide'); },280);
+	}
+	$('myEditClose').onclick=closeEdit;
+	$('editMask').onclick=closeEdit;
+	document.addEventListener('keydown',function(e){ if(e.key==='Escape' && $('editWrap').classList.contains('on')) closeEdit(); });
+	$('myShareBtn').onclick=function(){
+		location.hash='#pillow';
+		setTimeout(function(){
+			var box=document.getElementById('txt')||document.getElementById('pSearch');
+			if(box){ box.scrollIntoView({behavior:'smooth',block:'center'}); box.focus(); }
+		},350);
+	};
 	refreshMine();
 	window.addEventListener('hashchange',function(){ if(/#mine/.test(location.hash)) refreshMine(); });
 	document.addEventListener('visibilitychange',function(){ if(!document.hidden && /#mine/.test(location.hash)) refreshMine(); });
@@ -2845,7 +2945,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				msg('meCoverMsg',e.message||'背景图没换成','err');
 			});
 	});
-	$('meNameOpen').onclick=function(){ $('meNameBox').classList.toggle('hide'); if(!$('meNameBox').classList.contains('hide')) $('meNameIn').focus(); };
+	function toggleOpen(btnId, boxId, focusId){
+		var b=$(btnId), box=$(boxId); if(!b||!box) return;
+		b.onclick=function(){
+			box.classList.toggle('hide');
+			if(!box.classList.contains('hide') && focusId && $(focusId)) setTimeout(function(){ $(focusId).focus(); },60);
+		};
+	}
+	toggleOpen('meNameOpen','meNameBox','meNameIn');
+	toggleOpen('meSignOpen','meSignBox','meSignIn');
+	toggleOpen('meCityOpen','meCityBox','meCityIn');
+	toggleOpen('meBirthOpen','meBirthBox','meBirth');
 	$('mePassOpen').onclick=function(){ $('mePassBox').classList.toggle('hide'); if(!$('mePassBox').classList.contains('hide')) $('meOldPass').focus(); };
 	$('meAva').onclick=function(){
 		if(!ME||!ME.avatar) return;
@@ -2943,6 +3053,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 </script>
 
 <div class="page" id="contact">
+	<div class="pg-head"><h2>联系我们</h2><p>留言、合作、想说的话都放这儿</p></div>
 	<section class="banner">
 		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/contact-banner11.jpg.jpg" alt="联系我们横幅：两个人站在一起">
 		<div class="banner-text">
@@ -4415,7 +4526,275 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	.clip-tip{flex:1 1 auto;}
 }
 @media(max-width:900px){.photo-wall{grid-template-columns:repeat(3,minmax(0,1fr));}}
-@media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}</style>
+@media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}
+/* ================= 全站浅色卡片化（首页/日常记录/社区/联系人） ================= */
+#home .banner,#menu .banner,#pillow .banner,#contact .banner{
+	display:block!important;position:relative;max-width:960px;margin:16px auto 0;height:172px;
+	border-radius:24px;overflow:hidden;background:#F3E3D4;box-shadow:0 18px 40px rgba(150,74,30,.14);
+}
+#home .banner-img,#menu .banner-img,#pillow .banner-img,#contact .banner-img{
+	width:100%;height:100%;object-fit:cover;object-position:center 42%;display:block;
+}
+#home .banner::after,#menu .banner::after,#pillow .banner::after,#contact .banner::after{
+	background:linear-gradient(180deg,rgba(60,32,18,.06) 0%,rgba(60,32,18,.10) 62%,rgba(60,32,18,.34) 100%);
+}
+#home .banner-text,#menu .banner-text,#pillow .banner-text,#contact .banner-text{display:none!important;}
+#home .pg-head,#menu .pg-head,#pillow .pg-head,#contact .pg-head{padding-top:26px;}
+#home,#menu,#pillow,#contact{background:
+	radial-gradient(1100px 380px at 50% 0,#FFE9DC 0%,rgba(255,233,220,0) 70%),
+	linear-gradient(180deg,#FFF4EC 0%,#FDEBDE 55%,#FFF9F4 100%);}
+.pg-head{max-width:960px;margin:0 auto;padding:30px 16px 8px;text-align:center;}
+.pg-head h2{margin:0;font-size:26px;line-height:1.35;letter-spacing:.14em;color:#3A241A;font-weight:700;}
+.pg-head p{margin:9px 0 0;font-size:12.5px;letter-spacing:.08em;color:#B07A5D;}
+#home > .container,#menu > .container,#pillow > .container,#contact > .container{padding-top:8px;}
+#home .card,#menu .card{background:rgba(255,255,255,.76)!important;border:1px solid rgba(255,255,255,.72)!important;border-radius:20px!important;box-shadow:0 14px 34px rgba(170,90,45,.10)!important;}
+#home .table-box,#home .clip-box,#menu .card-wrap,#contact .feedback-wrap,#pillow .room{background:rgba(255,255,255,.78)!important;border:1px solid rgba(255,255,255,.72)!important;border-radius:22px!important;box-shadow:0 14px 34px rgba(170,90,45,.10)!important;}
+#pillow .post{background:rgba(255,255,255,.72)!important;border-color:rgba(246,227,211,.7)!important;}
+#pillow .room{padding:14px 16px 18px;}
+#contact .form-card{background:transparent!important;border:0!important;box-shadow:none!important;}
+
+/* 我的主页：手帐 / 拍立得感，弱化小红书瀑布流 */
+.xp-page-head h2{font-family:"Kaiti SC","STKaiti","KaiTi","Songti SC",serif;letter-spacing:.2em;}
+.xp-page-head h2::before,.xp-page-head h2::after{content:"✿";font-size:13px;color:#D98C63;vertical-align:6px;margin:0 10px;opacity:.85;}
+.xp-card{position:relative;}
+.xp-card::before{content:"";position:absolute;left:50%;top:-1px;width:104px;height:24px;transform:translateX(-50%) rotate(-2.6deg);
+	background:linear-gradient(180deg,rgba(255,223,200,.82),rgba(248,201,172,.62));border-left:1px dashed rgba(255,255,255,.7);
+	border-right:1px dashed rgba(255,255,255,.7);box-shadow:0 4px 10px rgba(150,74,30,.10);z-index:7;pointer-events:none;}
+.xp-stats{border-top:1px dashed #EBD4C2;border-bottom:1px dashed #EBD4C2;padding:12px 2px;margin-top:16px;}
+.xp-tabs{border-bottom:0;background:rgba(255,244,235,.66);border:1px solid rgba(255,255,255,.8);
+	border-radius:16px;padding:6px;gap:6px;margin-top:2px;}
+.xp-tabs button{padding:8px 14px;border-radius:11px;font-size:13px;letter-spacing:.04em;}
+.xp-tabs button.on{background:#FFFDFA;box-shadow:0 4px 12px rgba(170,90,45,.10);}
+.xp-tabs button.on:after{display:none;}
+.xp-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding-top:18px;}
+.xp-card-item{background:#FFFDFA;border:1px solid rgba(240,215,196,.9);border-radius:9px;padding:8px 8px 10px;
+	box-shadow:0 10px 22px rgba(150,74,30,.10);transform:rotate(-.5deg);}
+.xp-card-item:nth-child(even){transform:rotate(.6deg);}
+.xp-card-item:hover{transform:translateY(-3px) rotate(0);box-shadow:0 14px 28px rgba(150,74,30,.16);}
+.xp-card-img{aspect-ratio:1/1;border-radius:4px;}
+.xp-card-txt{aspect-ratio:1/1;border-radius:4px;background:#FFF6EC;font-family:"Kaiti SC","STKaiti","KaiTi",serif;font-size:14px;line-height:1.9;}
+.xp-card-body{padding:9px 4px 2px;}
+.xp-card-title{font-size:12.5px;line-height:1.6;color:#5A3A2A;}
+.xp-card-meta{font-size:11px;color:#B39A8B;}
+
+/* 我的主页卡片透明一点，让底色和封面透出来 */
+.xp-card{background:rgba(255,252,249,.76);border-color:rgba(255,255,255,.78);backdrop-filter:blur(10px);}
+.xp-info{margin-top:-30px;padding-top:2px;border-radius:22px 22px 0 0;background:linear-gradient(180deg,rgba(255,252,249,.55),rgba(255,252,249,.92));}
+.xp-head{margin-top:-48px;}
+.xp-ava{border-color:rgba(255,255,255,.85);}
+.xp-sheet{background:rgba(255,252,249,.84);border-color:rgba(255,255,255,.7);z-index:auto;}
+.xp-share{margin-left:auto;border:1px solid #F1D2BC;background:#FFF8F1;color:#BF5B2E;border-radius:999px;height:30px;padding:0 13px;font-size:12px;font-family:inherit;letter-spacing:.04em;cursor:pointer;white-space:nowrap;}
+.xp-share:hover{background:#FFF0E4;}
+
+/* 编辑主页：右侧滑入卡片 */
+.edit-mask{position:fixed;inset:0;z-index:299;background:rgba(46,26,15,.26);}
+.edit-drawer{position:fixed;top:0;right:0;bottom:0;z-index:300;width:min(430px,94vw);background:#FFFCF9;box-shadow:-18px 0 44px rgba(90,45,20,.20);transform:translateX(104%);transition:transform .30s ease;overflow-y:auto;padding:0 22px 44px;}
+.edit-drawer.on{transform:translateX(0);}
+.edit-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:18px 0 12px;margin-bottom:8px;background:#FFFCF9;border-bottom:1px solid #F2DFCF;}
+.edit-head h3{margin:0;font-size:18px;letter-spacing:.12em;color:#3A241A;}
+.edit-x{width:32px;height:32px;border-radius:50%;border:1px solid #EAD3C1;background:#FFF7F0;color:#BF5B2E;font-size:18px;line-height:1;cursor:pointer;font-family:inherit;}
+.edit-grid{display:block!important;gap:0!important;}
+.edit-grid .me-block{background:transparent;border:0;border-radius:0;padding:0;margin:0 0 20px;box-shadow:none;}
+.edit-grid .me-block h4{font-size:14px;}
+@media(max-width:640px){
+	.pg-head{padding:22px 16px 4px;}
+	.pg-head h2{font-size:22px;}
+	.edit-drawer{width:100vw;padding:0 18px 40px;}
+	.xp-share{height:26px;padding:0 10px;font-size:11.5px;}
+}
+
+/* ================= 2026-11 改版：五页统一的“相片扉页” ================= */
+#home,#menu,#pillow,#contact,#mine{
+	background:
+		radial-gradient(900px 420px at 8% 0,rgba(255,208,184,.50),rgba(255,208,184,0) 68%),
+		radial-gradient(760px 380px at 96% 4%,rgba(255,231,214,.55),rgba(255,231,214,0) 70%),
+		linear-gradient(180deg,#FFF8F2 0%,#FDEFE4 56%,#FFF9F5 100%);
+}
+.pg-head{max-width:960px;margin:0 auto;padding:26px 18px 10px;text-align:center;}
+.pg-head h2{margin:0;font-size:24px;font-weight:700;letter-spacing:.04em;color:#3A241A;}
+.pg-head p{margin:8px 0 0;font-size:12px;letter-spacing:.04em;color:#A97C63;}
+
+/* 顶部照片：完整显示，四周留出相纸张力的底色 */
+#home .banner,#menu .banner,#pillow .banner,#contact .banner{
+	height:clamp(232px,34vw,358px);max-width:960px;margin:8px auto 0;
+	border-radius:26px;overflow:hidden;
+	background:
+		radial-gradient(120% 90% at 50% 30%,#FBE7D9 0%,#F2CBB6 52%,#E5AB90 100%);
+	box-shadow:0 20px 46px rgba(150,74,30,.16);
+}
+#home .banner-img,#menu .banner-img,#pillow .banner-img,#contact .banner-img{
+	width:100%;height:100%;object-fit:contain;object-position:center;display:block;
+}
+#home .banner::after,#menu .banner::after,#pillow .banner::after,#contact .banner::after{
+	background:linear-gradient(180deg,rgba(46,24,14,.04) 0%,rgba(46,24,14,0) 58%,rgba(46,24,14,.16) 100%);
+}
+#home .banner-text,#menu .banner-text,#pillow .banner-text,#contact .banner-text{display:none!important;}
+
+/* 正文卡片：半透明压在照片下沿，照片还能透出来 */
+#home > .container,#menu > .container,#pillow > .container,#contact > .container{
+	max-width:960px;box-sizing:border-box;margin:-46px auto 0;padding:56px 26px 34px;
+	position:relative;z-index:4;
+	background:rgba(255,251,247,.86);
+	border:1px solid rgba(255,255,255,.9);border-radius:28px;
+	box-shadow:0 24px 60px rgba(150,74,30,.15);
+	-webkit-backdrop-filter:blur(16px) saturate(1.04);backdrop-filter:blur(16px) saturate(1.04);
+}
+#home .card-wrap .card{background:rgba(255,255,255,.68)!important;border-color:rgba(255,255,255,.82)!important;}
+#home .table-box,#home .clip-box{
+	background:rgba(255,255,255,.62)!important;border:1px solid rgba(255,255,255,.8)!important;
+	box-shadow:none!important;
+}
+#menu .card-wrap{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;}
+#menu .card{background:rgba(255,255,255,.66)!important;border-color:rgba(255,255,255,.82)!important;}
+#pillow .room{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;border-radius:0!important;}
+#pillow .post{background:rgba(255,255,255,.70)!important;border-color:rgba(247,232,220,.9)!important;}
+#contact .feedback-wrap{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;}
+#contact .form-card,#contact .info-card{background:rgba(255,255,255,.66)!important;border-color:rgba(255,255,255,.82)!important;}
+
+/* 我的主页：去掉花体和花边，标题跟正文一个字体 */
+.xp{max-width:960px;padding:24px 16px 34px;}
+.xp-page-head{padding:8px 0 16px;}
+.xp-page-head h2{font-family:inherit!important;font-size:24px!important;font-weight:700!important;letter-spacing:.04em!important;}
+.xp-page-head h2::before,.xp-page-head h2::after{display:none!important;content:none!important;}
+.xp-page-head p{margin-top:8px;font-size:12px;letter-spacing:.02em;color:#A97C63;}
+.xp-card{background:rgba(255,251,247,.82)!important;border:1px solid rgba(255,255,255,.88)!important;
+	box-shadow:0 22px 52px rgba(150,74,30,.16);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);}
+.xp-card::before{display:none!important;}
+.xp-cover{height:clamp(240px,34vw,348px);
+	background:radial-gradient(120% 90% at 50% 28%,#FBE7D9 0%,#F2CBB6 58%,#E5AB90 100%);}
+.xp-cover-img{object-fit:contain;object-position:center;}
+.xp-cover-shade{background:linear-gradient(180deg,rgba(40,20,10,.12),rgba(40,20,10,0) 40%,rgba(40,20,10,.10));}
+.xp-cover-btn{top:12px;bottom:auto;}
+.xp-info{margin-top:-58px;padding-top:6px;border-radius:22px 22px 0 0;
+	background:linear-gradient(180deg,rgba(255,251,247,.50) 0%,rgba(255,251,247,.92) 34%,rgba(255,251,247,.96) 100%);
+	-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
+.xp-head{margin-top:-50px;}
+.xp-stats{gap:0;margin-top:14px;border:0;padding:0;}
+.xp-stats>*{padding:0 16px;}
+.xp-stats>*+*{border-left:1px solid rgba(224,196,176,.55);}
+.xp-stats:first-child{padding-left:2px;}
+.xp-stats b{font-size:16px;}
+.xp-bio{margin-top:12px;}
+.xp-life{margin-top:14px;display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;
+	background:rgba(255,255,255,.55);border:1px dashed #EBD3C1;border-radius:16px;padding:10px 14px;}
+.xp-life span{font-size:12.5px;color:#8A6753;}
+.xp-life .xp-share{margin-left:auto;height:32px;}
+.xp-tabs{border-bottom:0;background:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.85);
+	border-radius:14px;padding:5px;gap:4px;margin-top:0;}
+.xp-tabs button{padding:8px 13px;border-radius:10px;font-size:13px;}
+.xp-sheet{background:rgba(255,251,247,.86)!important;border-color:rgba(255,255,255,.8)!important;
+	-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);z-index:auto;}
+.xp-edit{top:10px;bottom:auto;}
+
+/* 编辑主页：右侧滑入的一张卡片 */
+.edit-mask{position:fixed;inset:0;z-index:399;background:rgba(46,26,15,.30);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.edit-drawer{position:fixed;top:12px;right:12px;bottom:12px;z-index:400;
+	width:min(410px,calc(100vw - 24px));box-sizing:border-box;padding:0 20px 30px;
+	background:#FFFBF6;border:1px solid rgba(255,255,255,.9);border-radius:24px;
+	box-shadow:-22px 0 60px rgba(90,45,20,.24);
+	transform:translateX(calc(100% + 28px));transition:transform .32s cubic-bezier(.22,.7,.25,1);
+	overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.edit-drawer.on{transform:translateX(0);}
+.edit-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;
+	padding:16px 0 12px;margin-bottom:4px;background:#FFFBF6;border-bottom:1px solid #F2DFCF;}
+.edit-head h3{margin:0;font-size:17px;letter-spacing:.04em;color:#3A241A;font-weight:700;font-family:inherit;}
+.edit-lead{margin:10px 0 2px;font-size:12px;line-height:1.7;color:#A8897A;}
+.ed-list{margin-top:4px;}
+.ed-row{border-bottom:1px dashed #EED9C8;}
+.ed-line{width:100%;display:flex;align-items:center;gap:12px;padding:15px 2px;border:0;background:none;
+	font-family:inherit;text-align:left;cursor:pointer;}
+.ed-k{flex:0 0 58px;font-size:13.5px;font-weight:600;color:#3A241A;}
+.ed-v{flex:1;min-width:0;font-size:12.5px;color:#9C8275;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ed-go{flex:0 0 auto;font-size:12px;color:#C05E2A;}
+.ed-line:hover .ed-go{text-decoration:underline;}
+.ed-open{padding:0 2px 16px;}
+.ed-open .me-input{margin-bottom:8px;}
+.ed-note{margin:8px 0 0;font-size:11.5px;line-height:1.7;color:#B09A8B;}
+.me-forgot{margin-top:10px;}
+
+@media(max-width:640px){
+	.pg-head h2{font-size:21px;}
+	#home > .container,#menu > .container,#pillow > .container,#contact > .container{
+		margin:-34px 10px 0;padding:44px 15px 24px;border-radius:22px;}
+	#home .banner,#menu .banner,#pillow .banner,#contact .banner{height:208px;border-radius:20px;margin:6px 10px 0;}
+	.xp{padding:18px 12px 28px;}
+	.xp-page-head h2{font-size:21px!important;}
+	.xp-cover{height:214px;}
+	.xp-info{margin-top:-44px;}
+	.xp-head{margin-top:-42px;}
+	.xp-stats>*{padding:0 12px;}
+	.xp-life .xp-share{height:28px;padding:0 11px;font-size:11.5px;}
+	.edit-drawer{top:8px;right:8px;bottom:8px;width:calc(100vw - 16px);padding:0 16px 24px;border-radius:20px;}
+}
+
+/* 社区搜索：明确的搜索按钮 */
+#pillow .room-search{gap:8px;}
+#pillow .room-search input{padding:0 16px;height:44px;}
+#pillow .room-search .sbtn{flex:0 0 auto;height:40px;padding:0 17px;border-radius:999px;
+	background:#C05E2A;color:#FFF8F2;border:1px solid #C05E2A;font-size:13px;letter-spacing:.04em;
+	box-shadow:0 6px 14px rgba(160,80,35,.18);}
+#pillow .room-search .sbtn.ghost{background:transparent;color:#A06443;border-color:#E7CDBA;box-shadow:none;}
+#pillow .room-search .sbtn:hover{filter:brightness(1.04);}
+
+/* ================= 收尾：照片透出来、数字排开、联系页命名 ================= */
+#home > .container,#menu > .container,#pillow > .container,#contact > .container{
+	margin:-64px auto 0;padding:72px 26px 34px;
+	background:linear-gradient(180deg,rgba(255,250,246,.26) 0,rgba(255,250,246,.42) 62px,
+		rgba(255,250,246,.78) 150px,rgba(255,250,246,.88) 100%);
+	-webkit-backdrop-filter:blur(10px) saturate(1.02);backdrop-filter:blur(10px) saturate(1.02);
+}
+.xp-card{background:rgba(255,250,246,.60)!important;}
+.xp-info{margin-top:-42px;background:linear-gradient(180deg,rgba(255,250,246,.12) 0,rgba(255,250,246,.52) 56px,rgba(255,250,246,.84) 100%)!important;}
+.xp-sheet{background:rgba(255,250,246,.76)!important;}
+.xp-stats{gap:28px!important;}
+.xp-stats>*{padding:0!important;}
+.xp-stats>*+*{border-left:0!important;}
+.xp-tag{border-color:rgba(232,199,177,.9);background:rgba(255,244,235,.82);}
+.xp-life{background:rgba(255,255,255,.48);}
+
+/* ================= 2026-11-24 最终视觉：满幅大图 + 半透明压边 ================= */
+#home .banner,#menu .banner,#pillow .banner,#contact .banner{
+	height:clamp(320px,46vw,470px);border-radius:26px;
+	box-shadow:0 22px 52px rgba(150,74,30,.17);
+}
+#home .banner-img,#menu .banner-img,#pillow .banner-img,#contact .banner-img{
+	object-fit:cover;object-position:center 40%;
+}
+#home > .container,#menu > .container,#pillow > .container,#contact > .container{
+	margin:-54px auto 0;padding:64px 26px 34px;border-radius:28px;
+	background:linear-gradient(180deg,rgba(255,249,244,.56) 0,rgba(255,249,244,.90) 54px,rgba(255,250,246,.95) 100%);
+	-webkit-backdrop-filter:none;backdrop-filter:none;
+	box-shadow:0 24px 58px rgba(150,74,30,.14);
+}
+.xp-cover{height:clamp(320px,46vw,470px);z-index:1;}
+.xp-cover::before{content:"";position:absolute;inset:-18px;background-image:var(--cover,none);background-size:cover;background-position:center;filter:blur(24px);opacity:.92;transform:scale(1.04);pointer-events:none;}
+.xp-cover-img{object-fit:cover;object-position:center 32%;}
+.xp-cover.is-portrait .xp-cover-img{object-fit:cover;object-position:center 18%;}
+.xp-cover .xp-cover-img{position:relative;z-index:1;}
+.xp-cover-shade{z-index:2;}
+.xp-info{margin-top:-40px;border-radius:22px 22px 0 0;z-index:2;
+	background:linear-gradient(180deg,rgba(255,250,246,.58) 0,rgba(255,250,246,.92) 52px,rgba(255,250,246,.96) 100%);
+	-webkit-backdrop-filter:none;backdrop-filter:none;}
+.xp-head{margin-top:-46px;}
+.xp-who{padding-top:86px;}
+.xp-card{background:rgba(255,251,247,.74)!important;
+	-webkit-backdrop-filter:none;backdrop-filter:none;}
+.xp-sheet{background:rgba(255,250,246,.90)!important;}
+
+/* 编辑主页：从右侧滑入的卡片（用动画，避免 display:none 后过渡不触发） */
+.edit-drawer{transform:translateX(100%);transition:none;background:#FFFBF6;}
+.edit-drawer.on{animation:edSlide .32s cubic-bezier(.22,.7,.25,1) both;}
+@keyframes edSlide{from{transform:translateX(100%);}to{transform:translateX(0);}}
+.edit-mask{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:rgba(46,26,15,.26)!important;}
+
+@media(max-width:640px){
+	#home .banner,#menu .banner,#pillow .banner,#contact .banner{height:250px;border-radius:20px;}
+	#home > .container,#menu > .container,#pillow > .container,#contact > .container{margin:-40px 10px 0;padding:48px 15px 24px;border-radius:22px;}
+	.xp-cover{height:250px;}
+	.xp-info{margin-top:-34px;}
+	.xp-head{margin-top:-38px;}
+}
+</style>
 <!-- photoWall -->
 <script>
 /* 照片墙存储配置（GitHub 仓库）：填 token 即可全站共享；留空则只存在本机 */

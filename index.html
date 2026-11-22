@@ -1021,6 +1021,7 @@ body.modal-open{overflow:hidden;}
 		<p class="photo-hint" id="photoHint">点按钮会调用系统选择器：电脑上选文件，手机上从相册或相机挑。</p>
 		<div class="photo-viewer" id="photoViewer" aria-hidden="true">
 			<div class="photo-viewer-body" id="photoViewerBody"></div>
+			<button type="button" class="photo-viewer-dl" id="viewerDl">下载这张</button>
 			<button type="button" class="photo-viewer-close" aria-label="关闭">×</button>
 		</div>
 	</section>
@@ -2394,6 +2395,13 @@ body.modal-open{overflow:hidden;}
 }
 .photo-item:hover .photo-del,.photo-item:focus-within .photo-del{opacity:1;}
 .photo-del:hover{background:rgba(191,91,46,.85);}
+.photo-dl{
+	position:absolute;bottom:9px;right:9px;
+	width:28px;height:28px;border-radius:50%;border:0;
+	background:rgba(28,17,11,.55);color:#FFF8F2;font-size:14px;line-height:28px;
+	text-align:center;cursor:pointer;z-index:3;padding:0;
+}
+.photo-dl:hover{background:rgba(191,91,46,.85);}
 .photo-hint{
 	margin:14px 0 0;
 	font-size:13px;
@@ -2419,9 +2427,15 @@ body.modal-open{overflow:hidden;}
 	background:rgba(255,255,255,.14);color:#fff;font-size:20px;line-height:36px;
 	text-align:center;cursor:pointer;z-index:2;
 }
+.photo-viewer-dl{
+	position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+	padding:9px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);
+	background:rgba(255,255,255,.14);color:#fff;font-size:13.5px;letter-spacing:.5px;
+	cursor:pointer;z-index:2;display:none;
+}
+.photo-viewer-dl.on{display:block;}
 @media(max-width:900px){.photo-wall{grid-template-columns:repeat(3,minmax(0,1fr));}}
-@media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}
-</style>
+@media(max-width:600px){.photo-wall{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}}</style>
 <!-- photoWall -->
 <script>
 /* 照片墙存储配置（GitHub 仓库）：填 token 即可全站共享；留空则只存在本机 */
@@ -2452,7 +2466,7 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		if(cloud){ statusEl.className='photo-status'; statusEl.innerHTML='<i></i>共享模式：所有人上传的都看得见'; }
 		else { statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>本机模式：只有这台设备看得到'; }
 		if(hint) hint.innerHTML = cloud
-			? ('单个文件：图片 60MB、视频 50MB 以内' + (IS_WX?'<br>微信聊天里的图，先长按保存到相册，再点这里选':'') )
+			? '单个文件：图片 60MB、视频 50MB 以内'
 			: '单个文件在 200MB 以内';
 	}
 
@@ -2613,8 +2627,13 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		vp.addEventListener('loadeddata',done);
 	}
 	/* ---------- 视图 ---------- */
-	function openView(node){ bodyEl.innerHTML=''; bodyEl.appendChild(node); viewer.classList.add('on'); }
-	function closeView(){ var v=bodyEl.querySelector('video'); if(v) v.pause(); bodyEl.innerHTML=''; viewer.classList.remove('on'); }
+	function openView(node,item){
+		bodyEl.innerHTML=''; bodyEl.appendChild(node); viewer.classList.add('on');
+		viewer.__item=item||null;
+		var d=document.getElementById('viewerDl');
+		if(d) d.className='photo-viewer-dl'+(item?' on':'');
+	}
+	function closeView(){ var v=bodyEl.querySelector('video'); if(v) v.pause(); bodyEl.innerHTML=''; viewer.classList.remove('on'); var d=document.getElementById('viewerDl'); if(d) d.className='photo-viewer-dl'; }
 	/* 刚上传的图，Pages 发布有几十秒延迟，先在原地自动重试几次 */
 	function attachRetry(el,base){
 		if(!base||!/^https?:/.test(base)) return;
@@ -2646,11 +2665,11 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 				var vp=document.createElement('video');
 				vp.src=src; vp.controls=true; vp.playsInline=true; vp.preload='auto';
 				boxViewLoad(vp);
-				openView(vp);
+				openView(vp,item);
 				try{ var pr=vp.play(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
 			}else{
 				var ip=document.createElement('img'); ip.src=src; ip.alt=item.name||'照片';
-				openView(ip);
+				openView(ip,item);
 			}
 		});
 		var b=document.createElement('button');
@@ -2662,7 +2681,29 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 		});
 		/* 照片墙的删除权限：所有人都能删（包括别人传的） */
 		box.appendChild(b);
+		var dl=document.createElement('button');
+		dl.className='photo-dl'; dl.type='button'; dl.title='下载这张'; dl.textContent='↓';
+		dl.addEventListener('click',function(ev){ ev.stopPropagation(); saveItem(item); });
+		box.appendChild(dl);
 		return box;
+	}
+	/* 下载：先取文件再存到本地，别人传的图也能存下来 */
+	function saveItem(item){
+		var src=item.src||'';
+		if(!src&&item.blob){ src=URL.createObjectURL(item.blob); }
+		var m=(item.name||'').match(/\.[a-zA-Z0-9]+$/);
+		var ext=m?m[0].toLowerCase():'';
+		var name='政瞳之家-'+((item.ts?new Date(item.ts):new Date()).toISOString().slice(0,10))+'-'+Date.now().toString().slice(-6)+ext;
+		fetch(src,{cache:'force-cache'}).then(function(r){
+			if(!r.ok) throw new Error('fetch'+r.status);
+			return r.blob();
+		}).then(function(blob){
+			var u=URL.createObjectURL(blob), a=document.createElement('a');
+			a.href=u; a.download=name; document.body.appendChild(a); a.click();
+			setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); URL.revokeObjectURL(u); },2000);
+		}).catch(function(){
+			window.open(src,'_blank');    /* 取不到就直接开新窗口，长按也能保存 */
+		});
 	}
 	function paint(rows){
 		urls.forEach(function(u){ URL.revokeObjectURL(u); });
@@ -2762,6 +2803,8 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 	viewer.addEventListener('click',function(e){
 		if(e.target===viewer||e.target===viewer.querySelector('.photo-viewer-close')) closeView();
 	});
+	var vdl=document.getElementById('viewerDl');
+	if(vdl) vdl.addEventListener('click',function(e){ e.stopPropagation(); if(viewer.__item) saveItem(viewer.__item); });
 	document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeView(); });
 
 	setStatus();

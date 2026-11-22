@@ -178,6 +178,14 @@ body{
 	line-height:1.85;
 	margin:0;
 }
+.card-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.card-link{
+	display:inline-flex;align-items:center;
+	padding:6px 13px;border-radius:999px;border:1px solid #F0D6C2;background:#FDEFE3;
+	font-size:12px;letter-spacing:.6px;color:#BF5B2E;text-decoration:none;
+	transition:.2s;
+}
+.card-link:hover{background:#BF5B2E;border-color:#BF5B2E;color:#fff;}
 .tag{
 	display:inline-block;
 	margin-top:16px;
@@ -756,7 +764,6 @@ body.modal-open{overflow:hidden;}
 		<nav>
 			<ul class="nav">
 				<li><a href="#home" class="nav-link active" data-target="home">首页</a></li>
-				<li><a href="#feature" class="nav-link" data-target="feature">政瞳简介</a></li>
 				<li><a href="#menu" class="nav-link" data-target="menu">日常记录</a></li>
 				<li><a href="#contact" class="nav-link" data-target="contact">联系我们</a></li>
 			</ul>
@@ -765,7 +772,7 @@ body.modal-open{overflow:hidden;}
 </header>
 <div class="page active" id="home">
 	<section class="banner">
-		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/home-banner1.jpg.jpg" alt="首页横幅：江边的两个身影">
+		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/feature-banner13.jpg.jpg" alt="首页横幅：蛋糕前的两个人">
 		<div class="banner-text">
 			<div class="container">
 				<p class="banner-kicker">Aylio Home</p>
@@ -780,31 +787,63 @@ body.modal-open{overflow:hidden;}
 			<span class="section-note">一个务实，一个敏感</span>
 		</div>
 		<div class="card-wrap">
-			<a href="https://weibo.com/u/6231073055" target="_blank" rel="noopener" class="card">
-				<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/tong.jpg.jpg" alt="吕思瞳在餐桌前">
+			<div class="card">
+				<a href="https://weibo.com/u/6231073055" target="_blank" rel="noopener">
+					<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/tong.jpg.jpg" alt="吕思瞳在餐桌前">
+				</a>
 				<div class="card-text">
 					<h4>吕思瞳</h4>
 					<p>长春人，双鱼座，北京电影学院表演系。敏感细腻，先把情绪收进眼睛里，再交给镜头。</p>
 					<span class="tag">思瞳</span>
+					<div class="card-links" data-links="tong"></div>
 				</div>
-			</a>
-			<a href="https://weibo.com/u/7862709856" target="_blank" rel="noopener" class="card">
-				<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/ayden.jpg.jpg" alt="孙政在窗边">
+			</div>
+			<div class="card">
+				<a href="https://weibo.com/u/7862709856" target="_blank" rel="noopener">
+					<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/ayden.jpg.jpg" alt="孙政在窗边">
+				</a>
 				<div class="card-text">
 					<h4>孙政</h4>
 					<p>新加坡人，杜克毕业，二十六岁才转行做演员。话不多，遇事先想怎么解决，再把人安顿好。</p>
 					<span class="tag">孙政</span>
+					<div class="card-links" data-links="sun"></div>
 				</div>
-			</a>
-			<a href="https://weibo.com/u/9101087645" target="_blank" rel="noopener" class="card">
-				<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="两人并肩站着">
+			</div>
+			<div class="card">
+				<a href="https://weibo.com/u/9101087645" target="_blank" rel="noopener">
+					<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/5.jpg.jpg" alt="两人并肩站着">
+				</a>
 				<div class="card-text">
 					<h4>政瞳之家</h4>
-					<p>一个务实，一个敏感。一个负责把日子稳住，一个负责把日子照亮。</p>
+					<p>一个务实，一个敏感。一个负责把日子稳住，一个把日子照亮。</p>
 					<span class="tag">我们</span>
+					<div class="card-links" data-links="house"></div>
 				</div>
-			</a>
+			</div>
 		</div>
+		<script>
+		/* 三个人的平台账号：填上链接就会在卡片里出现对应按钮，没填的不显示 */
+		window.AYLIO_SOCIAL = {
+			tong:  { douyin: "", weibo: "https://weibo.com/u/6231073055", xiaohongshu: "" },
+			sun:   { douyin: "", weibo: "https://weibo.com/u/7862709856", xiaohongshu: "" },
+			house: { douyin: "", weibo: "https://weibo.com/u/9101087645", xiaohongshu: "" }
+		};
+		(function(){
+			var NAME = { douyin: "抖音", weibo: "微博", xiaohongshu: "小红书" };
+			[].forEach.call(document.querySelectorAll("[data-links]"), function(box){
+				var set = window.AYLIO_SOCIAL[box.getAttribute("data-links")] || {};
+				Object.keys(NAME).forEach(function(k){
+					var url = set[k];
+					if(!url) return;
+					var a = document.createElement("a");
+					a.className = "card-link"; a.href = url; a.target = "_blank"; a.rel = "noopener";
+					a.textContent = NAME[k];
+					box.appendChild(a);
+				});
+				if(!box.children.length) box.style.display = "none";
+			});
+		})();
+		</script>
 
 		<div class="section-head">
 			<h3 class="section-title">我们的记录清单</h3>
@@ -882,55 +921,6 @@ body.modal-open{overflow:hidden;}
 				<p class="clip-tip" id="clipTip"></p>
 			</form>
 			<div class="clip-list" id="clipList"></div>
-		</div>
-	</section>
-</div>
-<div class="page" id="feature">
-	<section class="banner">
-		<img class="banner-img" src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/feature-banner13.jpg.jpg" alt="政瞳简介横幅：蛋糕前的两个人">
-		<div class="banner-text">
-			<div class="container">
-				<p class="banner-kicker">ABOUT US</p>
-				<h1>政瞳简介</h1>
-				<p class="banner-sub">一个习惯解决，一个习惯感受</p>
-			</div>
-		</div>
-	</section>
-	<section class="container">
-		<div class="section-head">
-			<h3 class="section-title">相遇之后</h3>
-			<span class="section-note">2025.10.10 到现在</span>
-		</div>
-		<div class="img-text-wrap">
-			<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/10.jpg.jpg" alt="水边木栈道上的两个人">
-			<div class="text-block">
-				<p>2025 年 10 月 10 日，第一次一起开直播。那时刚因为《双程》认识，一个坐得笔直，一个紧张到接不上话，弹幕比他们俩说的话还多。</p>
-				<p>后来就成了固定的两个人：一个把流程、行程、麻烦事理顺，一个把气氛、情绪和别人注意不到的小地方记住。一个让日子稳，一个让日子有光。</p>
-			</div>
-		</div>
-
-		<div class="section-head">
-			<h3 class="section-title">孙政</h3>
-			<span class="section-note">先想怎么解决的那一个</span>
-		</div>
-		<div class="img-text-wrap">
-			<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/ayden.jpg.jpg" alt="孙政在窗边">
-			<div class="text-block">
-				<p>1993年生于新加坡，籍贯广东潮汕。杜克大学毕业后在科技公司做产品经理，二十五岁那年放下这份工作去演戏；服役时分在突击队。会拉二胡，有二胡演奏级文凭，也弹钢琴和小提琴。</p>
-				<p>他说自己是个「大 I 人」：少说话，多做事，不会炒热气氛，也不追求存在感。看着冷静，其实敏感、较真——怕的不是被骂，是被放弃。真在意一个人，是别人还在犹豫，他已经把事办妥了。</p>
-			</div>
-		</div>
-
-		<div class="section-head">
-			<h3 class="section-title">吕思瞳</h3>
-			<span class="section-note">把情绪都收进眼里的那一个</span>
-		</div>
-		<div class="img-text-wrap">
-			<img src="https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/img/tong.jpg.jpg" alt="吕思瞳在餐桌前">
-			<div class="text-block">
-				<p>1999年生于吉林长春，双鱼座。原本读的是空乘专业，临近毕业才起了考表演的念头，后来考进北京电影学院表演系。</p>
-				<p>演过不少配角，2025 年凭短片《当夏天结束的时候》拿下英国卡马森湾电影节最佳外语短片。导演说他「气质很阳光，声音有情绪感染力」；戏外安静，熟了话就多——敏感让他容易进角色，也容易陷在角色里，这不是短板，是他最会用的东西。</p>
-			</div>
 		</div>
 	</section>
 </div>

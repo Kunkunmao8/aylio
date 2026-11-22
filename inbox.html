@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>留言箱 · 政瞳之家</title>
+<style>
+	:root{ --ink:#2E211A; --sub:#8E7361; --line:#EFE1D4; --sun:#BF5B2E; }
+	*{box-sizing:border-box;}
+	body{margin:0;background:#FBF6F0;color:var(--ink);font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;}
+	.wrap{max-width:820px;margin:0 auto;padding:38px 22px 80px;}
+	h1{font-size:26px;letter-spacing:2px;margin:0 0 6px;}
+	.lead{font-size:13px;color:var(--sub);letter-spacing:.5px;margin:0 0 22px;}
+	.bar{display:flex;gap:10px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+	button{font:inherit;font-size:13px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;}
+	button.main{background:var(--sun);border-color:var(--sun);color:#fff;}
+	.count{font-size:12.5px;color:var(--sub);}
+	.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:0 0 14px;box-shadow:0 6px 18px rgba(120,80,50,.05);}
+	.head{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:10px;}
+	.name{font-size:16px;font-weight:600;letter-spacing:.5px;}
+	.tag{font-size:11.5px;color:#A06443;background:#FDEFE3;border:1px solid #F0D6C2;border-radius:999px;padding:2px 9px;margin-left:8px;}
+	.time{font-size:12px;color:var(--sub);}
+	.meta{font-size:13px;color:var(--sub);line-height:1.9;margin-bottom:10px;}
+	.meta a{color:#A06443;text-decoration:none;}
+	.msg{font-size:14px;line-height:1.9;white-space:pre-wrap;word-break:break-word;border-left:3px solid #F3E3D4;padding-left:12px;}
+	.del{margin-top:12px;font-size:12px;color:#A06443;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;}
+	.empty{font-size:14px;color:var(--sub);text-align:center;padding:40px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+	<h1>留言箱</h1>
+	<p class="lead">这个页面不挂在导航上，只有你自己打开。留言从网站上直接提交过来。</p>
+	<div class="bar">
+		<button class="main" id="reload">刷新</button>
+		<span class="count" id="count"></span>
+	</div>
+	<div id="list"><p class="empty">读取中…</p></div>
+</div>
+<script>
+(function(){
+	var BASE = 'https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/msg/1a93510507047761e6f61e5013f0dd69/';
+	var listEl = document.getElementById('list');
+	var countEl = document.getElementById('count');
+
+	function fmt(ts){
+		var d = new Date(ts || 0);
+		function p(n){ return (n<10?'0':'')+n; }
+		return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+	}
+	function esc(s){
+		return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+			return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+		});
+	}
+	function render(rows){
+		rows = rows || [];
+		countEl.textContent = rows.length ? ('共 ' + rows.length + ' 条') : '';
+		if(!rows.length){ listEl.innerHTML = '<p class="empty">还没有留言</p>'; return; }
+		listEl.innerHTML = rows.map(function(r, i){
+			return '<div class="card" data-f="' + esc(r.f) + '">'
+				+ '<div class="head"><div><span class="name">' + esc(r.name || '（未署名）') + '</span>'
+				+ (r.type ? '<span class="tag">' + esc(r.type) + '</span>' : '') + '</div>'
+				+ '<span class="time">' + fmt(r.ts) + '</span></div>'
+				+ '<div class="meta">邮箱：<a href="mailto:' + esc(r.mail) + '">' + esc(r.mail) + '</a>'
+				+ (r.phone ? '　手机：' + esc(r.phone) : '') + '</div>'
+				+ '<div class="msg">' + esc(r.msg) + '</div>'
+				+ '<button class="del" data-i="' + i + '">删除这条</button>'
+				+ '</div>';
+		}).join('');
+	}
+	var cache = [];
+	function load(){
+		listEl.innerHTML = '<p class="empty">读取中…</p>';
+		fetch(BASE + 'index.json?t=' + Date.now(), {cache:'no-store'})
+			.then(function(r){ return r.ok ? r.json() : []; })
+			.then(function(j){
+				cache = Array.isArray(j) ? j.sort(function(a,b){ return (b.ts||0)-(a.ts||0); }) : [];
+				render(cache);
+			})
+			.catch(function(){
+				listEl.innerHTML = '<p class="empty">读取失败，检查网络后再刷新</p>';
+			});
+	}
+	listEl.addEventListener('click', function(e){
+		var btn = e.target.closest('.del');
+		if(!btn) return;
+		var i = +btn.getAttribute('data-i');
+		var row = cache[i];
+		if(!row) return;
+		if(!confirm('删除 ' + (row.name || '这条') + ' 的留言？')) return;
+		btn.disabled = true;
+		fetch(BASE + row.f, {method:'DELETE'})
+			.catch(function(){})
+			.then(function(){
+				var keep = cache.filter(function(x){ return x.f !== row.f; });
+				return fetch(BASE + 'index.json', {method:'PUT', headers:{'Content-Type':'application/json','Cache-Control':'no-cache'}, body:JSON.stringify(keep)})
+					.then(function(){ cache = keep; render(cache); });
+			});
+	});
+	document.getElementById('reload').addEventListener('click', load);
+	load();
+})();
+</script>
+</body>
+</html>

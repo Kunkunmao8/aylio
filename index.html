@@ -2684,11 +2684,24 @@ window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region
 })();
 </script>
 <script>
-/* aylio_lazy_init: 首屏之外的图片延迟加载，省流量提速 */
+/* aylio_lazy_init: 首屏之外的图片延迟加载，省流量提速（自带实现，兼容所有浏览器） */
 (function(){
-	if(!('loading' in document.createElement('img'))) return;
-	document.querySelectorAll('img').forEach(function(i){
-		if(!i.hasAttribute('loading') && !i.getAttribute('fetchpriority')) i.loading='lazy';
+	if(!('IntersectionObserver' in window)) return;
+	var obs=new IntersectionObserver(function(list){
+		list.forEach(function(en){
+			if(!en.isIntersecting) return;
+			var img=en.target, s=img.getAttribute('data-src');
+			if(s){ img.setAttribute('src', s); img.removeAttribute('data-src'); }
+			obs.unobserve(img);
+		});
+	},{rootMargin:'800px 0px'});
+	[].slice.call(document.querySelectorAll('img')).forEach(function(img){
+		var s=img.getAttribute('src');
+		if(!s || /^data:/.test(s)) return;
+		img.removeAttribute('loading');
+		img.setAttribute('data-src', s);
+		img.removeAttribute('src');
+		obs.observe(img);
 	});
 })();
 </script></body>

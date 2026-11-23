@@ -482,7 +482,7 @@ tr:nth-child(even){background:#FEFCFA;}
 }
 .modal.is-open{display:block;}
 body.modal-open{overflow:hidden;}
-.album-close-bar{position:sticky;top:48px;height:0;z-index:30;display:flex;justify-content:flex-end;pointer-events:none;}
+.album-close-bar{position:sticky;top:48px;height:0;width:100%;z-index:30;display:flex;justify-content:flex-end;align-items:flex-start;pointer-events:none;}
 .close{
 	position:relative;
 	top:auto;
@@ -3487,9 +3487,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		
 		<div class="album-main-player">
 			<video id="vlogMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v3.jpg" data-dur="56">
-				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3s.mp4" type="video/mp4">
+				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" type="video/mp4">
 			</video>
-			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3s.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
+			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
 		</div>
 		<p class="album-main-meta">2026.06.07</p>
 		<p class="album-main-desc">“记录我们一起走过的日常”</p>
@@ -5542,9 +5542,9 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 })();
 </script>
 <script>
-/* 把每个相册弹窗的 × 放进贴在卡片右上角的吸顶条里，滚动时跟着卡片，不跑出卡片外 */
+/* 所有弹窗的 × 都放到卡片右上角，和页面其他按钮保持同一边 */
 (function(){
-	[].forEach.call(document.querySelectorAll('.album-modal-inner .close'), function(btn){
+	[].forEach.call(document.querySelectorAll('.modal .close'), function(btn){
 		if(btn.parentNode && btn.parentNode.classList.contains('album-close-bar')) return;
 		var bar=document.createElement('div');
 		bar.className='album-close-bar';

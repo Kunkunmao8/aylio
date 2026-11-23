@@ -1885,10 +1885,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var files=(rows||[]).filter(function(x){ return x&&x.name&&/\.json$/.test(x.name); });
 			note('rows:'+(rows||[]).length+' files:'+files.length);
 			return Promise.all(files.slice(0,200).map(function(f){
-				return supaDownload(f.name).catch(function(){ return null; });
+				var p=f.name.indexOf('posts/')===0?f.name:('posts/'+f.name);
+				return supaDownload(p).catch(function(){ return null; });
 			}));
 		}).then(function(list){
-			note('list:'+(list||[]).length);
+			note('list:'+(list||[]).length+' one:'+JSON.stringify((list||[])[0]||null).slice(0,80));
 			return (list||[]).filter(function(m){ return m&&m.id&&(m.text||m.img||m.video); });
 		}).catch(function(e){ note('err:'+e); return []; });
 	}

@@ -482,10 +482,12 @@ tr:nth-child(even){background:#FEFCFA;}
 }
 .modal.is-open{display:block;}
 body.modal-open{overflow:hidden;}
+.album-close-bar{position:sticky;top:48px;height:0;z-index:30;display:flex;justify-content:flex-end;pointer-events:none;}
 .close{
-	position:fixed;
-	top:18px;
-	right:18px;
+	position:relative;
+	top:auto;
+	right:auto;
+	margin:-34px -28px 0 0;
 	width:44px;
 	height:44px;
 	border:none;
@@ -495,9 +497,10 @@ body.modal-open{overflow:hidden;}
 	font-size:26px;
 	line-height:1;
 	cursor:pointer;
-	z-index:1001;
+	z-index:30;
 	box-shadow:0 6px 18px rgba(43,20,8,.22);
 	transition:.2s;
+	pointer-events:auto;
 }
 .close:hover{background:#EFD7C1;}
 .img-lightbox{display:none;position:fixed;inset:0;z-index:1200;background:rgba(18,11,7,.93);align-items:center;justify-content:center;padding:40px 18px;}
@@ -4224,9 +4227,18 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		return active ? active.id : "home";
 	}
 
+	function warmModalImages(box){
+		if(!box) return;
+		box.querySelectorAll('img').forEach(function(im){
+			if(im.getAttribute('loading')==='lazy') im.loading='eager';
+			im.decoding='async';
+		});
+	}
+
 	function openModal(id) {
 		var box = document.getElementById(id);
 		if (!box) { return; }
+		warmModalImages(box);
 		box.classList.add("is-open");
 		box.scrollTop = 0;
 		document.body.classList.add("modal-open");
@@ -4273,6 +4285,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if (hash.indexOf("modal:") === 0) {
 			var box = document.getElementById(hash.slice(6));
 			if (box) {
+				warmModalImages(box);
 				box.classList.add("is-open");
 				box.scrollTop = 0;
 				document.body.classList.add("modal-open");
@@ -4288,6 +4301,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if (hash.indexOf("modal:") === 0) {
 			var box = document.getElementById(hash.slice(6));
 			if (box && !box.classList.contains("is-open")) {
+				warmModalImages(box);
 				box.classList.add("is-open");
 				box.scrollTop = 0;
 				document.body.classList.add("modal-open");
@@ -5503,6 +5517,18 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 			btn.setAttribute("aria-label",show?"隐藏密码":"查看密码");
 			try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); }
 		});
+	});
+})();
+</script>
+<script>
+/* 把每个相册弹窗的 × 放进贴在卡片右上角的吸顶条里，滚动时跟着卡片，不跑出卡片外 */
+(function(){
+	[].forEach.call(document.querySelectorAll('.album-modal-inner .close'), function(btn){
+		if(btn.parentNode && btn.parentNode.classList.contains('album-close-bar')) return;
+		var bar=document.createElement('div');
+		bar.className='album-close-bar';
+		btn.parentNode.insertBefore(bar,btn);
+		bar.appendChild(btn);
 	});
 })();
 </script>

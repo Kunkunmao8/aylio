@@ -952,8 +952,30 @@ img{cursor:zoom-in;}
 .memory-card.matched .memory-front{outline:3px solid #D07C48;}
 .memory-tip{display:none;margin-top:14px;text-align:center;font-size:13px;color:#7A6157;letter-spacing:1px;}
 .memory-tip.show{display:block;}
-.memory-win{display:none;margin-top:16px;text-align:center;font-size:15px;color:#BF5B2E;letter-spacing:1px;}
-.memory-win.show{display:block;}
+/* 全部配对成功 · 庆祝层 */
+.mc-overlay{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(30,18,12,.74);backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .35s ease,visibility .35s ease;}
+.mc-overlay.show{opacity:1;visibility:visible;}
+.mc-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.mc-piece{position:absolute;top:-12vh;border-radius:2px;opacity:.95;animation-name:mcFall;animation-timing-function:linear;animation-fill-mode:forwards;}
+@keyframes mcFall{
+	0%{transform:translate3d(0,-12vh,0) rotate(0);opacity:1;}
+	100%{transform:translate3d(var(--drift,0px),112vh,0) rotate(var(--spin,360deg));opacity:.92;}
+}
+.mc-card{position:relative;z-index:2;width:min(430px,100%);padding:36px 30px 30px;border-radius:26px;background:linear-gradient(165deg,#FFFDF9,#F9EBDD);border:1px solid #EAD3BC;box-shadow:0 30px 70px rgba(20,10,6,.35);text-align:center;transform:translateY(18px) scale(.96);transition:transform .4s cubic-bezier(.2,.8,.3,1.2);}
+.mc-overlay.show .mc-card{transform:translateY(0) scale(1);}
+.mc-emoji{font-size:54px;line-height:1;margin-bottom:10px;animation:mcPop .7s ease both .1s;}
+@keyframes mcPop{0%{transform:scale(.65) rotate(-8deg);}55%{transform:scale(1.14) rotate(4deg);}100%{transform:scale(1) rotate(0);}}
+.mc-eyebrow{font-size:10px;letter-spacing:.3em;color:#A08274;margin-bottom:8px;}
+.mc-card h3{font-size:clamp(24px,4vw,31px);letter-spacing:.1em;color:#3A241A;margin:0 0 8px;font-weight:700;}
+.mc-card p{font-size:15px;line-height:1.8;color:#7A6157;margin:0 0 16px;letter-spacing:.03em;}
+.mc-stats{display:inline-flex;align-items:baseline;gap:5px;padding:9px 18px;border-radius:999px;background:#FBEBDD;color:#7A6157;font-size:13px;letter-spacing:.08em;margin-bottom:24px;}
+.mc-stats b{font-size:21px;color:#BF5B2E;line-height:1;}
+.mc-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;}
+.mc-btn{padding:11px 24px;border-radius:999px;font-size:14px;letter-spacing:.08em;cursor:pointer;font-family:inherit;transition:.2s;}
+.mc-btn.primary{background:#BF5B2E;border:1px solid #BF5B2E;color:#FFF9F3;box-shadow:0 8px 20px rgba(191,91,46,.25);}
+.mc-btn.primary:hover{background:#A65A33;}
+.mc-btn.ghost{background:transparent;border:1px solid #D9C2AE;color:#7A6157;}
+.mc-btn.ghost:hover{border-color:#BF5B2E;color:#BF5B2E;}
 @media(max-width:700px){.memory-room{padding:16px 12px 22px;border-radius:20px;}.memory-board{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;}.memory-back{font-size:18px;}.memory-bar{gap:14px;}}
 </style>
 
@@ -3416,9 +3438,23 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			</div>
 			<div class="memory-board" id="memoryBoard"></div>
 			<div class="memory-tip" id="memoryTip">先记住每张照片的位置，<span id="memoryCount">5</span> 秒后开始配对…</div>
-			<div class="memory-win" id="memoryWin">🎉 全部配对成功，你把回忆都找齐啦！</div>
 		</div>
 	</section>
+
+	<div class="mc-overlay" id="mcOverlay" aria-hidden="true">
+		<div class="mc-confetti" id="mcConfetti"></div>
+		<div class="mc-card">
+			<div class="mc-emoji">🎉</div>
+			<div class="mc-eyebrow">MEMORY COMPLETE</div>
+			<h3>全部配对成功</h3>
+			<p>你把 9 段回忆都找齐啦</p>
+			<div class="mc-stats"><b id="mcMoves">0</b> 步 · 9 对</div>
+			<div class="mc-actions">
+				<button type="button" class="mc-btn primary" id="mcReplay">再玩一次</button>
+				<button type="button" class="mc-btn ghost" id="mcClose">收好回忆</button>
+			</div>
+		</div>
+	</div>
 </div>
 <script>
 (function(){
@@ -3426,15 +3462,47 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var PAIR_FILES=["z12.jpg.jpg","z11.jpg.jpg","v11-2.jpg.jpg","home-banner1.jpg.jpg","menu-banner12.jpg.jpg","feature-banner13.jpg.jpg","contact-banner11.jpg.jpg","z1.jpg.jpg","z2.jpg.jpg"];
 	var PAIRS=PAIR_FILES.map(function(f,i){ return {id:i, img:/^https?:\/\//.test(f)?f:IMG_BASE+f}; });
 	var PREVIEW_MS=5000;
-	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), winEl=document.getElementById('memoryWin'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
+	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
+	var overlay=document.getElementById('mcOverlay'), confetti=document.getElementById('mcConfetti'), mcMoves=document.getElementById('mcMoves'), mcReplay=document.getElementById('mcReplay'), mcClose=document.getElementById('mcClose');
 	if(!board||!restartBtn) return;
-	var firstCard=null, lockBoard=false, matchedCount=0, moves=0, previewTimer=null, countTimer=null;
+	var firstCard=null, lockBoard=false, matchedCount=0, moves=0, previewTimer=null, countTimer=null, celebrationTimer=null;
+	var CONFETTI_COLORS=['#BF5B2E','#D07C48','#F3D79A','#FFF9F3','#A65A33','#E8B4A0'];
 	function shuffle(arr){ for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;} return arr; }
+	function hideCelebration(){
+		if(celebrationTimer){ clearTimeout(celebrationTimer); celebrationTimer=null; }
+		if(!overlay) return;
+		overlay.classList.remove('show');
+		overlay.setAttribute('aria-hidden','true');
+		if(confetti) confetti.innerHTML='';
+	}
+	function showCelebration(){
+		if(!overlay) return;
+		if(mcMoves) mcMoves.textContent=moves;
+		overlay.classList.add('show');
+		overlay.setAttribute('aria-hidden','false');
+		if(!confetti) return;
+		confetti.innerHTML='';
+		var frag=document.createDocumentFragment();
+		for(var i=0;i<64;i++){
+			var p=document.createElement('span');
+			p.className='mc-piece';
+			p.style.left=(Math.random()*100).toFixed(1)+'%';
+			p.style.width=(6+Math.random()*8).toFixed(1)+'px';
+			p.style.height=(8+Math.random()*12).toFixed(1)+'px';
+			p.style.background=CONFETTI_COLORS[i%CONFETTI_COLORS.length];
+			p.style.animationDelay=(Math.random()*1.2).toFixed(2)+'s';
+			p.style.animationDuration=(1.8+Math.random()*1.8).toFixed(2)+'s';
+			p.style.setProperty('--drift',(Math.random()*180-90).toFixed(0)+'px');
+			p.style.setProperty('--spin',(Math.random()*900-450).toFixed(0)+'deg');
+			frag.appendChild(p);
+		}
+		confetti.appendChild(frag);
+	}
 	function build(){
-		clearTimeout(previewTimer); clearInterval(countTimer);
+		clearTimeout(previewTimer); clearInterval(countTimer); hideCelebration();
 		var deck=shuffle(PAIRS.concat(PAIRS).map(function(c){return {id:c.id,img:c.img};}));
 		board.innerHTML=''; firstCard=null; lockBoard=false; matchedCount=0; moves=0;
-		movesEl.textContent='0'; matchedEl.textContent='0'; winEl.classList.remove('show');
+		movesEl.textContent='0'; matchedEl.textContent='0';
 		deck.forEach(function(card){
 			var el=document.createElement('div');
 			el.className='memory-card'; el.dataset.id=card.id;
@@ -3464,16 +3532,21 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(firstCard.dataset.id===second.dataset.id){
 			firstCard.classList.add('matched'); second.classList.add('matched');
 			firstCard=null; matchedCount++; matchedEl.textContent=matchedCount;
-			if(matchedCount===PAIRS.length){ setTimeout(function(){winEl.classList.add('show');},400); }
+			if(matchedCount===PAIRS.length){ celebrationTimer=setTimeout(showCelebration,450); }
 		}else{
 			lockBoard=true; var a=firstCard,b=second;
 			setTimeout(function(){a.classList.remove('flipped');b.classList.remove('flipped');firstCard=null;lockBoard=false;},800);
 		}
 	}
 	restartBtn.addEventListener('click',build);
+	if(mcReplay) mcReplay.addEventListener('click',function(){ hideCelebration(); build(); });
+	if(mcClose) mcClose.addEventListener('click',hideCelebration);
 	var started=false;
 	function startOnce(){ if(started) return; started=true; build(); }
-	window.addEventListener('zt:page',function(e){ if(e.detail==='game') startOnce(); });
+	window.addEventListener('zt:page',function(e){
+		if(e.detail==='game') startOnce();
+		else hideCelebration();
+	});
 	if(document.getElementById('game').classList.contains('active')) startOnce();
 })();
 </script>

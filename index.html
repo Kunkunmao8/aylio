@@ -4250,8 +4250,12 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function pauseVideos(box) {
 		box.querySelectorAll("video").forEach(function (v) {
 			try {
+				v.dataset.closed='1';
+				v.muted=true;
 				v.pause();
 				v.currentTime = 0;
+				var cover=v.parentElement && v.parentElement.querySelector('.video-poster');
+				if(cover){ cover.classList.remove('is-hidden'); cover.classList.remove('is-loading'); }
 			} catch (err) {}
 		});
 	}
@@ -4272,7 +4276,13 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 
 	function streamMeetVideo(v,cover){
-		if(v.dataset.mseStarted) return true;
+		if(v.dataset.mseStarted){
+			v.dataset.closed='';
+			v.muted=false;
+			cover.classList.add('is-hidden');
+			try{ var again=v.play(); if(again&&again.catch) again.catch(function(){}); }catch(e){}
+			return true;
+		}
 		if(!window.MediaSource || typeof fetch!=='function') return false;
 		var mime='';
 		['video/mp4; codecs="avc1.64001f,mp4a.40.2"','video/mp4; codecs="avc1.4d401f,mp4a.40.2"','video/mp4; codecs="avc1.42E01E,mp4a.40.2"'].forEach(function(m){
@@ -4317,7 +4327,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				if(!ab.byteLength) break;
 				offset+=ab.byteLength;
 				await append(ab);
-				if(!startedPlay && v.readyState>=2){
+				if(!startedPlay && v.readyState>=2 && v.dataset.closed!=='1'){
 					startedPlay=true;
 					cover.classList.add('is-hidden');
 					try{ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
@@ -4362,6 +4372,10 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		var box = document.getElementById(id);
 		if (!box) { return; }
 		warmModalImages(box);
+		box.querySelectorAll('video').forEach(function(v){
+			v.dataset.closed='';
+			v.muted=false;
+		});
 		box.classList.add("is-open");
 		box.scrollTop = 0;
 		document.body.classList.add("modal-open");

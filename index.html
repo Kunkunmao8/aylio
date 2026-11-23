@@ -686,7 +686,32 @@ body.modal-open{overflow:hidden;}
 	border-radius:18px;
 	overflow:hidden;
 	margin:0 auto;
+	position:relative;
 }
+.video-poster{
+	position:absolute;
+	inset:0;
+	z-index:2;
+	background:#000 center/contain no-repeat;
+	cursor:pointer;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+}
+.video-poster::after{
+	content:"\25B6";
+	width:62px;
+	height:62px;
+	border-radius:50%;
+	background:rgba(252,239,226,.94);
+	color:#BF5B2E;
+	font-size:24px;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.video-poster.is-hidden{display:none;}
 .video-shell video{
 	display:block;
 	width:100%;
@@ -3292,7 +3317,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
+			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -3368,7 +3393,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">共同出镜的那些瞬间</p>
 		
 		<div class="album-main-player">
-			<video id="collabMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v1.jpg" data-dur="11">
+			<video id="collabMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v1.jpg" data-dur="11">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v1.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -3486,7 +3511,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">把普通的一天拍成纪念</p>
 		
 		<div class="album-main-player">
-			<video id="vlogMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v3.jpg" data-dur="56">
+			<video id="vlogMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v3.jpg" data-dur="56">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" type="video/mp4">
 			</video>
 			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
@@ -4234,8 +4259,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			im.decoding='async';
 		});
 		box.querySelectorAll('video').forEach(function(v){
-			if(v.preload!=='auto') v.preload='auto';
-			if(v.readyState===0){ try{ v.load(); }catch(e){} }
+			if(v.preload!=='none') v.preload='none';
 		});
 	}
 
@@ -4245,6 +4269,19 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			function show(){ if(tip) tip.classList.add('show'); }
 			v.addEventListener('error', show);
 			v.querySelectorAll('source').forEach(function(s){ s.addEventListener('error', show); });
+			if(v.poster && v.parentElement && !v.parentElement.querySelector('.video-poster')){
+				var cover=document.createElement('div');
+				cover.className='video-poster';
+				cover.style.backgroundImage='url("'+v.poster+'")';
+				cover.addEventListener('click',function(){
+					cover.classList.add('is-hidden');
+					try{
+						if(v.readyState===0) v.load();
+						var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
+				});
+				v.addEventListener('playing',function(){ cover.classList.add('is-hidden'); });
+				v.parentElement.insertBefore(cover, v.nextSibling);
+			}
 		});
 	}
 
@@ -4255,13 +4292,6 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		box.classList.add("is-open");
 		box.scrollTop = 0;
 		document.body.classList.add("modal-open");
-		var first = box.querySelector("video");
-		if (first) {
-			try {
-				var p = first.play();
-				if (p && p.catch) p.catch(function () {});
-			} catch (e) {}
-		}
 		setHash("modal:" + id);
 	}
 

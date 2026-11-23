@@ -4281,11 +4281,12 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(!mime) return false;
 		v.dataset.mseStarted='1';
 		var url='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_hd_frag.mp4';
+		var fallbackUrl='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_lite.mp4';
 		var total=9235431, offset=0, sb=null, startedPlay=false, failed=false;
 		function label(t){ if(cover) cover.dataset.loadLabel=t; }
 		function fallback(){
 			if(failed) return; failed=true;
-			try{ v.src=url; v.load(); var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
+			try{ v.src=fallbackUrl; v.load(); var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
 		}
 		v.querySelectorAll('source').forEach(function(s){ s.remove(); });
 		v.removeAttribute('src');

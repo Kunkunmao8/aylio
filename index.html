@@ -1723,6 +1723,7 @@ a{color:inherit;}
 			</div>
 			<p class="gate-alt"><a href="?open=1#pillow">不想注册，用昵称直接留言 →</a></p>
 		</div>
+		<div id="shareDebug" style="font-size:12px;color:#BF5B2E;padding:4px 0"></div>
 		<div class="msgs" id="msgs"><div class="empty">还没有人留言，第一句留给你。</div></div>
 
 		<div class="nickbar hide" id="nickRow">
@@ -1889,6 +1890,10 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(){ return []; });
 	}
 	window.__readShared=readShared;
+	readShared().then(function(l){
+		var d=document.getElementById('shareDebug');
+		if(d) d.textContent='shared:'+(l||[]).length+' '+((l&&l[0]&&l[0].id)||'');
+	});
 
 	/* ---------- 身份 ---------- */
 	function myName(){

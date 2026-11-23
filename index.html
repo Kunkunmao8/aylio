@@ -1851,6 +1851,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function supaPublic(name){
 		return SUPA+'/storage/v1/object/public/'+BUCKET+'/'+String(name).split('/').map(encodeURIComponent).join('/');
 	}
+	function supaDownload(name){
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+String(name).split('/').map(encodeURIComponent).join('/'),{
+			headers:supaHeaders(),cache:'no-store'
+		}).then(function(r){ return r.ok?r.json():null; });
+	}
 	function supaUpload(file,name){
 		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+encodeURIComponent(name),{
 			method:'POST',
@@ -1877,7 +1882,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		return supaList('posts/').then(function(rows){
 			var files=(rows||[]).filter(function(x){ return x&&x.name&&/\.json$/.test(x.name); });
 			return Promise.all(files.slice(0,200).map(function(f){
-				return fetch(supaPublic(f.name),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });
+				return supaDownload(f.name).catch(function(){ return null; });
 			}));
 		}).then(function(list){
 			return (list||[]).filter(function(m){ return m&&m.id&&(m.text||m.img||m.video); });

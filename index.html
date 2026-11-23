@@ -707,6 +707,7 @@ body.modal-open{overflow:hidden;}
 	text-align:center;
 }
 .video-tip.show{display:block;}
+.video-tip a{color:#F7D9BE;text-decoration:underline;}
 .meet-modal-inner{
 	width:min(900px,100%);
 	margin:0 auto;
@@ -3291,11 +3292,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" controls playsinline preload="metadata" poster="video/poster_v2.jpg" data-dur="231">
-				<source src="video/v2_h264.mp4" type="video/mp4">
+			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" crossorigin="anonymous" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2.jpg" data-dur="231">
+				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
-			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
+			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
 		</div>
 		<div class="link-btn-group">
 			<a href="https://video.weibo.com/show?fid=1034:5346626991226920" target="_blank" rel="noopener">查看回放</a>
@@ -3367,11 +3368,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">共同出镜的那些瞬间</p>
 		
 		<div class="album-main-player">
-			<video id="collabMainVideo" controls playsinline preload="metadata" poster="video/poster_v1.jpg" data-dur="11">
-				<source src="video/v1_h264.mp4" type="video/mp4">
+			<video id="collabMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" crossorigin="anonymous" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v1.jpg" data-dur="11">
+				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v1.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
-			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
+			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v1.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
 		</div>
 		<p class="album-main-meta">2026.07.02</p>
 		<p class="album-main-desc">“命运的红线将我们紧紧缠绕”</p>
@@ -3485,10 +3486,10 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">把普通的一天拍成纪念</p>
 		
 		<div class="album-main-player">
-			<video id="vlogMainVideo" controls playsinline preload="metadata" poster="video/poster_v3.jpg" data-dur="56">
-				<source src="video/v3_h264.mp4" type="video/mp4">
+			<video id="vlogMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" crossorigin="anonymous" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v3.jpg" data-dur="56">
+				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" type="video/mp4">
 			</video>
-			<p class="video-tip">视频没能加载，检查网络后再试一次。</p>
+			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
 		</div>
 		<p class="album-main-meta">2026.06.07</p>
 		<p class="album-main-desc">“记录我们一起走过的日常”</p>
@@ -4233,6 +4234,10 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			if(im.getAttribute('loading')==='lazy') im.loading='eager';
 			im.decoding='async';
 		});
+		box.querySelectorAll('video').forEach(function(v){
+			if(v.preload!=='auto') v.preload='auto';
+			if(v.readyState===0){ try{ v.load(); }catch(e){} }
+		});
 	}
 
 	function openModal(id) {
@@ -4242,6 +4247,13 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		box.classList.add("is-open");
 		box.scrollTop = 0;
 		document.body.classList.add("modal-open");
+		var first = box.querySelector("video");
+		if (first) {
+			try {
+				var p = first.play();
+				if (p && p.catch) p.catch(function () {});
+			} catch (e) {}
+		}
 		setHash("modal:" + id);
 	}
 

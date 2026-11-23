@@ -5140,7 +5140,13 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		var d=document.getElementById('viewerDl');
 		if(d) d.className='photo-viewer-dl'+(item?' on':'');
 	}
-	function closeView(){ var v=bodyEl.querySelector('video'); if(v) v.pause(); bodyEl.innerHTML=''; viewer.classList.remove('on'); var d=document.getElementById('viewerDl'); if(d) d.className='photo-viewer-dl'; }
+	function closeView(){
+		var restore=viewer.__restore; viewer.__restore=null;
+		var v=bodyEl.querySelector('video'); if(v) v.pause();
+		bodyEl.innerHTML=''; viewer.classList.remove('on');
+		if(restore) restore();
+		var d=document.getElementById('viewerDl'); if(d) d.className='photo-viewer-dl';
+	}
 	/* 刚上传的图，Pages 发布有几十秒延迟，先在原地自动重试几次 */
 	function attachRetry(el,base){
 		if(!base||!/^https?:/.test(base)) return;
@@ -5175,8 +5181,12 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 				openView(vp,item);
 				try{ var pr=vp.play(); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
 			}else{
-				var ip=document.createElement('img'); ip.src=src; ip.alt=item.name||'照片';
-				openView(ip,item);
+				/* 直接把已经加载好的缩略图搬进大图层，不再重新下载一遍，点开就是原图 */
+				var im=box.querySelector('img'), origin=im&&im.parentNode;
+				if(im&&origin){
+					openView(im,item);
+					viewer.__restore=function(){ origin.appendChild(im); };
+				}
 			}
 		});
 		var b=document.createElement('button');

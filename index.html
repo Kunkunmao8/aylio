@@ -4297,6 +4297,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		});
 		ms.addEventListener('error',fallback);
 		v.src=URL.createObjectURL(ms);
+		try{ var earlyPlay=v.play(); if(earlyPlay&&earlyPlay.catch) earlyPlay.catch(function(){}); }catch(e){}
 		function append(ab){
 			return new Promise(function(res){
 				function done(){ sb.removeEventListener('updateend',done); res(); }

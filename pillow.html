@@ -1,6 +1,31 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
+<script>
+(function(){
+  var COSBASE='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+  var DATA='data/';
+  var LS='aylio_gh:';
+  var nativeFetch=window.fetch.bind(window);
+  window.fetch=function(input,init){
+    init=init||{};
+    var url=(typeof input==='string')?input:((input&&input.url)||'');
+    if(url.indexOf(COSBASE)===0){
+      var path=url.slice(COSBASE.length);
+      if(String(init.method||'GET').toUpperCase()==='PUT'){
+        try{ localStorage.setItem(LS+path, typeof init.body==='string'?init.body:''); }catch(e){}
+        return Promise.resolve(new Response('{}',{status:200,headers:{'Content-Type':'application/json'}}));
+      }
+      var local=null;
+      try{ local=localStorage.getItem(LS+path); }catch(e){}
+      if(local) return Promise.resolve(new Response(local,{status:200,headers:{'Content-Type':'application/json'}}));
+      return nativeFetch(DATA+path,{cache:'no-store'});
+    }
+    return nativeFetch(input,init);
+  };
+})();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>小枕头留言箱 · 政瞳之家</title>

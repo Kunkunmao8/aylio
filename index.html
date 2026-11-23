@@ -4229,14 +4229,22 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 
 	function warmModalImages(box){
-		if(!box) return;
-		box.querySelectorAll('img').forEach(function(im){
+		if(!box) return;		box.querySelectorAll('img').forEach(function(im){
 			if(im.getAttribute('loading')==='lazy') im.loading='eager';
 			im.decoding='async';
 		});
 		box.querySelectorAll('video').forEach(function(v){
 			if(v.preload!=='auto') v.preload='auto';
 			if(v.readyState===0){ try{ v.load(); }catch(e){} }
+		});
+	}
+
+	function setupVideoFallbacks(){
+		document.querySelectorAll('.video-shell video').forEach(function(v){
+			var tip = v.parentElement && v.parentElement.querySelector('.video-tip');
+			function show(){ if(tip) tip.classList.add('show'); }
+			v.addEventListener('error', show);
+			v.querySelectorAll('source').forEach(function(s){ s.addEventListener('error', show); });
 		});
 	}
 
@@ -4306,6 +4314,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}
 		if (document.getElementById(hash)) { activatePage(hash, false); }
 	}
+	setupVideoFallbacks();
 	restoreFromHash();
 
 	window.addEventListener("hashchange", function () {

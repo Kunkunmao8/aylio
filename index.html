@@ -3325,11 +3325,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
-				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720.mp4" type="video/mp4">
+			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
+				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_lite.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
-			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
+			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_lite.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
 		</div>
 		<div class="link-btn-group">
 			<a href="https://video.weibo.com/show?fid=1034:5346626991226920" target="_blank" rel="noopener">查看回放</a>
@@ -3401,7 +3401,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">共同出镜的那些瞬间</p>
 		
 		<div class="album-main-player">
-			<video id="collabMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v1.jpg" data-dur="11">
+			<video id="collabMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v1.jpg" data-dur="11">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v1.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -3519,7 +3519,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">把普通的一天拍成纪念</p>
 		
 		<div class="album-main-player">
-			<video id="vlogMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v3.jpg" data-dur="56">
+			<video id="vlogMainVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v3.jpg" data-dur="56">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" type="video/mp4">
 			</video>
 			<p class="video-tip">视频没能加载，<a href="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v3.mp4" target="_blank" rel="noopener">点这里直接打开视频</a>。</p>
@@ -4281,7 +4281,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				var cover=document.createElement('div');
 				cover.className='video-poster';
 				cover.style.backgroundImage='url("'+v.poster+'")';
+				var started=false;
 				cover.addEventListener('click',function(){
+					started=true;
 					cover.classList.add('is-loading');
 					try{
 						if(v.readyState>=2) cover.classList.add('is-hidden');
@@ -4290,7 +4292,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 						v.addEventListener('loadeddata', doPlay, { once:true });
 					}catch(e){}
 				});
-				v.addEventListener('loadeddata',function(){ cover.classList.add('is-hidden'); });
+				v.addEventListener('loadeddata',function(){ if(started) cover.classList.add('is-hidden'); });
 				if(v.readyState>=2) cover.classList.add('is-hidden');
 				v.parentElement.insertBefore(cover, v.nextSibling);
 			}
@@ -5632,5 +5634,6 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 </script>
 </body>
 </html>
+
 
 

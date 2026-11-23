@@ -1893,10 +1893,6 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(e){ note('err:'+e); return []; });
 	}
 	window.__readShared=readShared;
-	readShared().then(function(l){
-		var d=document.getElementById('shareDebug');
-		if(d) d.textContent='shared:'+(l||[]).length+' '+((l&&l[0]&&l[0].id)||'');
-	});
 
 	/* ---------- 身份 ---------- */
 	function myName(){

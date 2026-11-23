@@ -712,6 +712,14 @@ body.modal-open{overflow:hidden;}
 	box-shadow:0 8px 24px rgba(0,0,0,.35);
 }
 .video-poster.is-hidden{display:none;}
+.video-poster.is-loading::after{
+	content:"加载中…";
+	width:auto;
+	padding:0 24px;
+	border-radius:26px;
+	font-size:15px;
+	letter-spacing:1px;
+}
 .video-shell video{
 	display:block;
 	width:100%;
@@ -4274,6 +4282,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				cover.className='video-poster';
 				cover.style.backgroundImage='url("'+v.poster+'")';
 				cover.addEventListener('click',function(){
+					cover.classList.add('is-loading');
 					try{
 						if(v.readyState===0) v.load();
 						if(v.readyState>=2) cover.classList.add('is-hidden');

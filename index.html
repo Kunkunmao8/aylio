@@ -3325,7 +3325,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
+			<video id="meetVideo" data-warm-preload="auto" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_lite.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -4267,7 +4267,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			im.decoding='async';
 		});
 		box.querySelectorAll('video').forEach(function(v){
-			if(v.preload!=='none') v.preload='none';
+			if(v.dataset.warmPreload!=='auto') v.preload='none';
 		});
 	}
 

@@ -4951,7 +4951,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <!-- photoWall -->
 <script>
 /* 照片墙存储配置（GitHub 仓库）：填 token 即可全站共享；留空则只存在本机 */
-window.AYLIO_CLOUD = { provider: "local", bucket: "", region: "ap-guangzhou", dir: "photos" };
+window.AYLIO_CLOUD = { provider: "supabase", bucket: "wall", region: "", dir: "photos" };
 /* 小枕头留言箱的邮箱验证码发信（EmailJS）：把三个值填上，验证码就会真的发到用户邮箱 */
 window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9v", publicKey: "oWUnwDNjmReeW1-UX" };
 </script>
@@ -4967,11 +4967,23 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	if(!wall||!input||!viewer||!bodyEl) return;
 	var IS_WX=/MicroMessenger/i.test(navigator.userAgent||'');
 	if(IS_WX){ try{ input.removeAttribute('accept'); }catch(e){} }   /* 微信里放开类型限制，否则有时只给拍照、进不去相册 */
-	var cloud=!!(CFG.bucket);
-	var COSBASE='https://'+CFG.bucket+'.cos.'+(CFG.region||'ap-guangzhou')+'.myqcloud.com';
+	var SUPA='https://yzzktnkfprpystxbhnln.supabase.co';
+	var SUPAKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6emt0bmtmcHJweXN0eGJobmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyODI4MTMsImV4cCI6MjExMDg1ODgxM30.5MppDnGsfdc3J5ejdxQzJ4W0_10QkTKlW3tgqVsrXCI';
+	var BUCKET='wall';
 	var DIR=(CFG.dir||'photos');
-	var RAW=COSBASE+'/'+DIR+'/';
-	var MANIFEST=RAW+'_index.json';
+	var RAW=SUPA+'/storage/v1/object/public/'+BUCKET+'/'+DIR+'/';
+	var cloud=true;
+	function supaHeaders(extra){
+		var h={apikey:SUPAKEY,Authorization:'Bearer '+SUPAKEY};
+		if(extra) for(var k in extra) h[k]=extra[k];
+		return h;
+	}
+	function supaObj(name){
+		return SUPA+'/storage/v1/object/'+BUCKET+'/'+String(name).split('/').map(encodeURIComponent).join('/');
+	}
+	function supaPub(name){
+		return SUPA+'/storage/v1/object/public/'+BUCKET+'/'+String(name).split('/').map(encodeURIComponent).join('/');
+	}
 	var MYID=(function(){try{var k='aylio_owner_id',v=localStorage.getItem(k);if(!v){v='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);localStorage.setItem(k,v);}return v;}catch(e){return 'anon';}})();
 	var urls=[], dbp=null;
 
@@ -4980,7 +4992,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		if(cloud){ statusEl.className='photo-status'; statusEl.innerHTML='<i></i>共享模式：所有人上传的都看得见'; }
 		else { statusEl.className='photo-status off'; statusEl.innerHTML='<i></i>本机模式：只有这台设备看得到'; }
 		if(hint) hint.innerHTML = cloud
-			? '单个文件：图片 60MB、视频 50MB 以内'
+			? '单个文件：图片 20MB、视频 50MB 以内'
 			: '单个文件在 200MB 以内';
 	}
 
@@ -5022,7 +5034,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		});
 	}
 
-	/* ---------- 腾讯云 COS 云存储 ---------- */
+	/* ---------- Supabase 公共照片墙 ---------- */
 	function isVideoName(n){ return /\.(mp4|mov|webm)$/i.test(n); }
 	function ctypeOf(n){
 		if(isVideoName(n)) return 'video/mp4';
@@ -5031,45 +5043,24 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		if(/\.gif$/i.test(n)) return 'image/gif';
 		return 'image/jpeg';
 	}
-	function readManifest(){
-		return fetch(MANIFEST+'?t='+Date.now(),{cache:'no-store'})
-			.then(function(r){
-				if(r.status===404) return [];
-				if(!r.ok) throw new Error('list '+r.status);
-				return r.json();
-			})
-			.then(function(j){ return Array.isArray(j)?j:[]; });
-	}
-	function writeManifest(list){
-		return fetch(MANIFEST,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(list)})
-			.then(function(r){ if(!r.ok) throw new Error('manifest '+r.status); });
-	}
-	function cosList(){
-		return readManifest().then(function(list){
-			return list.filter(function(x){return x&&x.name&&/\.(jpg|jpeg|png|gif|webp|mp4|mov|webm)$/i.test(x.name);})
-				.map(function(x){
-					return {
-						id:x.name,
-						name:x.name,
-						type:ctypeOf(x.name),
-						src:RAW+encodeURIComponent(x.name),
-						owner:x.owner||'',
-						ts:x.ts||parseInt(x.name,10)||0
-					};
-				})
-				.sort(function(a,b){return b.ts-a.ts;});
-		});
-	}
-	function addToManifest(rec){
-		return readManifest().then(function(list){
-			var keeps=list.filter(function(x){return x&&x.name!==rec.name;});
-			keeps.unshift(rec);
-			return writeManifest(keeps);
-		});
-	}
-	function removeFromManifest(name){
-		return readManifest().then(function(list){
-			return writeManifest(list.filter(function(x){return x&&x.name!==name;}));
+	function supaList(prefix){
+		return fetch(SUPA+'/storage/v1/object/list/'+BUCKET,{
+			method:'POST',
+			headers:supaHeaders({'Content-Type':'application/json'}),
+			body:JSON.stringify({prefix:prefix,limit:200,offset:0,sortBy:{column:'created_at',order:'desc'}})
+		}).then(function(r){ if(!r.ok) throw new Error('list '+r.status); return r.json(); })
+		.then(function(rows){
+			return (rows||[]).filter(function(x){
+				return x&&x.name&&/\.(jpg|jpeg|png|gif|webp|mp4|mov|webm)$/i.test(x.name);
+			}).map(function(x){
+				var n=x.name.indexOf(DIR+'/')===0?x.name.slice(DIR.length+1):x.name;
+				return {
+					id:n, name:n, type:ctypeOf(n),
+					src:RAW+n,
+					owner:'',
+					ts:(x.created_at?Date.parse(x.created_at):0)||parseInt(n,10)||0
+				};
+			}).sort(function(a,b){return b.ts-a.ts;});
 		});
 	}
 	/* 手机原图动辄几 MB，先无损缩小到 1600px 内再传，加载更快 */
@@ -5111,20 +5102,21 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 			img.src=u;
 		});
 	}
-	function cosUpload(file){
+	function supaUpload(file){
 		return shrinkImage(file).then(function(f){
 			var m=f.name.match(/\.[a-zA-Z0-9]+$/), ext=m?m[0].toLowerCase():'';
-			var name=Date.now()+'-'+MYID+'-'+Math.random().toString(36).slice(2,7)+ext;
+			var name=DIR+'/'+Date.now()+'-'+MYID+'-'+Math.random().toString(36).slice(2,7)+ext;
 			var ct=ctypeOf(name);
-			return fetch(RAW+name,{method:'PUT',headers:{'Content-Type':ct,'Cache-Control':'public, max-age=31536000'},body:f})
-				.then(function(r){ if(!r.ok) throw new Error('upload '+r.status); })
-				.then(function(){ return addToManifest({name:name,owner:MYID,ts:parseInt(name,10)||Date.now(),type:ct}); });
+			return fetch(supaObj(name),{
+				method:'POST',
+				headers:supaHeaders({'Content-Type':ct,'x-upsert':'false'}),
+				body:f
+			}).then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return supaPub(name); });
 		});
 	}
-	function cosDel(item){
-		return fetch(RAW+encodeURIComponent(item.name),{method:'DELETE',cache:'no-store'})
-			.then(function(){ return removeFromManifest(item.name); })
-			.catch(function(){ return removeFromManifest(item.name); });
+	function supaDel(item){
+		return fetch(supaObj(DIR+'/'+item.name),{method:'DELETE',headers:supaHeaders(),cache:'no-store'})
+			.catch(function(){});
 	}
 
 	/* 视频打开时先显示"加载中"，能播了就撤掉 */
@@ -5191,7 +5183,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		b.addEventListener('click',function(ev){
 			ev.stopPropagation();
 			if(!confirm(item.owner&&item.owner!==MYID?'删掉这张别人传的照片？':'删掉这一张？')) return;
-			(cloud?cosDel(item):localDel(item.id)).then(refresh);
+			(cloud?supaDel(item):localDel(item.id)).then(refresh);
 		});
 		/* 照片墙的删除权限：所有人都能删（包括别人传的） */
 		box.appendChild(b);
@@ -5242,7 +5234,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		if(cloud){
 			var cached=cacheRead();
 			if(cached.length) paint(cached);          /* 先用上次的清单秒出图，云端连不上也照样能看 */
-			return cosList().then(function(rows){ cacheSave(rows); paint(rows); return rows; })
+			return supaList(DIR+'/').then(function(rows){ cacheSave(rows); paint(rows); return rows; })
 				.catch(function(e){
 					if(statusEl){
 						statusEl.className='photo-status off';
@@ -5271,7 +5263,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	function handleFiles(files){
 		if(!files.length) return;
 		var limitV=cloud?50*1024*1024:200*1024*1024;
-		var limitI=cloud?60*1024*1024:200*1024*1024;
+		var limitI=cloud?20*1024*1024:200*1024*1024;
 		var bad=[];
 		var list=files.filter(function(f){
 			var t=guessType(f);
@@ -5289,7 +5281,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 				? toJpeg(f)
 				: Promise.resolve(new File([f], f.name||('p'+Date.now()), {type:t}));
 			var task = prep.then(function(g){
-				return cloud ? cosUpload(g) : localAdd({id:Date.now()+done, type:t, name:g.name, blob:g});
+				return cloud ? supaUpload(g) : localAdd({id:Date.now()+done, type:t, name:g.name, blob:g});
 			});
 			task.then(function(){ done++; }).catch(function(e){
 				fail++; done++;

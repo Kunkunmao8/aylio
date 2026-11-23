@@ -500,6 +500,11 @@ body.modal-open{overflow:hidden;}
 	transition:.2s;
 }
 .close:hover{background:#EFD7C1;}
+.img-lightbox{display:none;position:fixed;inset:0;z-index:1200;background:rgba(18,11,7,.93);align-items:center;justify-content:center;padding:40px 18px;}
+.img-lightbox.on{display:flex;}
+.img-lightbox-body{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+.img-lightbox-body img{max-width:94vw;max-height:86vh;object-fit:contain;border-radius:10px;box-shadow:0 24px 70px rgba(0,0,0,.5);}
+.lb-close{position:fixed;top:18px;right:18px;width:44px;height:44px;border:none;border-radius:50%;background:#FCEFE2;color:#BF5B2E;font-size:26px;line-height:1;cursor:pointer;z-index:1201;box-shadow:0 6px 18px rgba(43,20,8,.22);}
 
 .album-modal-inner{
 	width:min(1160px,100%);
@@ -2085,7 +2090,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(m.img){
 			var wrap=el('div','post-media');
 			var im=el('img'); im.src=m.img; im.alt='图片'; im.loading='lazy';
-			im.onclick=function(){ window.open(m.img,'_blank'); };
+			im.onclick=function(){ if(window.openImgLightbox) window.openImgLightbox(im); else window.open(m.img,'_blank'); };
 			wrap.appendChild(im); card.appendChild(wrap);
 		}
 		if(m.video){
@@ -2226,7 +2231,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		UP=USERSMAP[lower(name)]||{name:name};
 		UP.name=UP.name||name;
 		var ava=$('upAva'); ava.innerHTML='';
-		if(UP.avatar){ var im=document.createElement('img'); im.src=UP.avatar; im.alt=name; im.onclick=function(){ window.open(UP.avatar,'_blank'); }; ava.appendChild(im); }
+		if(UP.avatar){ var im=document.createElement('img'); im.src=UP.avatar; im.alt=name; im.onclick=function(){ if(window.openImgLightbox) window.openImgLightbox(im); }; ava.appendChild(im); }
 		else { ava.textContent=String(name).slice(0,1); }
 		$('upName').textContent=name;
 		var upc=$('upCover');
@@ -2268,7 +2273,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var a=el('span'); a.textContent=m.video?'视频':'图文';
 			var b=el('span'); b.textContent='♥ '+(m.likes||0);
 			mt.appendChild(a); mt.appendChild(b); body.appendChild(tt); body.appendChild(mt); c.appendChild(body);
-			c.onclick=function(){ closeUserPage(); if(m.img) window.open(m.img,'_blank'); };
+			c.onclick=function(){ closeUserPage(); if(m.img&&window.openImgLightbox) window.openImgLightbox(im); };
 			grid.appendChild(c);
 		});
 	}
@@ -5499,6 +5504,41 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 			try{ input.focus({preventScroll:true}); }catch(e){ input.focus(); }
 		});
 	});
+})();
+</script>
+<div class="img-lightbox" id="imgLightbox" aria-hidden="true">
+	<button type="button" class="lb-close" id="imgLightboxClose" aria-label="关闭">&times;</button>
+	<div class="img-lightbox-body" id="imgLightboxBody"></div>
+</div>
+<script>
+/* 社区图片点开：直接用已经加载好的那张图铺满屏幕，不再开新标签重新下载 */
+(function(){
+	var lb=document.getElementById('imgLightbox');
+	var body=document.getElementById('imgLightboxBody');
+	var closeBtn=document.getElementById('imgLightboxClose');
+	if(!lb||!body||!closeBtn) return;
+	var restore=null;
+	function close(){
+		lb.classList.remove('on'); lb.setAttribute('aria-hidden','true');
+		body.innerHTML='';
+		if(restore){ try{ restore(); }catch(e){} restore=null; }
+	}
+	window.openImgLightbox=function(el){
+		var img=el;
+		if(typeof el==='string'||!el||!el.parentNode){
+			img=document.createElement('img'); img.src=String(el||''); img.alt='图片';
+		}else{
+			var origin=el.parentNode;
+			restore=function(){ origin.appendChild(el); };
+		}
+		body.innerHTML='';
+		body.appendChild(img);
+		lb.classList.add('on'); lb.setAttribute('aria-hidden','false');
+	};
+	window.closeImgLightbox=close;
+	closeBtn.onclick=close;
+	lb.addEventListener('click',function(e){ if(e.target===lb) close(); });
+	document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&lb.classList.contains('on')) close(); });
 })();
 </script>
 </body>

@@ -1888,6 +1888,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			return (list||[]).filter(function(m){ return m&&m.id&&(m.text||m.img||m.video); });
 		}).catch(function(){ return []; });
 	}
+	window.__readShared=readShared;
 
 	/* ---------- 身份 ---------- */
 	function myName(){

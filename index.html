@@ -4280,9 +4280,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		});
 		if(!mime) return false;
 		v.dataset.mseStarted='1';
-		var url='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_frag.mp4';
-		var fallbackUrl='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_lite.mp4';
-		var total=5822289, offset=0, sb=null, startedPlay=false, failed=false;
+		var url='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_clear_frag.mp4';
+		var fallbackUrl='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_clear.mp4';
+		var total=11024509, offset=0, sb=null, startedPlay=false, failed=false;
 		function fallback(){
 			if(failed) return; failed=true;
 			try{ v.src=fallbackUrl; v.load(); var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
@@ -4308,7 +4308,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		async function pump(){
 			if(sb===null){ return; }
 			while(offset<total){
-				var size=(offset<131072)?65535:262143;
+				var size=(offset===0)?393215:262143;
 				var end=Math.min(offset+size,total-1);
 				var r;
 				try{ r=await fetch(url,{headers:{'Range':'bytes='+offset+'-'+end},cache:'no-store'}); }catch(e){ fallback(); return; }

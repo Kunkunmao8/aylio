@@ -483,8 +483,8 @@ tr:nth-child(even){background:#FEFCFA;}
 .modal.is-open{display:block;}
 body.modal-open{overflow:hidden;}
 .close{
-	position:absolute;
-	top:16px;
+	position:fixed;
+	top:18px;
 	right:18px;
 	width:44px;
 	height:44px;
@@ -495,7 +495,8 @@ body.modal-open{overflow:hidden;}
 	font-size:26px;
 	line-height:1;
 	cursor:pointer;
-	z-index:10;
+	z-index:1001;
+	box-shadow:0 6px 18px rgba(43,20,8,.22);
 	transition:.2s;
 }
 .close:hover{background:#EFD7C1;}

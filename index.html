@@ -1880,14 +1880,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; });
 	}
 	function readShared(){
+		function note(s){ var d=document.getElementById('shareDebug'); if(d) d.textContent=s; }
 		return supaList('posts/').then(function(rows){
 			var files=(rows||[]).filter(function(x){ return x&&x.name&&/\.json$/.test(x.name); });
+			note('rows:'+(rows||[]).length+' files:'+files.length);
 			return Promise.all(files.slice(0,200).map(function(f){
 				return supaDownload(f.name).catch(function(){ return null; });
 			}));
 		}).then(function(list){
+			note('list:'+(list||[]).length);
 			return (list||[]).filter(function(m){ return m&&m.id&&(m.text||m.img||m.video); });
-		}).catch(function(){ return []; });
+		}).catch(function(e){ note('err:'+e); return []; });
 	}
 	window.__readShared=readShared;
 	readShared().then(function(l){

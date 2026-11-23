@@ -4284,9 +4284,11 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				cover.addEventListener('click',function(){
 					cover.classList.add('is-loading');
 					try{
-						if(v.readyState===0) v.load();
 						if(v.readyState>=2) cover.classList.add('is-hidden');
-						var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
+						var doPlay=function(){ try{ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} };
+						doPlay();
+						v.addEventListener('loadeddata', doPlay, { once:true });
+					}catch(e){}
 				});
 				v.addEventListener('loadeddata',function(){ cover.classList.add('is-hidden'); });
 				if(v.readyState>=2) cover.classList.add('is-hidden');

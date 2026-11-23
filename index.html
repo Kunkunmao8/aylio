@@ -713,7 +713,7 @@ body.modal-open{overflow:hidden;}
 }
 .video-poster.is-hidden{display:none;}
 .video-poster.is-loading::after{
-	content:"加载中…";
+	content:attr(data-load-label);
 	width:auto;
 	padding:0 24px;
 	border-radius:26px;
@@ -3325,7 +3325,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<p class="album-subtitle">2025.10.10，第一次见面的影像</p>
 		<p class="album-count">2026 · 一段影像 · 一次回放</p>
 		<div class="video-shell">
-			<video id="meetVideo" data-warm-preload="auto" controls playsinline webkit-playsinline x5-playsinline preload="auto" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
+			<video id="meetVideo" controls playsinline webkit-playsinline x5-playsinline preload="none" poster="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/poster_v2_hd.jpg" data-dur="231">
 				<source src="https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_720_lite.mp4" type="video/mp4">
 				你的浏览器不支持视频播放，请换用 Chrome 或 Edge。
 			</video>
@@ -4271,6 +4271,62 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		});
 	}
 
+	function streamMeetVideo(v,cover){
+		if(v.dataset.mseStarted) return true;
+		if(!window.MediaSource || typeof fetch!=='function') return false;
+		var mime='';
+		['video/mp4; codecs="avc1.64001f,mp4a.40.2"','video/mp4; codecs="avc1.4d401f,mp4a.40.2"','video/mp4; codecs="avc1.42E01E,mp4a.40.2"'].forEach(function(m){
+			if(!mime && MediaSource.isTypeSupported(m)) mime=m;
+		});
+		if(!mime) return false;
+		v.dataset.mseStarted='1';
+		var url='https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/video/v2_frag.mp4';
+		var total=5822289, offset=0, sb=null, startedPlay=false, failed=false;
+		function label(t){ if(cover) cover.dataset.loadLabel=t; }
+		function fallback(){
+			if(failed) return; failed=true;
+			try{ v.src=url; v.load(); var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
+		}
+		v.querySelectorAll('source').forEach(function(s){ s.remove(); });
+		v.removeAttribute('src');
+		var ms=new MediaSource();
+		ms.addEventListener('sourceopen',function(){
+			try{ sb=ms.addSourceBuffer(mime); ms.duration=231; }catch(e){ fallback(); return; }
+			pump();
+		});
+		ms.addEventListener('error',fallback);
+		v.src=URL.createObjectURL(ms);
+		function append(ab){
+			return new Promise(function(res){
+				function done(){ sb.removeEventListener('updateend',done); res(); }
+				sb.addEventListener('updateend',done);
+				try{ sb.appendBuffer(ab); }catch(e){ sb.removeEventListener('updateend',done); res(); }
+			});
+		}
+		async function pump(){
+			if(sb===null){ return; }
+			while(offset<total){
+				label('加载 '+Math.min(99,Math.round(offset*100/total))+'%');
+				var end=Math.min(offset+524287,total-1);
+				var r;
+				try{ r=await fetch(url,{headers:{'Range':'bytes='+offset+'-'+end},cache:'no-store'}); }catch(e){ fallback(); return; }
+				if(r.status!==206 && r.status!==200){ fallback(); return; }
+				var ab=await r.arrayBuffer();
+				if(!ab.byteLength) break;
+				offset+=ab.byteLength;
+				await append(ab);
+				if(!startedPlay && v.readyState>=2){
+					startedPlay=true;
+					label('播放中');
+					cover.classList.add('is-hidden');
+					try{ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){}
+				}
+			}
+			try{ if(ms.readyState==='open') ms.endOfStream(); }catch(e){}
+		}
+		return true;
+	}
+
 	function setupVideoFallbacks(){
 		document.querySelectorAll('.video-shell video').forEach(function(v){
 			var tip = v.parentElement && v.parentElement.querySelector('.video-tip');
@@ -4280,11 +4336,13 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			if(v.poster && v.parentElement && !v.parentElement.querySelector('.video-poster')){
 				var cover=document.createElement('div');
 				cover.className='video-poster';
+				cover.dataset.loadLabel='加载中';
 				cover.style.backgroundImage='url("'+v.poster+'")';
 				var started=false;
 				cover.addEventListener('click',function(){
 					started=true;
 					cover.classList.add('is-loading');
+					if(v.id==='meetVideo' && streamMeetVideo(v,cover)) return;
 					try{
 						if(v.readyState>=2) cover.classList.add('is-hidden');
 						var doPlay=function(){ try{ var p=v.play(); if(p&&p.catch) p.catch(function(){}); }catch(e){} };

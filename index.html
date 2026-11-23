@@ -914,6 +914,7 @@ img{cursor:zoom-in;}
 }
 .reel-room-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 4px 14px;color:#A08274;font-size:11px;letter-spacing:.22em;}
 .reel-screen{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#1c1712;box-shadow:inset 0 0 80px rgba(0,0,0,.55),0 12px 30px rgba(40,20,10,.16);transition:background .6s ease;}
+.reel-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 32%;opacity:.55;filter:saturate(.82) sepia(.16) brightness(.78);z-index:0;pointer-events:none;transition:opacity .6s ease;}
 .reel-screen::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 42%,transparent 42%,rgba(0,0,0,.56) 100%);z-index:1;}
 .reel-screen::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");mix-blend-mode:soft-light;z-index:1;}
 .reel-caption{position:absolute;left:0;right:0;bottom:0;padding:44px 28px 22px;background:linear-gradient(to top,rgba(0,0,0,.88),rgba(0,0,0,.45) 55%,transparent);z-index:2;}
@@ -3344,6 +3345,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		<div class="reel-room">
 			<div class="reel-room-top"><span>SEASONS ARCHIVE</span><span>2025 — 2026</span></div>
 			<div class="reel-screen" id="reelScreen">
+				<img class="reel-photo no-zoom" id="reelPhoto" alt="" draggable="false">
 				<div class="reel-caption">
 					<div class="reel-season" id="reelSeason"></div>
 					<div class="reel-title" id="reelTitle"></div>
@@ -3362,14 +3364,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <script>
 (function(){
 	var reels=[
-		{season:'初夏 · 初见', title:'第一次直播', date:'2025.10.10', desc:'刚因为《双程》认识，一个坐得笔直，一个紧张到接不上话，环球梦之旅从这里开始。', bg:'linear-gradient(135deg,#3a4a5a,#1c2733)'},
-		{season:'夏末 · 七夕', title:'七夕留念', date:'2026.08.19', desc:'一对对戒在桌下悄悄戴上；信里只问一句：往后的路，你陪我一起走吗？', bg:'linear-gradient(135deg,#8a4a3a,#4a2320)'},
-		{season:'秋日 · 海洋馆', title:'海底套房的一晚', date:'2026.09.01', desc:'玻璃外是水族箱，床上有毛巾折成的魔鬼鱼，两个人躺着带大家看小鱼。', bg:'linear-gradient(135deg,#2a4a6a,#14283a)'},
-		{season:'秋日 · 纪念日', title:'相识一周年', date:'2026.10.10', desc:'那晚拿出一本 1917 年的旧儿童故事书，扉页是一位母亲写给女儿的话，说要读给他听。', bg:'linear-gradient(135deg,#6a5230,#3a2c18)'},
-		{season:'冬日 · 初雪', title:'初雪时刻', date:'2026.11.08', desc:'立冬凌晨睡不着，撑一把伞去看初雪，伞被风吹歪，两个人挤在一把伞下，还吃了饺子。', bg:'linear-gradient(135deg,#4a5560,#22282e)'}
+		{season:'初夏 · 初见', title:'第一次直播', date:'2025.10.10', img:'img/z12.jpg.jpg', desc:'刚因为《双程》认识，一个坐得笔直，一个紧张到接不上话，环球梦之旅从这里开始。', bg:'linear-gradient(135deg,#3a4a5a,#1c2733)'},
+		{season:'夏末 · 七夕', title:'七夕留念', date:'2026.08.19', img:'img/z11.jpg.jpg', desc:'一对对戒在桌下悄悄戴上；信里只问一句：往后的路，你陪我一起走吗？', bg:'linear-gradient(135deg,#8a4a3a,#4a2320)'},
+		{season:'秋日 · 海洋馆', title:'海底套房的一晚', date:'2026.09.01', img:'img/home-banner1.jpg.jpg', desc:'玻璃外是水族箱，床上有毛巾折成的魔鬼鱼，两个人躺着带大家看小鱼。', bg:'linear-gradient(135deg,#2a4a6a,#14283a)'},
+		{season:'秋日 · 纪念日', title:'相识一周年', date:'2026.10.10', img:'img/feature-banner13.jpg.jpg', desc:'那晚拿出一本 1917 年的旧儿童故事书，扉页是一位母亲写给女儿的话，说要读给他听。', bg:'linear-gradient(135deg,#6a5230,#3a2c18)'},
+		{season:'冬日 · 初雪', title:'初雪时刻', date:'2026.11.08', img:'img/z1.jpg.jpg', desc:'立冬凌晨睡不着，撑一把伞去看初雪，伞被风吹歪，两个人挤在一把伞下，还吃了饺子。', bg:'linear-gradient(135deg,#4a5560,#22282e)'}
 	];
 	var screen=document.getElementById('reelScreen');
-	var seasonEl=document.getElementById('reelSeason'), titleEl=document.getElementById('reelTitle'), descEl=document.getElementById('reelDesc');
+	var seasonEl=document.getElementById('reelSeason'), titleEl=document.getElementById('reelTitle'), descEl=document.getElementById('reelDesc'), photoEl=document.getElementById('reelPhoto');
 	var timeline=document.getElementById('reelTimeline'), progress=document.getElementById('reelProgress');
 	var prevBtn=document.getElementById('reelPrev'), nextBtn=document.getElementById('reelNext'), playBtn=document.getElementById('reelPlay');
 	if(!screen||!timeline||!prevBtn) return;
@@ -3384,6 +3386,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function render(){
 		var r=reels[current];
 		screen.style.background=r.bg;
+		if(photoEl){ if(r.img){ photoEl.style.display='block'; photoEl.src=r.img; } else { photoEl.style.display='none'; } }
 		nodes.forEach(function(el,i){ el.classList.toggle('active',i===current); });
 		seasonEl.textContent=r.season; titleEl.textContent=r.title; descEl.textContent=r.desc;
 		progress.style.width=(reels.length>1?(current/(reels.length-1))*100:0)+'%';

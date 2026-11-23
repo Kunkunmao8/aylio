@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script>
+(function(){
+  var COSBASE='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+  var DATA='data/';
+  var LS='aylio_gh:';
+  var nativeFetch=window.fetch.bind(window);
+  window.fetch=function(input,init){
+    init=init||{};
+    var url=(typeof input==='string')?input:((input&&input.url)||'');
+    if(url.indexOf(COSBASE)===0){
+      var path=url.slice(COSBASE.length);
+      if(String(init.method||'GET').toUpperCase()==='PUT'){
+        try{ localStorage.setItem(LS+path, typeof init.body==='string'?init.body:''); }catch(e){}
+        return Promise.resolve(new Response('{}',{status:200,headers:{'Content-Type':'application/json'}}));
+      }
+      var local=null;
+      try{ local=localStorage.getItem(LS+path); }catch(e){}
+      if(local) return Promise.resolve(new Response(local,{status:200,headers:{'Content-Type':'application/json'}}));
+      return nativeFetch(DATA+path,{cache:'no-store'});
+    }
+    return nativeFetch(input,init);
+  };
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="政瞳之家：孙政 × 吕思瞳的影像与日常。合拍、vlog、家庭会议、日常记录。">
@@ -1779,7 +1803,7 @@ a{color:inherit;}
 var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免登录版 */
 (function(){
 	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
-	var DEFAULT_COVER=HOST+'pillow/banner.jpg';
+	var DEFAULT_COVER='img/pillow-banner.jpg';
 	var ROOM=HOST+'pillow/';
 	var MAN=ROOM+'_index.json';
 	var USERS=HOST+'auth/users.json';
@@ -2400,12 +2424,12 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'发送失败'; });
 	}
 	function upload(file, kind){
-		var name=(file.name||'x'), ext=((name.match(/\.[a-zA-Z0-9]+$/)||[''])[0]).toLowerCase();
-		if(!ext) ext = kind==='video' ? '.mp4' : '.jpg';
-		var key='pillow/u/'+Date.now()+'-'+rand(6)+ext;
-		var type=file.type||(kind==='video'?'video/mp4':'image/jpeg');
-		return fetch(HOST+key,{method:'PUT',headers:{'Content-Type':type,'Cache-Control':'public, max-age=31536000'},body:file})
-			.then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return HOST+key; });
+		return new Promise(function(res,rej){
+			var fr=new FileReader();
+			fr.onload=function(){ res(fr.result); };
+			fr.onerror=function(){ rej(new Error('读取文件失败')); };
+			fr.readAsDataURL(file);
+		});
 	}
 	function sendFile(file, kind){
 		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
@@ -2950,8 +2974,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		var name=f.name||'a.jpg', ext=((name.match(/\.[a-zA-Z0-9]+$/)||[''])[0]).toLowerCase()||'.jpg';
 		var key='avatar/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+ext;
 		$('meAvaBtn').disabled=true; $('meAvaBtn').textContent='上传中…';
-		fetch(HOST+key,{method:'PUT',headers:{'Content-Type':f.type||'image/jpeg','Cache-Control':'public, max-age=31536000'},body:f})
-			.then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return HOST+key; })
+		new Promise(function(res,rej){ var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.onerror=rej; fr.readAsDataURL(f); })
 			.then(function(url){
 				return readUsers().then(function(list){
 					var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
@@ -2983,8 +3006,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		var key='cover/'+Date.now()+'-'+Math.random().toString(36).slice(2,8)+ext;
 		$('meCoverBtn').disabled=true; $('meCoverBtn2').disabled=true;
 		$('meCoverBtn').textContent='上传中…';
-		fetch(HOST+key,{method:'PUT',headers:{'Content-Type':f.type||'image/jpeg','Cache-Control':'public, max-age=31536000'},body:f})
-			.then(function(r){ if(!r.ok) throw new Error('上传失败 '+r.status); return HOST+key; })
+		new Promise(function(res,rej){ var fr=new FileReader(); fr.onload=function(){res(fr.result);}; fr.onerror=rej; fr.readAsDataURL(f); })
 			.then(function(url){
 				return readUsers().then(function(list){
 					var u=list.filter(function(x){ return (x.mail||'').toLowerCase()===(ME.mail||'').toLowerCase(); })[0];
@@ -4858,7 +4880,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <!-- photoWall -->
 <script>
 /* 照片墙存储配置（GitHub 仓库）：填 token 即可全站共享；留空则只存在本机 */
-window.AYLIO_CLOUD = { provider: "cos", bucket: "aylio-media-1538364358", region: "ap-guangzhou", dir: "photos" };
+window.AYLIO_CLOUD = { provider: "local", bucket: "", region: "ap-guangzhou", dir: "photos" };
 /* 小枕头留言箱的邮箱验证码发信（EmailJS）：把三个值填上，验证码就会真的发到用户邮箱 */
 window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9v", publicKey: "oWUnwDNjmReeW1-UX" };
 </script>

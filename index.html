@@ -1839,6 +1839,51 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	function save(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 	function load(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 
+	/* ---------- 共享照片（Supabase 免费存储） ---------- */
+	var SUPA='https://yzzktnkfprpystxbhnln.supabase.co';
+	var SUPAKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6emt0bmtmcHJweXN0eGJobmxuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUyODI4MTMsImV4cCI6MjExMDg1ODgxM30.5MppDnGsfdc3J5ejdxQzJ4W0_10QkTKlW3tgqVsrXCI';
+	var BUCKET='wall';
+	function supaHeaders(extra){
+		var h={apikey:SUPAKEY,Authorization:'Bearer '+SUPAKEY};
+		if(extra) for(var k in extra) h[k]=extra[k];
+		return h;
+	}
+	function supaPublic(name){
+		return SUPA+'/storage/v1/object/public/'+BUCKET+'/'+String(name).split('/').map(encodeURIComponent).join('/');
+	}
+	function supaUpload(file,name){
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+encodeURIComponent(name),{
+			method:'POST',
+			headers:supaHeaders({'Content-Type':file.type||'application/octet-stream','x-upsert':'false'}),
+			body:file
+		}).then(function(r){ if(!r.ok) throw new Error('共享上传失败 '+r.status); return supaPublic(name); });
+	}
+	function supaWritePost(msg){
+		var name='posts/'+msg.id+'.json';
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+name.split('/').map(encodeURIComponent).join('/'),{
+			method:'POST',
+			headers:supaHeaders({'Content-Type':'application/json','x-upsert':'false'}),
+			body:JSON.stringify(msg)
+		}).then(function(r){ if(!r.ok) throw new Error('共享帖子写入失败 '+r.status); });
+	}
+	function supaList(prefix){
+		return fetch(SUPA+'/storage/v1/object/list/'+BUCKET,{
+			method:'POST',
+			headers:supaHeaders({'Content-Type':'application/json'}),
+			body:JSON.stringify({prefix:prefix,limit:200,offset:0,sortBy:{column:'created_at',order:'desc'}})
+		}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; });
+	}
+	function readShared(){
+		return supaList('posts/').then(function(rows){
+			var files=(rows||[]).filter(function(x){ return x&&x.name&&/\.json$/.test(x.name); });
+			return Promise.all(files.slice(0,200).map(function(f){
+				return fetch(supaPublic(f.name),{cache:'no-store'}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });
+			}));
+		}).then(function(list){
+			return (list||[]).filter(function(m){ return m&&m.id&&(m.text||m.img||m.video); });
+		}).catch(function(){ return []; });
+	}
+
 	/* ---------- 身份 ---------- */
 	function myName(){
 		if(NEED_LOGIN) return ME.name || '朋友';
@@ -2363,8 +2408,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		if(animate){ msgsEl.scrollIntoView({behavior:'smooth',block:'start'}); }
 	}
 	function refresh(){
-		readRoom().then(function(list){
-			list=dedupe(list||[]);
+		Promise.all([readRoom(), readShared()]).then(function(res){
+			var list=dedupe((res[0]||[]).concat(res[1]||[]));
 			if(list.length!==lastCount || QUERY){ paint(list); }
 		});
 	}
@@ -2424,6 +2469,21 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'发送失败'; });
 	}
 	function upload(file, kind){
+		if(kind==='image'){
+			var ext='.jpg';
+			var n=(file.name||'').toLowerCase();
+			var m=n.match(/\.(jpe?g|png|gif|webp|bmp|heic|heif|avif)$/);
+			if(m) ext='.'+m[1];
+			var name=Date.now()+'-'+rand(6)+ext;
+			return supaUpload(file,name).catch(function(){
+				return new Promise(function(res,rej){
+					var fr=new FileReader();
+					fr.onload=function(){ res(fr.result); };
+					fr.onerror=function(){ rej(new Error('读取文件失败')); };
+					fr.readAsDataURL(file);
+				});
+			});
+		}
 		return new Promise(function(res,rej){
 			var fr=new FileReader();
 			fr.onload=function(){ res(fr.result); };
@@ -2442,6 +2502,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var t=txtEl.value.trim(); if(t) { msg.text=t; txtEl.value=''; }
 			mineIds.push(msg.id);
 			return post(msg).then(function(){
+				if(kind==='image' && /^https?:/.test(String(msg.img||''))) return supaWritePost(msg).catch(function(){});
+			}).then(function(){
 				upTip.textContent='发出去了';
 				paint(dedupe([msg]),true); refresh();
 				setTimeout(function(){ upTip.textContent=''; },2000);

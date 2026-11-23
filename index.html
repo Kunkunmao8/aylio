@@ -2471,6 +2471,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		mineIds.push(msg.id);
 		btnSend.disabled=true;
 		post(msg).then(function(){
+			return supaWritePost(msg).catch(function(){});
+		}).then(function(){
 			txtEl.value=''; btnSend.disabled=false;
 			paint(dedupe([msg]),true); refresh();
 		}).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'发送失败'; });

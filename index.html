@@ -889,6 +889,73 @@ img{cursor:zoom-in;}
 #authGate .hide{display:none;}
 @media (max-width:420px){#authGate .ag-card{padding:22px 18px 16px;}}
 </style>
+
+<style>
+/* ===== 相识天数计时器 ===== */
+.days-counter{
+	max-width:960px;margin:28px auto 0;padding:30px 26px 28px;text-align:center;
+	background:linear-gradient(145deg,#FFFBF6,#F7E7D7);
+	border:1px solid #F2DDCB;border-radius:24px;
+	box-shadow:0 18px 42px rgba(150,74,30,.10);
+}
+.dc-label{font-size:12px;letter-spacing:4px;color:#A08274;}
+.dc-nums{display:flex;justify-content:center;align-items:flex-end;gap:24px;margin:16px 0 8px;flex-wrap:wrap;}
+.dc-num{font-size:clamp(28px,4.2vw,40px);line-height:1;color:#BF5B2E;font-weight:700;letter-spacing:1px;}
+.dc-unit{font-size:12px;color:#7A6157;margin-left:5px;font-weight:400;letter-spacing:1px;}
+.dc-text{font-size:14px;color:#7A6157;margin-top:12px;letter-spacing:.06em;}
+@media(max-width:600px){.days-counter{padding:24px 16px 22px;}.dc-nums{gap:14px;}.dc-num{font-size:28px;}}
+
+/* ===== 时光放映厅 ===== */
+.reel-room{
+	max-width:960px;margin:0 auto;padding:22px 22px 26px;
+	background:linear-gradient(160deg,#FFFBF6,#F8E9DA);
+	border:1px solid #F2DDCB;border-radius:28px;
+	box-shadow:0 20px 50px rgba(150,74,30,.12);
+}
+.reel-room-top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:0 4px 14px;color:#A08274;font-size:11px;letter-spacing:.22em;}
+.reel-screen{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#1c1712;box-shadow:inset 0 0 80px rgba(0,0,0,.55),0 12px 30px rgba(40,20,10,.16);transition:background .6s ease;}
+.reel-screen::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 50% 42%,transparent 42%,rgba(0,0,0,.56) 100%);z-index:1;}
+.reel-screen::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");mix-blend-mode:soft-light;z-index:1;}
+.reel-caption{position:absolute;left:0;right:0;bottom:0;padding:44px 28px 22px;background:linear-gradient(to top,rgba(0,0,0,.88),rgba(0,0,0,.45) 55%,transparent);z-index:2;}
+.reel-season{font-size:11px;letter-spacing:.24em;color:#F3D79A;margin-bottom:8px;}
+.reel-title{font-size:clamp(18px,3.2vw,28px);line-height:1.35;color:#fff;margin:0 0 7px;font-weight:600;letter-spacing:.06em;}
+.reel-desc{font-size:14px;line-height:1.8;color:#E8D9C4;max-width:680px;margin:0;}
+.reel-timeline{position:relative;display:flex;justify-content:space-between;align-items:center;margin:26px 4px 0;padding:0 6px;}
+.reel-timeline::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:#E7D3BD;transform:translateY(-50%);}
+.reel-progress{position:absolute;left:0;top:50%;height:2px;background:linear-gradient(90deg,#BF5B2E,#D07C48);transform:translateY(-50%);transition:width .5s ease;}
+.reel-node{position:relative;z-index:2;width:42px;height:42px;border-radius:50%;background:#FFF9F3;border:2px solid #E7D3BD;color:#A08274;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.25s;font-family:inherit;}
+.reel-node:hover{border-color:#BF5B2E;color:#BF5B2E;}
+.reel-node.active{background:#BF5B2E;border-color:#BF5B2E;color:#fff;box-shadow:0 0 16px rgba(191,91,46,.4);}
+.reel-controls{margin-top:22px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.reel-btn{padding:10px 22px;border:1px solid #E7D3BD;background:#fff;color:#7A6157;border-radius:999px;font-size:14px;letter-spacing:1px;cursor:pointer;font-family:inherit;transition:.2s;}
+.reel-btn:hover{border-color:#BF5B2E;color:#BF5B2E;}
+.reel-btn.primary{background:#BF5B2E;color:#fff;border-color:#BF5B2E;}
+.reel-btn.primary:hover{background:#A65A33;color:#fff;}
+@media(max-width:600px){.reel-room{padding:14px 12px 18px;border-radius:20px;}.reel-caption{padding:30px 16px 16px;}.reel-node{width:32px;height:32px;font-size:10px;}.reel-timeline{margin-top:18px;}.reel-btn{padding:9px 16px;font-size:13px;}}
+
+/* ===== 翻牌游戏 ===== */
+.memory-room{max-width:960px;margin:0 auto;padding:24px 22px 30px;background:linear-gradient(160deg,#FFFBF6,#F8E9DA);border:1px solid #F2DDCB;border-radius:28px;box-shadow:0 20px 50px rgba(150,74,30,.12);}
+.memory-bar{display:flex;align-items:center;justify-content:center;gap:26px;flex-wrap:wrap;padding:0 0 16px;color:#7A6157;font-size:14px;}
+.memory-bar b{color:#BF5B2E;font-size:19px;margin-left:4px;}
+.memory-restart{padding:9px 20px;border:1px solid #E7D3BD;background:#fff;color:#7A6157;border-radius:999px;font-size:13px;letter-spacing:1px;cursor:pointer;font-family:inherit;transition:.2s;}
+.memory-restart:hover{border-color:#BF5B2E;color:#BF5B2E;}
+.memory-board{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;}
+.memory-card{aspect-ratio:3/4;perspective:1000px;cursor:pointer;}
+.memory-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s ease;}
+.memory-card.flipped .memory-inner{transform:rotateY(180deg);}
+.memory-card.matched{cursor:default;}
+.memory-face{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;overflow:hidden;}
+.memory-back{background:linear-gradient(145deg,#BF5B2E,#A65A33);box-shadow:0 6px 16px rgba(166,90,51,.22);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.86);font-size:24px;letter-spacing:2px;}
+.memory-front{background:#fff;border:1px solid #F2DDCB;transform:rotateY(180deg);box-shadow:0 6px 16px rgba(150,74,30,.12);}
+.memory-front img{width:100%;height:100%;object-fit:cover;display:block;}
+.memory-card.matched .memory-front{outline:3px solid #D07C48;}
+.memory-tip{display:none;margin-top:14px;text-align:center;font-size:13px;color:#7A6157;letter-spacing:1px;}
+.memory-tip.show{display:block;}
+.memory-win{display:none;margin-top:16px;text-align:center;font-size:15px;color:#BF5B2E;letter-spacing:1px;}
+.memory-win.show{display:block;}
+@media(max-width:700px){.memory-room{padding:16px 12px 22px;border-radius:20px;}.memory-board{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;}.memory-back{font-size:18px;}.memory-bar{gap:14px;}}
+</style>
+
 </head>
 <body>
 <div id="authGate">
@@ -1123,6 +1190,8 @@ img{cursor:zoom-in;}
 				<li><a href="#home" class="nav-link active" data-target="home">首页</a></li>
 				<li><a href="#menu" class="nav-link" data-target="menu">日常记录</a></li>
 				<li><a href="#pillow" class="nav-link" data-target="pillow">社区</a></li>
+				<li><a href="#theater" class="nav-link" data-target="theater">时光放映厅</a></li>
+				<li><a href="#game" class="nav-link" data-target="game">翻牌游戏</a></li>
 				<li><a href="#contact" class="nav-link" data-target="contact">联系我们</a></li>
 				<li><a href="#mine" class="nav-link" data-target="mine">我的</a></li>
 			</ul>
@@ -1142,6 +1211,16 @@ img{cursor:zoom-in;}
 		</div>
 	</section>
 	<section class="container">
+		<div class="days-counter" aria-label="相识天数计时器">
+			<div class="dc-label">从 2025.10.10 到今天</div>
+			<div class="dc-nums">
+				<span class="dc-num" id="dcDays">0<span class="dc-unit">天</span></span>
+				<span class="dc-num" id="dcHours">0<span class="dc-unit">时</span></span>
+				<span class="dc-num" id="dcMins">0<span class="dc-unit">分</span></span>
+				<span class="dc-num" id="dcSecs">0<span class="dc-unit">秒</span></span>
+			</div>
+			<div class="dc-text">一个把日子稳住，一个把日子照亮。</div>
+		</div>
 		<div class="section-head">
 			<h3 class="section-title">关于我们</h3>
 			<span class="section-note">一个务实，一个敏感</span>
@@ -3259,6 +3338,142 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 })();
 </script>
 
+<div class="page" id="theater">
+	<div class="pg-head"><h2>时光放映厅</h2><p>拖动时间轴，回到那一天</p></div>
+	<section class="container">
+		<div class="reel-room">
+			<div class="reel-room-top"><span>SEASONS ARCHIVE</span><span>2025 — 2026</span></div>
+			<div class="reel-screen" id="reelScreen">
+				<div class="reel-caption">
+					<div class="reel-season" id="reelSeason"></div>
+					<div class="reel-title" id="reelTitle"></div>
+					<p class="reel-desc" id="reelDesc"></p>
+				</div>
+			</div>
+			<div class="reel-timeline" id="reelTimeline"><div class="reel-progress" id="reelProgress"></div></div>
+			<div class="reel-controls">
+				<button class="reel-btn" type="button" id="reelPrev">‹ 上一幕</button>
+				<button class="reel-btn primary" type="button" id="reelPlay">▶ 自动放映</button>
+				<button class="reel-btn" type="button" id="reelNext">下一幕 ›</button>
+			</div>
+		</div>
+	</section>
+</div>
+<script>
+(function(){
+	var reels=[
+		{season:'初夏 · 初见', title:'第一次直播', date:'2025.10.10', desc:'刚因为《双程》认识，一个坐得笔直，一个紧张到接不上话，环球梦之旅从这里开始。', bg:'linear-gradient(135deg,#3a4a5a,#1c2733)'},
+		{season:'夏末 · 七夕', title:'七夕留念', date:'2026.08.19', desc:'一对对戒在桌下悄悄戴上；信里只问一句：往后的路，你陪我一起走吗？', bg:'linear-gradient(135deg,#8a4a3a,#4a2320)'},
+		{season:'秋日 · 海洋馆', title:'海底套房的一晚', date:'2026.09.01', desc:'玻璃外是水族箱，床上有毛巾折成的魔鬼鱼，两个人躺着带大家看小鱼。', bg:'linear-gradient(135deg,#2a4a6a,#14283a)'},
+		{season:'秋日 · 纪念日', title:'相识一周年', date:'2026.10.10', desc:'那晚拿出一本 1917 年的旧儿童故事书，扉页是一位母亲写给女儿的话，说要读给他听。', bg:'linear-gradient(135deg,#6a5230,#3a2c18)'},
+		{season:'冬日 · 初雪', title:'初雪时刻', date:'2026.11.08', desc:'立冬凌晨睡不着，撑一把伞去看初雪，伞被风吹歪，两个人挤在一把伞下，还吃了饺子。', bg:'linear-gradient(135deg,#4a5560,#22282e)'}
+	];
+	var screen=document.getElementById('reelScreen');
+	var seasonEl=document.getElementById('reelSeason'), titleEl=document.getElementById('reelTitle'), descEl=document.getElementById('reelDesc');
+	var timeline=document.getElementById('reelTimeline'), progress=document.getElementById('reelProgress');
+	var prevBtn=document.getElementById('reelPrev'), nextBtn=document.getElementById('reelNext'), playBtn=document.getElementById('reelPlay');
+	if(!screen||!timeline||!prevBtn) return;
+	var nodes=[];
+	reels.forEach(function(r,i){
+		var node=document.createElement('button');
+		node.type='button'; node.className='reel-node'; node.textContent=r.date.slice(5);
+		node.addEventListener('click',function(){ stopAuto(); goTo(i); });
+		timeline.appendChild(node); nodes.push(node);
+	});
+	var current=0, autoTimer=null;
+	function render(){
+		var r=reels[current];
+		screen.style.background=r.bg;
+		nodes.forEach(function(el,i){ el.classList.toggle('active',i===current); });
+		seasonEl.textContent=r.season; titleEl.textContent=r.title; descEl.textContent=r.desc;
+		progress.style.width=(reels.length>1?(current/(reels.length-1))*100:0)+'%';
+	}
+	function goTo(i){ current=(i+reels.length)%reels.length; render(); }
+	function stopAuto(){ if(autoTimer){clearInterval(autoTimer);autoTimer=null;} playBtn.textContent='▶ 自动放映'; }
+	function startAuto(){ stopAuto(); autoTimer=setInterval(function(){goTo(current+1);},6000); playBtn.textContent='⏸ 暂停放映'; }
+	prevBtn.addEventListener('click',function(){ stopAuto(); goTo(current-1); });
+	nextBtn.addEventListener('click',function(){ stopAuto(); goTo(current+1); });
+	playBtn.addEventListener('click',function(){ autoTimer?stopAuto():startAuto(); });
+	document.addEventListener('keydown',function(e){
+		if(!document.getElementById('theater').classList.contains('active')) return;
+		if(e.key==='ArrowLeft'){ stopAuto(); goTo(current-1); }
+		if(e.key==='ArrowRight'){ stopAuto(); goTo(current+1); }
+	});
+	render();
+})();
+</script>
+<div class="page" id="game">
+	<div class="pg-head"><h2>翻牌游戏</h2><p>把散落的回忆，一张张找回来</p></div>
+	<section class="container">
+		<div class="memory-room">
+			<div class="memory-bar">
+				<span>步数 <b id="memoryMoves">0</b></span>
+				<span>已配对 <b id="memoryMatched">0</b> / 9</span>
+				<button class="memory-restart" type="button" id="memoryRestart">重新洗牌</button>
+			</div>
+			<div class="memory-board" id="memoryBoard"></div>
+			<div class="memory-tip" id="memoryTip">先记住每张照片的位置，<span id="memoryCount">5</span> 秒后开始配对…</div>
+			<div class="memory-win" id="memoryWin">🎉 全部配对成功，你把回忆都找齐啦！</div>
+		</div>
+	</section>
+</div>
+<script>
+(function(){
+	var IMG_BASE='img/';
+	var PAIR_FILES=["z12.jpg.jpg","z11.jpg.jpg","v11-2.jpg.jpg","home-banner1.jpg.jpg","menu-banner12.jpg.jpg","feature-banner13.jpg.jpg","contact-banner11.jpg.jpg","z1.jpg.jpg","z2.jpg.jpg"];
+	var PAIRS=PAIR_FILES.map(function(f,i){ return {id:i, img:/^https?:\/\//.test(f)?f:IMG_BASE+f}; });
+	var PREVIEW_MS=5000;
+	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), winEl=document.getElementById('memoryWin'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
+	if(!board||!restartBtn) return;
+	var firstCard=null, lockBoard=false, matchedCount=0, moves=0, previewTimer=null, countTimer=null;
+	function shuffle(arr){ for(var i=arr.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=arr[i];arr[i]=arr[j];arr[j]=t;} return arr; }
+	function build(){
+		clearTimeout(previewTimer); clearInterval(countTimer);
+		var deck=shuffle(PAIRS.concat(PAIRS).map(function(c){return {id:c.id,img:c.img};}));
+		board.innerHTML=''; firstCard=null; lockBoard=false; matchedCount=0; moves=0;
+		movesEl.textContent='0'; matchedEl.textContent='0'; winEl.classList.remove('show');
+		deck.forEach(function(card){
+			var el=document.createElement('div');
+			el.className='memory-card'; el.dataset.id=card.id;
+			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front"><img class="no-zoom" loading="lazy" src="'+card.img+'" alt="配对照片" draggable="false"></div></div>';
+			el.addEventListener('click',function(){ flip(el); });
+			board.appendChild(el);
+		});
+		startPreview();
+	}
+	function startPreview(){
+		var cards=board.querySelectorAll('.memory-card');
+		lockBoard=true; tip.classList.add('show');
+		[].forEach.call(cards,function(c){c.classList.add('flipped');});
+		var remain=Math.round(PREVIEW_MS/1000); countEl.textContent=remain;
+		countTimer=setInterval(function(){ remain--; if(remain>0) countEl.textContent=remain; else clearInterval(countTimer); },1000);
+		previewTimer=setTimeout(function(){
+			clearInterval(countTimer); [].forEach.call(cards,function(c){c.classList.remove('flipped');});
+			tip.classList.remove('show'); lockBoard=false;
+		},PREVIEW_MS);
+	}
+	function flip(el){
+		if(lockBoard||el===firstCard||el.classList.contains('matched')||el.classList.contains('flipped')) return;
+		el.classList.add('flipped');
+		if(!firstCard){ firstCard=el; return; }
+		moves++; movesEl.textContent=moves;
+		var second=el;
+		if(firstCard.dataset.id===second.dataset.id){
+			firstCard.classList.add('matched'); second.classList.add('matched');
+			firstCard=null; matchedCount++; matchedEl.textContent=matchedCount;
+			if(matchedCount===PAIRS.length){ setTimeout(function(){winEl.classList.add('show');},400); }
+		}else{
+			lockBoard=true; var a=firstCard,b=second;
+			setTimeout(function(){a.classList.remove('flipped');b.classList.remove('flipped');firstCard=null;lockBoard=false;},800);
+		}
+	}
+	restartBtn.addEventListener('click',build);
+	var started=false;
+	function startOnce(){ if(started) return; started=true; build(); }
+	window.addEventListener('zt:page',function(e){ if(e.detail==='game') startOnce(); });
+	if(document.getElementById('game').classList.contains('active')) startOnce();
+})();
+</script>
 <div class="page" id="contact">
 	<div class="pg-head"><h2>联系我们</h2><p>留言、合作、想说的话都放这儿</p></div>
 	<section class="banner">
@@ -4235,6 +4450,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		pages.forEach(function (p) { p.classList.remove("active"); });
 		var target = document.getElementById(targetId);
 		if (target) { target.classList.add("active"); }
+		try { window.dispatchEvent(new CustomEvent("zt:page", {detail: targetId})); } catch(err) {}
 		if (keepHash !== false) { setHash(targetId); }
 	}
 
@@ -5815,6 +6031,24 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		});
 		b.appendChild(btn);
 	});
+})();
+</script>
+<script>
+(function(){
+	var START='2025-10-10T00:00:00+08:00';
+	var start=new Date(START);
+	var dEl=document.getElementById('dcDays'),hEl=document.getElementById('dcHours'),mEl=document.getElementById('dcMins'),sEl=document.getElementById('dcSecs');
+	if(!dEl) return;
+	function pad(n){return n<10?'0'+n:''+n;}
+	function tick(){
+		var diff=Date.now()-start.getTime(); if(diff<0) diff=0;
+		var days=Math.floor(diff/86400000),hrs=Math.floor(diff%86400000/3600000),mins=Math.floor(diff%3600000/60000),secs=Math.floor(diff%60000/1000);
+		dEl.innerHTML=days+'<span class="dc-unit">天</span>';
+		hEl.innerHTML=pad(hrs)+'<span class="dc-unit">时</span>';
+		mEl.innerHTML=pad(mins)+'<span class="dc-unit">分</span>';
+		sEl.innerHTML=pad(secs)+'<span class="dc-unit">秒</span>';
+	}
+	tick(); setInterval(tick,1000);
 })();
 </script>
 </body>

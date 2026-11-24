@@ -6606,6 +6606,13 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		var frame = document.querySelector("#" + id + " iframe[data-src]");
 		if (frame && !frame.getAttribute("src")) {
 			frame.setAttribute("src", frame.getAttribute("data-src"));
+			/* 游戏页自己已经有加载提示：2 秒后先露出画面，避免父页面一直盖着奶油色遮罩 */
+			setTimeout(function(){
+				if (frame.classList.contains("loaded")) return;
+				frame.classList.add("loaded");
+				var loading = document.getElementById(id + "Loading");
+				if (loading) loading.classList.add("hide");
+			}, 2200);
 		}
 	}
 	var parkourFrame = document.querySelector("#parkour iframe[data-src]");

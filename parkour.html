@@ -260,28 +260,37 @@ async function fetchText(url,timeout=18000){
   }
 }
 let THREE = null;
-try{
-  const btn=document.getElementById('btnStart');
-  const parts=new Array(6);
-  let done=0;
-  await Promise.all([1,2,3,4,5,6].map(async i=>{
-    parts[i-1]=await fetchText('./three-chunks/part-'+i+'.js?v=1124f');
-    done++;
-    if(btn) btn.textContent='3D 引擎加载中… '+done+'/6';
-  }));
-  const code=parts.join('');
+const btnStartEl=document.getElementById('btnStart');
+function moduleFromText(code){
   if(code.length<500000) throw new Error('bundle incomplete: '+code.length);
   const blobUrl=URL.createObjectURL(new Blob([code],{type:'application/javascript'}));
-  THREE=await import(blobUrl);
-  URL.revokeObjectURL(blobUrl);
+  return import(blobUrl).finally(()=>URL.revokeObjectURL(blobUrl));
+}
+try{
+  // 主通道：Supabase 免费公共存储，国内访问比 GitHub Pages 稳定
+  if(btnStartEl) btnStartEl.textContent='3D 引擎加载中…';
+  const code=await fetchText('https://yzzktnkfprpystxbhnln.supabase.co/storage/v1/object/public/wall/games/three-parkour.min.js?v=3',20000);
+  THREE=await moduleFromText(code);
 }catch(err){
-  console.warn('本地分块加载失败，尝试 CDN：',err);
-  for (const url of [
-    'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js',
-    'https://unpkg.com/three@0.160.0/build/three.module.min.js'
-  ]) {
-    try { THREE = await import(url); break; }
-    catch(e) { console.warn('3D 引擎加载失败：', url, e); }
+  console.warn('云端 3D 引擎加载失败，改用站内分块：',err);
+  try{
+    const parts=new Array(6);
+    let done=0;
+    await Promise.all([1,2,3,4,5,6].map(async i=>{
+      parts[i-1]=await fetchText('./three-chunks/part-'+i+'.js?v=1124g');
+      done++;
+      if(btnStartEl) btnStartEl.textContent='3D 引擎加载中… '+done+'/6';
+    }));
+    THREE=await moduleFromText(parts.join(''));
+  }catch(err2){
+    console.warn('站内分块也失败，尝试 CDN：',err2);
+    for (const url of [
+      'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js',
+      'https://unpkg.com/three@0.160.0/build/three.module.min.js'
+    ]) {
+      try { THREE = await import(url); break; }
+      catch(e) { console.warn('3D 引擎加载失败：', url, e); }
+    }
   }
 }
 if (!THREE) {

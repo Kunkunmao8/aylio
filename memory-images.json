@@ -1,0 +1,15 @@
+{
+  "version": "1126a",
+  "note": "换图只改这个文件：把 src 换成新图片路径，t 换成卡面短标题，保持 9 组即可，无需改 index.html。",
+  "images": [
+    { "src": "img/memory/01-chujian.jpg", "t": "初见" },
+    { "src": "img/memory/02-zhuguang.jpg", "t": "烛光" },
+    { "src": "img/memory/03-bingjian.jpg", "t": "并肩" },
+    { "src": "img/memory/04-tongkuang.jpg", "t": "同框" },
+    { "src": "img/memory/05-dongye.jpg", "t": "冬夜" },
+    { "src": "img/memory/06-xiaoju.jpg", "t": "小聚" },
+    { "src": "img/memory/07-baobao.jpg", "t": "抱抱熊" },
+    { "src": "img/memory/08-yiqi.jpg", "t": "一起" },
+    { "src": "img/memory/09-danao.jpg", "t": "打闹" }
+  ]
+}

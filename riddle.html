@@ -175,8 +175,9 @@ html,body{background:#FBF3E9!important;color:#4A2E21!important;}
 
 <script type="module">
 let THREE;
-try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'); }
-catch(e) { THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js'); }
+try { THREE = await import('./three.module.min.js'); }
+catch(e1) { try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'); }
+catch(e2) { THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js'); } }
 
 const SAVE_KEY='aylio_hall_v1';
 const state={ done:{vault:false,cipher:false,hanzi:false}, mounted:null, cur:null };

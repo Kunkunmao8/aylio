@@ -1050,14 +1050,16 @@ GAMES.nono=function(stage, controls, api, level){
   let solved=false, hints=0, mode=null;
 
   const wrap=document.createElement('div'); wrap.className='nonowrap';
+  wrap.style.cssText='max-width:100%;overflow-x:auto;display:flex;justify-content:center;';
   stage.appendChild(wrap);
   const canvas=document.createElement('canvas');
   canvas.style.cssText='display:block;border-radius:14px;touch-action:none;cursor:pointer;';
   wrap.appendChild(canvas);
 
   const K=Math.min(devicePixelRatio,2);
-  const LW=52, TH=58, PAD=3;
-  const S=Math.max(280, Math.min(stage.clientWidth||360, 400));
+  const maxRC=Math.max(1,...RC.map(x=>x.length)), maxCC=Math.max(1,...CC.map(x=>x.length));
+  const LW=Math.max(52, 10+maxRC*9), TH=Math.max(58, 12+maxCC*12), PAD=3;
+  const S=Math.max(340, Math.min(stage.clientWidth||360, 440));
   const cw=Math.floor((S-LW-8)/N);
   const W=LW+N*cw+6, H=TH+N*cw+6;
   canvas.width=Math.round(W*K); canvas.height=Math.round(H*K);
@@ -1077,16 +1079,16 @@ GAMES.nono=function(stage, controls, api, level){
   function draw(){
     ctx.setTransform(K,0,0,K,0,0);
     ctx.clearRect(0,0,W,H);
-    ctx.fillStyle='rgba(255,255,255,0.028)'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#FFF9EF'; ctx.fillRect(0,0,W,H); ctx.strokeStyle='#D8B893'; ctx.lineWidth=1; ctx.strokeRect(0.5,0.5,W-1,H-1);
     ctx.textBaseline='middle';
-    ctx.font='700 11px ui-monospace,Menlo,monospace';
+    ctx.font='800 12px ui-monospace,Menlo,monospace';
     for(let r=0;r<N;r++){
-      ctx.fillStyle=rowDone(r)?'#efc264':'rgba(176,192,215,.85)';
+      ctx.fillStyle=rowDone(r)?'#8E4A2A':'#5A3B26';
       ctx.textAlign='right';
       ctx.fillText(RC[r].join(' '), gx-6, gy+r*cw+cw/2);
     }
     for(let c=0;c<N;c++){
-      ctx.fillStyle=colDone(c)?'#efc264':'rgba(176,192,215,.85)';
+      ctx.fillStyle=colDone(c)?'#8E4A2A':'#5A3B26';
       ctx.textAlign='center';
       CC[c].forEach((n,i)=>ctx.fillText(String(n), gx+c*cw+cw/2, gy-10-((CC[c].length-1-i)*12)));
     }
@@ -1097,17 +1099,17 @@ GAMES.nono=function(stage, controls, api, level){
         g.addColorStop(0,'#f3d38c'); g.addColorStop(1,'#d8a441');
         ctx.fillStyle=g; ctx.fillRect(x+1,y+1,cw-2,cw-2);
       } else if(st===2){
-        ctx.strokeStyle='rgba(120,140,170,.75)'; ctx.lineWidth=1.2;
+        ctx.strokeStyle='#A36B4A'; ctx.lineWidth=1.6;
         ctx.beginPath(); ctx.moveTo(x+3,y+3); ctx.lineTo(x+cw-3,y+cw-3);
         ctx.moveTo(x+cw-3,y+3); ctx.lineTo(x+3,y+cw-3); ctx.stroke();
       } else {
-        ctx.fillStyle='rgba(255,255,255,0.05)'; ctx.fillRect(x+1,y+1,cw-2,cw-2);
+        ctx.fillStyle=((r+c)%2?'#F6E7D2':'#FDF3E3'); ctx.fillRect(x+1,y+1,cw-2,cw-2); ctx.strokeStyle='#D8B893'; ctx.lineWidth=1; ctx.strokeRect(x+1.5,y+1.5,cw-3,cw-3);
       }
     }
     for(let i=0;i<=N;i++){
       const thick=(i%(N/2)===0);
-      ctx.strokeStyle=thick?'rgba(232,194,100,.55)':'rgba(255,255,255,.13)';
-      ctx.lineWidth=thick?2:1;
+      ctx.strokeStyle=thick?'#B45B33':'#D8B893';
+      ctx.lineWidth=thick?2.2:1;
       ctx.beginPath(); ctx.moveTo(gx+i*cw,gy-2); ctx.lineTo(gx+i*cw,gy+N*cw+2); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(gx-2,gy+i*cw); ctx.lineTo(gx+N*cw+2,gy+i*cw); ctx.stroke();
     }
@@ -1326,22 +1328,35 @@ GAMES.gravity=function(stage, controls, api, level){
     const p=at(r,c);
     if(walls[r][c]){
       const g1=new THREE.BoxGeometry(0.92,0.62,0.92);
-      const m1=new THREE.MeshStandardMaterial({color:0x3a4c72,roughness:.8,metalness:.2,emissive:0x0a1326,emissiveIntensity:.9});
+      const m1=new THREE.MeshStandardMaterial({color:0x7088AD,roughness:.65,metalness:.2,emissive:0x1A2A44,emissiveIntensity:1.1});
       const m=new THREE.Mesh(g1,m1); m.position.set(p.x,0.31,p.z); board.add(m);
       const g2=new THREE.BoxGeometry(0.92,0.05,0.92);
-      const m2=new THREE.MeshStandardMaterial({color:0x7d90b3,roughness:.55,emissive:0x16233d,emissiveIntensity:1});
+      const m2=new THREE.MeshStandardMaterial({color:0xC6D9EC,roughness:.45,emissive:0x24395A,emissiveIntensity:1.2});
       const cap=new THREE.Mesh(g2,m2); cap.position.set(p.x,0.63,p.z); board.add(cap);
       geos.push(g1,g2); mats.push(m1,m2);
     } else {
       const g1=new THREE.BoxGeometry(0.9,0.1,0.9);
-      const m1=new THREE.MeshStandardMaterial({color:(r+c)%2?0x1c2b46:0x182440,roughness:.95});
+      const m1=new THREE.MeshStandardMaterial({color:(r+c)%2?0x3E5A82:0x2C4264,roughness:.9});
       const m=new THREE.Mesh(g1,m1); m.position.set(p.x,-0.05,p.z); board.add(m);
       const g2=new THREE.CircleGeometry(0.055,10);
-      const m2=new THREE.MeshBasicMaterial({color:0x3f6295,transparent:true,opacity:.75});
+      const m2=new THREE.MeshBasicMaterial({color:0x9CC6EF,transparent:true,opacity:.9});
       const dot=new THREE.Mesh(g2,m2); dot.rotation.x=-Math.PI/2; dot.position.set(p.x,0.001,p.z); board.add(dot);
       geos.push(g1,g2); mats.push(m1,m2);
     }
   }
+  // 最后一关的地板网格线：让每一格边界都能看清
+  const gridPts=[];
+  const half=(n-1)/2+0.5;
+  for(let i=0;i<=n;i++){
+    const q=-half+i;
+    gridPts.push(new THREE.Vector3(q,0.012,-half), new THREE.Vector3(q,0.012,half));
+    gridPts.push(new THREE.Vector3(-half,0.012,q), new THREE.Vector3(half,0.012,q));
+  }
+  const gridGeo=new THREE.BufferGeometry().setFromPoints(gridPts);
+  const gridMat=new THREE.LineBasicMaterial({color:0x9EC3E8,transparent:true,opacity:.55});
+  const gridLines=new THREE.LineSegments(gridGeo,gridMat);
+  board.add(gridLines); geos.push(gridGeo); mats.push(gridMat);
+
   const holeRings=[];
   const ringGeos=[];
   holes.forEach(h=>{

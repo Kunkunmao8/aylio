@@ -40,7 +40,7 @@
   .card .ic{width:52px;height:52px;border-radius:14px;background:radial-gradient(circle at 30% 25%,#2a3a56,#131c2c);
     display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(232,180,74,.25);flex:0 0 auto;}
   .card h3{font-size:15px;letter-spacing:1px;margin-bottom:5px;}
-  .card p{font-size:11.5px;line-height:1.7;color:#7A5B47;}
+  .card p{font-size:11.5px;line-height:1.7;color:#9fabc2;}
   .card .st{margin-left:auto;font-size:10px;color:var(--gold);text-align:right;flex:0 0 auto;letter-spacing:1px;}
   .card .st i{display:block;width:8px;height:8px;border-radius:50%;background:rgba(232,180,74,.25);margin:6px 0 0 auto;}
   .card .st i.on{background:var(--gold);box-shadow:0 0 8px rgba(232,180,74,.6);}
@@ -49,7 +49,7 @@
   .playhead{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--dim);letter-spacing:1px;flex:0 0 auto;}
   .playhead button{background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;font-family:inherit;padding:4px 0;}
   .h3{font-size:18px;letter-spacing:1.5px;margin:12px 0 6px;flex:0 0 auto;}
-  .sub{font-size:12px;line-height:1.9;color:#7A5B47;margin-bottom:12px;flex:0 0 auto;}
+  .sub{font-size:12px;line-height:1.9;color:#9fc7d2;margin-bottom:12px;flex:0 0 auto;}
   .stagebox{position:relative;width:100%;display:flex;justify-content:center;flex:0 0 auto;}
   .controls{margin-top:12px;display:flex;flex-direction:column;gap:9px;align-items:center;flex:0 0 auto;}
   .row{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;align-items:center;width:100%;}
@@ -81,23 +81,37 @@
 
   footer{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;}
 </style>
+
 <style id="aylio-cream">
 :root{--ink:#FBF3E9;--ink2:#F4E3D0;--gold:#B45B33;--gold2:#8E4A2A;--cream:#4A2E21;--dim:#8A6753;--cyan:#A9532D;--red:#A7412E;--green:#6F7D4E;}
 html,body{background:#FBF3E9!important;color:#4A2E21!important;}
 .stagewrap,.wrap{max-width:100%!important;}
 .stagebox canvas{filter:brightness(1.06) sepia(.12) saturate(1.02);}
+.topbar,.topbar button,.playhead,.playhead button,footer{color:#8A6753!important;}
+.menuhead h1,.h3,.card h3,.fxcard h4{color:#4A2E21!important;}
+.menuhead h1 em{color:#B45B33!important;}
+.menuhead p{color:#8A6753!important;}
+.menuhead .seal{border-color:rgba(180,91,51,.5)!important;color:#B45B33!important;box-shadow:0 0 24px rgba(180,91,51,.16) inset!important;}
+.menuhead .seal::after{border-color:rgba(180,91,51,.22)!important;}
 .hintline,.sub,.card p,.cover .desc,.story .lines,.fxcard p{color:#5C4030!important;}
 .story .lines p.dim{color:#8A6753!important;}
 .legend span,.tab{color:#7A5B47!important;}
 .screen{background:radial-gradient(ellipse at 20% 0%,rgba(214,139,93,.12),transparent 55%),radial-gradient(ellipse at 90% 90%,rgba(180,91,51,.06),transparent 50%),linear-gradient(180deg,#FFF9F1 0%,#F5E6D4 100%)!important;}
 .fx{background:rgba(74,46,33,.45)!important;}
 .fxcard{background:linear-gradient(180deg,#FFF9F0,#F3E0CB)!important;border-color:#D9B48C!important;box-shadow:0 24px 60px rgba(90,45,20,.18)!important;}
+.fxcard .paper{background:linear-gradient(180deg,#FFF8EC,#EEDCC4)!important;color:#3F2A1A!important;border-color:#DCC09B!important;}
 .bigbtn,.cbtn.primary{background:linear-gradient(180deg,#D68B5D,#B45B33)!important;color:#FFF9F3!important;box-shadow:0 8px 20px rgba(180,91,51,.22)!important;}
 .cbtn,.bigbtn.ghost{background:rgba(180,91,51,.08)!important;border-color:rgba(180,91,51,.35)!important;color:#4A2E21!important;box-shadow:none!important;}
 .nocell{background:rgba(122,75,48,.08)!important;color:#8A6753!important;}
 .nocell.cross{color:#B49A83!important;}
 .card{background:linear-gradient(135deg,rgba(214,139,93,.14),rgba(255,249,241,.82))!important;border-color:rgba(180,91,51,.24)!important;}
-.card .ic{background:radial-gradient(circle at 30% 25%,#FFF4E5,#EBCDB2)!important;border-color:rgba(180,91,51,.28)!important;}
+.card .ic{background:radial-gradient(circle at 30% 25%,#FFF4E5,#EBCDB2)!important;border-color:rgba(180,91,51,.28)!important;color:#9A4B28!important;}
+.card .st{color:#B45B33!important;}
+.card .st i{background:rgba(180,91,51,.25)!important;}
+.card .st i.on{background:#B45B33!important;box-shadow:0 0 8px rgba(180,91,51,.55)!important;}
+.tip{color:#9A5532!important;}
+.tip.bad{color:#A7412E!important;}
+footer{color:#A98268!important;}
 </style>
 </head>
 <body>
@@ -175,7 +189,7 @@ html,body{background:#FBF3E9!important;color:#4A2E21!important;}
 
 <script type="module">
 let THREE;
-try { THREE = await import('./three.module.min.js'); }
+try { THREE = await import('./three.full.module.js'); }
 catch(e1) { try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'); }
 catch(e2) { THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js'); } }
 
@@ -237,10 +251,12 @@ const HINTS={
 };
 
 function openGame(game){
+  if(!GAMES[game]){ setTip('还在加载，等一两秒再点。',true); return; }
   state.cur=game;
   playTag.textContent=TAGS[game];
   playTitle.textContent={vault:'旧物仓',cipher:'破译台',hanzi:'字谜锁'}[game];
   playHint.textContent=HINTS[game];
+  playHint.style.display=(game==='vault')?'none':'';
   playStep.textContent='';
   stage.innerHTML=''; controls.innerHTML=''; setTip('');
   show(scPlay); scPlay.scrollTop=0;
@@ -320,7 +336,7 @@ GAMES.vault=function(stage, controls, api){
   const sndBad  =()=>{ tone(150,.16,'square',.12); tone(110,.2,'square',.12,.12); if(navigator.vibrate) navigator.vibrate(90); };
   const sndGood =()=>{ tone(523,.14,'triangle',.16); tone(659,.14,'triangle',.16,.1); tone(784,.22,'triangle',.16,.2); };
 
-  const S=Math.max(290, Math.min(stage.clientWidth||380, 560));
+  const S=Math.max(290, Math.min(stage.clientWidth||560, 560));
   const H=Math.round(S*0.9);
   const host=document.createElement('div');
   host.style.cssText='position:relative;width:'+S+'px;height:'+H+'px;border-radius:16px;overflow:hidden;border:1px solid rgba(232,180,74,.22);background:#2A1B12;box-shadow:inset 0 0 60px rgba(40,20,10,.55);';
@@ -430,29 +446,82 @@ GAMES.vault=function(stage, controls, api){
   });
   keep(sideG,woodM); keep(backG2,woodDarkM);
 
-  const bookCols=[0x8f3b34,0x2f5d6b,0x7a6a2f,0x4e3a6b,0x35604a,0xa8542f,0x25405e,0x6d4560];
+  const bookCols=[0x6b3a32,0x2d4650,0x74603a,0x443159,0x304c3d,0x83462a,0x283c50,0x554050];
   const books=[];
+  function bookLabel(hex, worn){
+    const c=document.createElement('canvas'); c.width=72; c.height=240;
+    const x=c.getContext('2d');
+    const base='#'+hex.toString(16).padStart(6,'0');
+    x.fillStyle=base; x.fillRect(0,0,72,240);
+    // 书脊竖向明暗 + 做旧
+    const gd=x.createLinearGradient(0,0,72,0);
+    gd.addColorStop(0,'rgba(0,0,0,.55)'); gd.addColorStop(.22,'rgba(255,255,255,.10)');
+    gd.addColorStop(.55,'rgba(0,0,0,.12)'); gd.addColorStop(1,'rgba(0,0,0,.62)');
+    x.fillStyle=gd; x.fillRect(0,0,72,240);
+    for(let k=0;k<26;k++){
+      x.fillStyle='rgba(0,0,0,'+(0.03+Math.random()*0.07)+')';
+      x.fillRect(Math.random()*72,Math.random()*240,1+Math.random()*3,2+Math.random()*8);
+    }
+    // 磨损的边
+    x.fillStyle='rgba(240,230,205,.18)'; x.fillRect(0,0,72,3); x.fillRect(0,237,72,3);
+    // 描金横条
+    x.fillStyle='rgba(220,180,96,.62)'; x.fillRect(5,30,62,3); x.fillRect(5,206,62,3);
+    // 书名线条
+    x.fillStyle='rgba(240,228,190,.6)';
+    x.fillRect(30,86,12,2); x.fillRect(26,94,20,2); x.fillRect(32,102,8,2);
+    if(worn){
+      x.fillStyle='rgba(30,20,12,.35)'; x.beginPath(); x.moveTo(72,168); x.lineTo(52,186); x.lineTo(72,196); x.fill();
+      x.strokeStyle='rgba(160,40,30,.75)'; x.lineWidth=3; x.strokeRect(12,214,48,18);
+      x.fillStyle='rgba(170,44,32,.8)'; x.font='700 12px sans-serif'; x.fillText('藏',24,228);
+    }
+    const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+  }
   [0.11,0.69,1.27,1.85].forEach((y,row)=>{
     let x=-SW/2+0.1;
     const n=6+((row*3)%3);
     for(let i=0;i<n;i++){
-      const bw=0.055+rndInt(Math.random,0,1)*0.03;
-      const bh=0.34+rndInt(Math.random,0,1)*0.12;
+      const bw=0.058+rndInt(Math.random,0,1)*0.03;
+      const bh=0.33+rndInt(Math.random,0,1)*0.13;
       if(x+bw>SW/2-0.08) break;
-      const g=new THREE.BoxGeometry(bw,bh,0.3);
-      const m=std({color:bookCols[(row*3+i)%bookCols.length],roughness:.82});
+      const g=new THREE.BoxGeometry(bw,bh,0.34);
+      const m=std({color:bookCols[(row*3+i)%bookCols.length],roughness:.86});
       const b=new THREE.Mesh(g,m);
-      b.position.set(x+bw/2,y+bh/2+0.024,0.06);
-      if(i%5===4) b.rotation.z=0.2;
+      const zOff=0.03+Math.random()*0.06;
+      b.position.set(x+bw/2,y+bh/2+0.024,0.06+zOff-0.05);
+      if(i%5===4) b.rotation.z=0.18;
+      b.rotation.y=(Math.random()-.5)*0.05;
       b.castShadow=true;
       b.userData.sub={g:'shelf', kind:'book', target:false, bookId:books.length};
       shelfGroup.add(b); keep(g,m);
-      books.push({mesh:b, out:0, target:false, baseZ:0.06});
+      // 书脊贴纸（做旧）
+      const lblG=new THREE.PlaneGeometry(bw*0.94,bh*0.94);
+      const lblM=std({map:bookLabel(bookCols[(row*3+i)%bookCols.length],false),roughness:.8});
+      const lbl=new THREE.Mesh(lblG,lblM); lbl.position.set(0,0,0.171); b.add(lbl);
+      keep(lblG,lblM);
+      const hitG=new THREE.BoxGeometry(Math.max(0.1,bw+0.02),bh+0.02,0.46);
+      const hitM=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false});
+      const hit=new THREE.Mesh(hitG,hitM); hit.position.set(x+bw/2,y+bh/2+0.024,0.1);
+      hit.userData.sub={g:'shelf', kind:'book', target:false, bookId:books.length};
+      shelfGroup.add(hit); keep(hitG,hitM);
+      books.push({mesh:b, out:0, target:false, baseZ:0.06, pulled:false, hit, bh, lbl, row, bw, baseY:b.rotation.y});
       x+=bw+0.008;
     }
   });
-  const targetBook=books[Math.floor(Math.random()*books.length)];
+  const cands=books.filter(b=>b.row===1||b.row===2);
+  const targetBook=(cands.length?cands:books)[Math.floor(Math.random()*(cands.length||books.length))];
   targetBook.target=true; targetBook.mesh.userData.sub.target=true;
+  targetBook.hit.userData.sub.target=true;
+  // 目标书：更旧的书脊 + 露在外面的纸片
+  targetBook.lbl.material.map=bookLabel(0x7d5c44,true);
+  targetBook.lbl.material.needsUpdate=true;
+  targetBook.mesh.material.color.setHex(0x8a6a52);
+  const peekG=new THREE.BoxGeometry(0.12,0.14,0.008);
+  const peekM=std({color:0xf0e4c8,roughness:.92,emissive:0xfff3d8,emissiveIntensity:.45});
+  const peek=new THREE.Mesh(peekG,peekM);
+  peek.position.set(targetBook.bw/2-0.006,0.055,0.192);
+  peek.rotation.set(-0.1,0.26,0.32);
+  peek.userData.sub={g:'shelf', kind:'book', target:targetBook.mesh.userData.sub.bookId, bookId:targetBook.mesh.userData.sub.bookId};
+  targetBook.mesh.add(peek); keep(peekG,peekM);
   // 目标书里夹着的纸条（抽出后可见）
   const slipG=new THREE.PlaneGeometry(0.16,0.11);
   const slipM=std({color:0xe8dfc9,roughness:.95,side:THREE.DoubleSide});
@@ -471,29 +540,42 @@ GAMES.vault=function(stage, controls, api){
   });
   keep(topG,topM); keep(legG,null);
   // 抽屉（可拉开）
-  const drawerGroup=new THREE.Group(); drawerGroup.position.set(0,0.53,0.44); deskGroup.add(drawerGroup);
+  const drawerGroup=new THREE.Group(); drawerGroup.position.set(0,0.52,0.2); deskGroup.add(drawerGroup);
   const drawerM=std({map:woodTex,color:0xb98f5c,roughness:.7});
-  const drawerG=new THREE.BoxGeometry(0.62,0.23,0.06);
-  const drawerFront=new THREE.Mesh(drawerG,drawerM); drawerFront.castShadow=true; drawerGroup.add(drawerFront);
+  // 抽屉内胆：底板 + 左右 + 后壁，拉开后能看到里面的东西
+  const trayM=std({map:woodTex,color:0xc9a06a,roughness:.75,side:THREE.DoubleSide});
+  const trayBotG=new THREE.PlaneGeometry(0.56,0.42);
+  const trayBot=new THREE.Mesh(trayBotG,trayM); trayBot.rotation.x=-Math.PI/2; trayBot.position.set(0,-0.09,0.01);
+  drawerGroup.add(trayBot);
+  const traySideG=new THREE.BoxGeometry(0.03,0.19,0.42);
+  [-0.275,0.275].forEach(x=>{ const s=new THREE.Mesh(traySideG,drawerM); s.position.set(x,0,0.01); drawerGroup.add(s); });
+  const trayBackG=new THREE.BoxGeometry(0.56,0.19,0.03);
+  const trayBack=new THREE.Mesh(trayBackG,drawerM); trayBack.position.set(0,0,-0.2); drawerGroup.add(trayBack);
+  // 抽屉面板
+  const drawerG=new THREE.BoxGeometry(0.62,0.23,0.05);
+  const drawerFront=new THREE.Mesh(drawerG,drawerM); drawerFront.castShadow=true; drawerFront.position.set(0,0,0.22); drawerGroup.add(drawerFront);
   const knobG=new THREE.SphereGeometry(0.032,12,10);
   const knobM=std({color:0xe6c47c,roughness:.3,metalness:.85});
-  const knob=new THREE.Mesh(knobG,knobM); knob.position.set(0,0,0.05); drawerGroup.add(knob);
+  const knob=new THREE.Mesh(knobG,knobM); knob.position.set(0,0,0.26); drawerGroup.add(knob);
   drawerFront.userData.sub={g:'desk', kind:'drawer'};
   knob.userData.sub={g:'desk', kind:'drawer'};
-  keep(drawerG,drawerM); keep(knobG,knobM);
+  keep(drawerG,drawerM); keep(knobG,knobM); keep(trayBotG,trayM); keep(traySideG,drawerM); keep(trayBackG,drawerM);
   // 车票（抽屉内，拉开后可点）
-  const ticketC=document.createElement('canvas'); ticketC.width=160; ticketC.height=72;
+  const ticketC=document.createElement('canvas'); ticketC.width=180; ticketC.height=80;
   const tc=ticketC.getContext('2d');
-  tc.fillStyle='#e3d7b6'; tc.fillRect(0,0,160,72);
-  tc.strokeStyle='#7a6a45'; tc.lineWidth=2; tc.strokeRect(4,4,152,64);
-  tc.fillStyle='#5a4c30'; tc.font='600 15px ui-monospace,monospace';
-  tc.fillText('NO. 0'+lvl.data.desk.d,18,34);
-  tc.font='11px sans-serif'; tc.fillText('单程 · 旧站',18,54);
-  tc.setLineDash([4,3]); tc.beginPath(); tc.moveTo(112,8); tc.lineTo(112,64); tc.stroke();
+  tc.fillStyle='#e3d7b6'; tc.fillRect(0,0,180,80);
+  tc.strokeStyle='#7a6a45'; tc.lineWidth=2; tc.strokeRect(4,4,172,72);
+  tc.fillStyle='#5a4c30'; tc.font='600 18px ui-monospace,monospace';
+  tc.fillText('NO. 0'+lvl.data.desk.d,16,38);
+  tc.font='11px sans-serif'; tc.fillText('单程 · 旧站',16,60);
+  tc.setLineDash([4,3]); tc.beginPath(); tc.moveTo(128,8); tc.lineTo(128,72); tc.stroke();
+  tc.fillStyle='#8a3a2a'; tc.font='600 12px sans-serif'; tc.fillText('点我',142,46);
   const ticketTex=new THREE.CanvasTexture(ticketC); ticketTex.colorSpace=THREE.SRGBColorSpace;
-  const ticketG=new THREE.PlaneGeometry(0.3,0.135);
-  const ticketM=std({map:ticketTex,roughness:.9,side:THREE.DoubleSide});
-  const ticket=new THREE.Mesh(ticketG,ticketM); ticket.position.set(0,0.02,0.02); ticket.visible=false;
+  const ticketG=new THREE.PlaneGeometry(0.34,0.15);
+  const ticketM=std({map:ticketTex,roughness:.9,side:THREE.DoubleSide,emissive:0xffffff,emissiveMap:ticketTex,emissiveIntensity:.32});
+  const ticket=new THREE.Mesh(ticketG,ticketM);
+  ticket.rotation.x=-Math.PI/2; ticket.rotation.z=0.22;
+  ticket.position.set(-0.02,-0.075,0.03); ticket.visible=false;
   ticket.userData.sub={g:'desk', kind:'ticket'};
   drawerGroup.add(ticket); keep(ticketG,ticketM);
   // 台灯
@@ -539,23 +621,28 @@ GAMES.vault=function(stage, controls, api){
     }
     const ha=(lvl.time.hh%12+lvl.time.mm/60)*Math.PI/6, ma=lvl.time.mm*Math.PI/30;
     cctx.strokeStyle='#2b2417';
-    cctx.lineWidth=9; cctx.beginPath(); cctx.moveTo(100,100); cctx.lineTo(100+Math.sin(ha)*48,100-Math.cos(ha)*48); cctx.stroke();
-    cctx.lineWidth=6; cctx.beginPath(); cctx.moveTo(100,100); cctx.lineTo(100+Math.sin(ma)*70,100-Math.cos(ma)*70); cctx.stroke();
+    cctx.lineWidth=10; cctx.beginPath(); cctx.moveTo(100,100); cctx.lineTo(100+Math.sin(ha)*46,100-Math.cos(ha)*46); cctx.stroke();
+    cctx.lineWidth=7; cctx.strokeStyle='#8a3a2a'; cctx.beginPath(); cctx.moveTo(100,100); cctx.lineTo(100+Math.sin(ma)*74,100-Math.cos(ma)*74); cctx.stroke();
     cctx.fillStyle='#2b2417'; cctx.beginPath(); cctx.arc(100,100,7,0,Math.PI*2); cctx.fill();
   })();
   const clockTex=new THREE.CanvasTexture(clockC); clockTex.colorSpace=THREE.SRGBColorSpace; clockTex.anisotropy=4;
-  const faceG=new THREE.CylinderGeometry(0.34,0.34,0.05,40);
-  const faceM=std({color:0x4b3a22,roughness:.7});
-  const faceTopM=std({map:clockTex,roughness:.85});
-  const face=new THREE.Mesh(faceG,[faceM,faceTopM,faceM]);
-  face.rotation.x=Math.PI/2; face.castShadow=true;
+  // 钟面：正面朝房间的正圆（表盘 12 在正上方）
+  const faceG=new THREE.CircleGeometry(0.335,64);
+  const faceM=std({map:clockTex,roughness:.85,emissive:0xffffff,emissiveMap:clockTex,emissiveIntensity:.42});
+  const face=new THREE.Mesh(faceG,faceM);
+  face.position.z=0.012;
   face.userData.sub={g:'clock', kind:'face'};
   clockGroup.add(face);
-  const rimG=new THREE.TorusGeometry(0.355,0.028,10,40);
+  const faceBackG=new THREE.CylinderGeometry(0.335,0.335,0.06,40);
+  const faceBackM=std({color:0x3b2d1b,roughness:.7});
+  const faceBack=new THREE.Mesh(faceBackG,faceBackM); faceBack.rotation.x=Math.PI/2; faceBack.position.z=-0.02;
+  clockGroup.add(faceBack);
+  const rimG=new THREE.TorusGeometry(0.352,0.03,12,44);
   const rim=new THREE.Mesh(rimG,brassM);
+  rim.position.z=0.02;
   rim.userData.sub={g:'clock', kind:'rim'};
   clockGroup.add(rim);
-  keep(faceG,[faceM,faceTopM]); keep(rimG,null);
+  keep(faceG,faceM); keep(faceBackG,faceBackM); keep(rimG,null);
 
   /* ---------- 画框 ---------- */
   const paintC=document.createElement('canvas'); paintC.width=260; paintC.height=190;
@@ -640,6 +727,113 @@ GAMES.vault=function(stage, controls, api){
   doorGroup.add(padFace);
   keep(padG,padM); keep(padFaceG,padFaceM);
 
+
+  /* ---------- 翻开的大书（书架纸条） ---------- */
+  const pageC=document.createElement('canvas'); pageC.width=280; pageC.height=200;
+  const pctx=pageC.getContext('2d');
+  pctx.fillStyle='#f2e8d2'; pctx.fillRect(0,0,280,200);
+  pctx.strokeStyle='rgba(140,110,70,.35)'; pctx.lineWidth=2; pctx.strokeRect(10,10,260,180);
+  pctx.fillStyle='rgba(70,58,40,.9)'; pctx.font='600 18px sans-serif'; pctx.textAlign='center';
+  pctx.fillText('旧物仓清册',140,46);
+  pctx.fillStyle='#8a3a2a'; pctx.font='600 44px ui-monospace,monospace';
+  pctx.fillText('0'+lvl.data.shelf.d,140,112);
+  pctx.fillStyle='rgba(110,95,70,.9)'; pctx.font='600 14px sans-serif';
+  pctx.fillText('编号',140,140);
+  pctx.font='11px sans-serif'; pctx.fillStyle='rgba(110,95,70,.7)';
+  pctx.fillText('一九九八 · 入库',140,168);
+  const pageTex=new THREE.CanvasTexture(pageC); pageTex.colorSpace=THREE.SRGBColorSpace;
+
+  const pageRiC=document.createElement('canvas'); pageRiC.width=280; pageRiC.height=200;
+  const rctx=pageRiC.getContext('2d');
+  rctx.fillStyle='#efe5cd'; rctx.fillRect(0,0,280,200);
+  for(let i=0;i<9;i++){ rctx.fillStyle='rgba(90,80,60,.2)'; rctx.fillRect(26,36+i*17,228-(i%3)*14,2); }
+  rctx.strokeStyle='rgba(120,60,40,.55)'; rctx.lineWidth=2;
+  rctx.setLineDash([7,5]); rctx.strokeRect(60,66,160,82); rctx.setLineDash([]);
+  rctx.fillStyle='rgba(120,90,55,.7)'; rctx.font='600 12px sans-serif'; rctx.textAlign='center';
+  rctx.fillText('（夹层）',140,182);
+  const pageRiTex=new THREE.CanvasTexture(pageRiC); pageRiTex.colorSpace=THREE.SRGBColorSpace;
+
+  const bookView=new THREE.Group();
+  bookView.position.set(-0.95,1.32,1.4);
+  bookView.rotation.set(0.16,-0.05,0);
+  bookView.visible=false;
+  scene.add(bookView);
+  const coverBoxG=new THREE.BoxGeometry(1.0,0.64,0.03);
+  const coverBox=new THREE.Mesh(coverBoxG,std({map:woodTex,color:0x7b5a38,roughness:.8}));
+  coverBox.position.set(0,0,-0.03); bookView.add(coverBox);
+  const pageL=new THREE.Mesh(new THREE.PlaneGeometry(0.46,0.62),std({map:pageTex,roughness:.95,emissive:0xffffff,emissiveMap:pageTex,emissiveIntensity:.6}));
+  pageL.position.set(-0.235,0,0.001); pageL.rotation.y=-0.06; bookView.add(pageL);
+  const pageR=new THREE.Mesh(new THREE.PlaneGeometry(0.46,0.62),std({map:pageRiTex,roughness:.95,emissive:0xffffff,emissiveMap:pageRiTex,emissiveIntensity:.6}));
+  pageR.position.set(0.235,0,0.001); pageR.rotation.set(-Math.PI/2,0.06,0);
+  pageR.userData.sub={g:'book',kind:'page'};
+  bookView.add(pageR);
+  // 夹在书里的纸条
+  const slipC=document.createElement('canvas'); slipC.width=180; slipC.height=120;
+  const sctx=slipC.getContext('2d');
+  sctx.fillStyle='#f6eccf'; sctx.fillRect(0,0,180,120);
+  sctx.strokeStyle='rgba(120,90,50,.5)'; sctx.lineWidth=2; sctx.strokeRect(3,3,174,114);
+  sctx.fillStyle='#5a4526'; sctx.font='600 20px sans-serif'; sctx.textAlign='center';
+  sctx.fillText('第 '+lvl.data.shelf.p+' 位',90,56);
+  sctx.font='11px sans-serif'; sctx.fillStyle='rgba(90,70,45,.8)'; sctx.fillText('（夹在这一页）',90,84);
+  const slipTex=new THREE.CanvasTexture(slipC); slipTex.colorSpace=THREE.SRGBColorSpace;
+  const slipCardG=new THREE.PlaneGeometry(0.3,0.2);
+  const slipCard=new THREE.Mesh(slipCardG,std({map:slipTex,roughness:.92,side:THREE.DoubleSide,emissive:0xffffff,emissiveMap:slipTex,emissiveIntensity:.55}));
+  slipCard.position.set(0.235,0.0,0.012); slipCard.visible=false;
+  slipCard.userData.sub={g:'book',kind:'slip'};
+  bookView.add(slipCard);
+  const slipFloatG=new THREE.Group();
+  slipFloatG.position.set(-0.95,1.42,2.02);
+  slipFloatG.visible=false;
+  scene.add(slipFloatG);
+  const slipFloatGeo=new THREE.PlaneGeometry(0.34,0.22);
+  const slipFloatMesh=new THREE.Mesh(slipFloatGeo,std({map:slipTex,roughness:.95,emissive:0xffffff,emissiveMap:slipTex,emissiveIntensity:.6}));
+  slipFloatMesh.userData.sub={g:'slipFloat',kind:'paper'};
+  slipFloatG.add(slipFloatMesh);
+  keep(slipFloatGeo,slipFloatMesh.material);
+
+  const spineG=new THREE.BoxGeometry(0.04,0.64,0.05);
+  const spine=new THREE.Mesh(spineG,std({color:0x5f4428,roughness:.9})); spine.position.set(0,0,0.02); bookView.add(spine);
+  keep(coverBoxG,null); keep(slipCardG,slipCard.material);
+
+  /* ---------- 放大的车票 ---------- */
+  const ticketFrontC=document.createElement('canvas'); ticketFrontC.width=320; ticketFrontC.height=150;
+  const tfc=ticketFrontC.getContext('2d');
+  tfc.fillStyle='#e6d9b8'; tfc.fillRect(0,0,320,150);
+  tfc.strokeStyle='#7a6a45'; tfc.lineWidth=3; tfc.strokeRect(8,8,304,134);
+  tfc.setLineDash([6,4]); tfc.beginPath(); tfc.moveTo(226,10); tfc.lineTo(226,140); tfc.stroke(); tfc.setLineDash([]);
+  tfc.fillStyle='#4a3c22'; tfc.font='600 17px sans-serif'; tfc.fillText('旧 站 · 单 程 票',24,44);
+  tfc.font='600 44px ui-monospace,monospace'; tfc.fillText('0'+lvl.data.desk.d,24,104);
+  tfc.font='12px sans-serif'; tfc.fillStyle='#6b5a3a'; tfc.font='11px sans-serif'; tfc.fillText('NO.'+Math.floor(Math.random()*9000+1000),240,44);
+  tfc.fillText('1998.11.07',240,72); tfc.fillText('当日有效 · 无座',240,96);
+  const ticketFrontTex=new THREE.CanvasTexture(ticketFrontC); ticketFrontTex.colorSpace=THREE.SRGBColorSpace;
+  const ticketBackC=document.createElement('canvas'); ticketBackC.width=320; ticketBackC.height=150;
+  const tbc=ticketBackC.getContext('2d');
+  tbc.fillStyle='#ded0ad'; tbc.fillRect(0,0,320,150);
+  tbc.strokeStyle='rgba(120,90,50,.5)'; tbc.lineWidth=2; tbc.strokeRect(8,8,304,134);
+  tbc.save(); tbc.translate(160,78); tbc.rotate(-0.06);
+  tbc.fillStyle='rgba(50,45,35,.85)'; tbc.font='italic 600 34px "Kaiti SC",serif'; tbc.textAlign='center';
+  tbc.fillText('第 '+lvl.data.desk.p+' 位',0,6);
+  tbc.restore();
+  tbc.fillStyle='rgba(110,90,60,.75)'; tbc.font='11px sans-serif'; tbc.textAlign='center'; tbc.fillText('背面 · 铅笔字',160,128);
+  const ticketBackTex=new THREE.CanvasTexture(ticketBackC); ticketBackTex.colorSpace=THREE.SRGBColorSpace;
+
+  const ticketView=new THREE.Group();
+  ticketView.position.set(0.42,1.32,1.85);
+  ticketView.scale.set(0.92,0.92,1);
+  ticketView.rotation.set(-0.22,0,0.04);
+  ticketView.visible=false;
+  scene.add(ticketView);
+  const tvFrontG=new THREE.PlaneGeometry(0.72,0.34);
+  const tvFront=new THREE.Mesh(tvFrontG,std({map:ticketFrontTex,roughness:.9}));
+  tvFront.userData.sub={g:'ticketZoom',kind:'front'};
+  ticketView.add(tvFront);
+  const tvBackG=new THREE.PlaneGeometry(0.72,0.34);
+  const tvBack=new THREE.Mesh(tvBackG,std({map:ticketBackTex,roughness:.9}));
+  tvBack.rotation.y=Math.PI; tvBack.position.z=-0.012;
+  tvBack.userData.sub={g:'ticketZoom',kind:'back'};
+  ticketView.add(tvBack);
+  keep(tvFrontG,tvFront.material); keep(tvBackG,tvBack.material);
+
   /* ---------- 环境点缀 ---------- */
   const ceilingLampG=new THREE.ConeGeometry(0.26,0.2,20,1,true);
   const ceilingLamp=new THREE.Mesh(ceilingLampG,std({color:0x2a3242,emissive:0xffca7d,emissiveIntensity:.35,side:THREE.DoubleSide}));
@@ -664,18 +858,28 @@ GAMES.vault=function(stage, controls, api){
   /* ---------- 视图 / 飞镜 ---------- */
   const VIEWS={
     room:{pos:new THREE.Vector3(1.95,2.42,5.35), tgt:new THREE.Vector3(-0.55,1.26,-1.65)},
-    shelf:{pos:new THREE.Vector3(-1.45,1.62,-0.1), tgt:new THREE.Vector3(-2.6,1.22,-1.32)},
+    shelf:{pos:new THREE.Vector3(-1.8,1.5,0.35), tgt:new THREE.Vector3(-2.6,1.2,-1.3)},
     desk:{pos:new THREE.Vector3(0.42,1.72,2.05), tgt:new THREE.Vector3(0.42,0.7,0.18)},
     clock:{pos:new THREE.Vector3(-1.15,2.5,-1.25), tgt:new THREE.Vector3(-1.15,2.42,-3.5)},
-    painting:{pos:new THREE.Vector3(0.62,2.0,-1.25), tgt:new THREE.Vector3(0.62,1.98,-3.54)}
+    painting:{pos:new THREE.Vector3(0.62,2.0,-1.25), tgt:new THREE.Vector3(0.62,1.98,-3.54)},
+    book:{pos:new THREE.Vector3(-0.95,1.72,3.0), tgt:new THREE.Vector3(-0.95,1.32,1.4)},
+    ticket:{pos:new THREE.Vector3(0.42,1.9,3.15), tgt:new THREE.Vector3(0.42,1.32,1.85)},
+    drawer:{pos:new THREE.Vector3(0.42,1.5,1.42), tgt:new THREE.Vector3(0.42,0.56,0.36)},
+    slip:{pos:new THREE.Vector3(-0.95,1.58,2.55), tgt:new THREE.Vector3(-0.95,1.42,2.02)}
   };
+  const PARENT={book:'shelf', ticket:'desk', slip:'book'};
   let view='room', camT=1;
   const cp=VIEWS.room.pos.clone(), ct=VIEWS.room.tgt.clone();
   const cp0=cp.clone(), ct0=ct.clone();
   function gotoView(v,label){
     view=v; camT=0; cp0.copy(cp); ct0.copy(ct);
+    bookView.visible=(v==='book');
+    ticketView.visible=(v==='ticket');
+    slipFloatG.visible=(v==='slip');
+    if(v==='shelf'){ bookOpen=0; pageR.rotation.x=-Math.PI/2; slipCard.visible=false; }
     if(v==='room'){ focusBar.style.display='none'; }
-    else { focusBar.style.display='flex'; if(label) focusBarLabel.textContent=label; }
+    else { focusBar.style.display='flex'; focusBarLabel.textContent=label||TITLES[v]||''; }
+    updateActions();
   }
 
   /* ---------- 线索状态 ---------- */
@@ -686,7 +890,7 @@ GAMES.vault=function(stage, controls, api){
     painting:{flip:false, board:false, done:false}
   };
   const TITLES={shelf:'书架', desk:'写字台', clock:'墙上的钟', painting:'墙上的画框', door:'门 · 四位密码'};
-  const HOVER={shelf:'凑近书架看看', desk:'凑近写字台看看', clock:'看一下钟面', painting:'看一下画框', door:'点门去解密码'};
+  const HOVER={shelf:'凑近书架看看', desk:'凑近写字台看看', clock:'看一下钟面', painting:'看一下画框', door:'点门去解密码', book:'抽出来看看', ticket:'拿起车票', page:'看看这页', slip:'抽出纸条', ticketZoom:'翻看车票', slipFloat:'看清纸条'};
 
   function countDone(){ let n=0; for(const k in clue) if(clue[k].done) n++; return n; }
   function refreshStep(){ api.setStep('线索 '+countDone()+'/4'); }
@@ -702,40 +906,55 @@ GAMES.vault=function(stage, controls, api){
     const c=clue.shelf;
     if(sub.kind==='book'){
       const b=books[sub.bookId];
-      if(!b.target){ showFx('空书','书页上只有一道折痕，什么都没夹着。'); sndClick(); return; }
-      if(!c.book){
-        c.book=true;
-        b.out=1; sndOpen();
-        showFx('抽出的书','书被抽出来，封底的纸边上印着一个数字。书页里还夹着一张纸条。');
-        slip.visible=true;
-        slip.position.set(b.mesh.position.x,b.mesh.position.y+0.02,b.mesh.position.z+0.12);
-      } else {
-        showFx('这本书','封底纸边上印着 <b>'+lvl.data.shelf.d+'</b>。纸条上还写着一行小字。');
+      if(!b.pulled){
+        books.forEach(x=>{ if(x!==b) x.pulled=false; });
+        b.pulled=true; sndOpen();
+        api.setTip('这本书抽出来了，再点它一下翻开。');
+        return;
       }
+      if(!b.target){
+        b.pulled=false; sndClick();
+        showFx('空书','翻开来，页上只有一道折痕，什么都没夹。');
+        return;
+      }
+      c.book=true;
+      bookOpen=0.001; b.pulled=true; sndOpen();
+      gotoView('book','书架 · 翻开的书');
+      api.setTip('书页里夹着一张纸条，点它。');
+      return;
+    }
+    if(sub.kind==='page'){
+      if(!c.book){ showFx('书页','先抽出一本夹着东西的书。'); return; }
+      showFx('书页','右页角落印着一行小字：<b>编号 0'+lvl.data.shelf.d+'</b>。');
       return;
     }
     if(sub.kind==='slip'){
       if(!c.book){ showFx('纸条','纸条还夹在书里，先把那本书抽出来。'); return; }
-      c.slip=true;
-      finishClue('shelf');
-      showFx('纸条','纸条上写着：<b>第 '+lvl.data.shelf.p+' 位</b>。<br />这一格的线索齐了：数字 <b>'+lvl.data.shelf.d+'</b>，排在第 <b>'+lvl.data.shelf.p+'</b> 位。');
+      const first=!c.slip;
+      if(first){ c.slip=true; finishClue('shelf'); sndOpen(); }
+      else sndClick();
+      slipCard.visible=false;
+      gotoView('slip','纸条');
+      api.setTip('纸条捧到眼前了，看清上面的字。');
+      const text=first
+        ? '纸条上写着：<b>第 '+lvl.data.shelf.p+' 位</b>。<br />这一格齐了：编号 <b>'+lvl.data.shelf.d+'</b>，排在第 <b>'+lvl.data.shelf.p+'</b> 位。'
+        : '第 <b>'+lvl.data.shelf.p+' 位</b>。';
+      setTimeout(()=>showFx('纸条',text),first?750:150);
     }
   }
   function inspectDesk(sub){
     const c=clue.desk;
     if(sub.kind==='flavor'){ showFx('桌上的杂物','普通的纸、笔和一把旧钥匙，和这里的门锁对不上。'); sndClick(); return; }
     if(sub.kind==='drawer'){
-      if(!c.drawer){ c.drawer=true; sndOpen(); ticket.visible=true; showFx('拉开的抽屉','抽屉滑开，里面躺着一张旧车票。'); }
+      if(!c.drawer){ c.drawer=true; sndOpen(); ticket.visible=true; gotoView('drawer','写字台 · 拉开的抽屉'); showFx('拉开的抽屉','抽屉滑开，里面躺着一张旧车票，点它。'); }
       else showFx('抽屉','车票躺在抽屉底，背面好像还写了字。');
       return;
     }
     if(sub.kind==='ticket'){
       if(!c.drawer){ showFx('车票','抽屉还没拉开。'); return; }
-      if(!c.ticket){
-        c.ticket=true;
-        showFx('旧车票','车票号末位是 <b>'+lvl.data.desk.d+'</b>。翻到背面，铅笔写着：<b>第 '+lvl.data.desk.p+' 位</b>。');
-        finishClue('desk');
-      } else showFx('车票','车票号 <b>'+lvl.data.desk.d+'</b>，第 <b>'+lvl.data.desk.p+'</b> 位。');
+      c.ticket=true;
+      gotoView('ticket','写字台 · 旧车票');
+      api.setTip('票面印着末位数字，点「翻到背面」看后面的铅笔字。');
     }
   }
   function inspectClock(sub){
@@ -759,7 +978,8 @@ GAMES.vault=function(stage, controls, api){
       showFx('画的正面','两片山坡和一颗落日。画框背面好像还贴着东西。'); sndClick(); return;
     }
     if(sub.kind==='frame'){
-      if(!c.flip){ c.flip=true; sndOpen(); showFx('翻过画框','画框被翻到背面。背板角落刻着数字。'); }
+      if(!c.flip){ showFx('画框背面','画框还能翻过来，点下方「翻过来」。'); sndClick(); }
+      else showFx('画框背面','背板角落刻着 <b>'+lvl.data.painting.d+'</b>。');
       return;
     }
     if(sub.kind==='board'){
@@ -777,6 +997,7 @@ GAMES.vault=function(stage, controls, api){
   const mouse=new THREE.Vector2();
   const clock4=new THREE.Clock();
   let raf=null, hovered=null, solved=false;
+  let slipUp=0, slipUpAnim=0, tFlip=false, bookOpen=0;
 
   function pickGroup(ev){
     const rect=renderer.domElement.getBoundingClientRect();
@@ -786,7 +1007,9 @@ GAMES.vault=function(stage, controls, api){
     const hits=ray.intersectObject(scene,true);
     for(const h of hits){
       let o=h.object;
-      if(!o.visible) continue;
+      let vis=true, p=o;
+      while(p){ if(p.visible===false){ vis=false; break; } p=p.parent; }
+      if(!vis) continue;
       while(o&&!o.userData.sub) o=o.parent;
       if(o&&o.userData.sub) return o.userData.sub;
     }
@@ -814,6 +1037,9 @@ GAMES.vault=function(stage, controls, api){
     else if(sub.g==='desk') inspectDesk(sub);
     else if(sub.g==='clock') inspectClock(sub);
     else if(sub.g==='painting') inspectPainting(sub);
+    else if(sub.g==='book') inspectShelf(sub);
+    else if(sub.g==='ticketZoom') showFx('车票','点下方「翻到背面」看票背的铅笔字。');
+    else if(sub.g==='slipFloat') showFx('纸条','第 <b>'+lvl.data.shelf.p+' 位</b>。');
   });
 
   /* ---------- 特写顶栏 ---------- */
@@ -823,6 +1049,44 @@ GAMES.vault=function(stage, controls, api){
   host.appendChild(focusBar);
   const focusBarLabel=focusBar.querySelector('#focusLbl');
   focusBar.querySelector('button').onclick=()=>{ gotoView('room'); sndClick(); };
+
+  /* ---------- 特写操作按钮（翻面 / 合上） ---------- */
+  const actBar=document.createElement('div');
+  actBar.style.cssText='position:absolute;left:0;right:0;top:54px;left:0;right:0;display:flex;justify-content:center;gap:10px;z-index:6;pointer-events:none;';
+  host.appendChild(actBar);
+  function updateActions(){
+    actBar.innerHTML='';
+    const add=(label,fn)=>{
+      const b=document.createElement('button');
+      b.className='cbtn'; b.textContent=label;
+      b.style.cssText='padding:9px 20px;font-size:13px;letter-spacing:1px;pointer-events:auto;';
+      b.onclick=(e)=>{ e.stopPropagation(); fn(); };
+      actBar.appendChild(b);
+    };
+    if(view==='painting'){
+      add(clue.painting.flip?'翻回正面':'翻过来',()=>{
+        clue.painting.flip=!clue.painting.flip; sndOpen(); updateActions();
+        api.setTip(clue.painting.flip?'画框翻到了背面，点背板看刻痕。':'画框翻回正面。');
+      });
+    }
+    if(view==='ticket'){
+      add(tFlip?'翻回正面':'翻到背面',()=>{
+        tFlip=!tFlip; sndOpen(); updateActions();
+        if(tFlip){
+          const c=clue.desk;
+          api.setTip('背面用铅笔写着“第 '+lvl.data.desk.p+' 位”。');
+          if(!c.done) finishClue('desk');
+        } else api.setTip('车票翻回正面。');
+      });
+    }
+    if(view==='book'){
+      add('合上书',()=>{ gotoView('shelf','书架'); sndClick(); });
+    }
+    if(view==='slip'){
+      add('夹回书页',()=>{ gotoView('book','书架 · 翻开的书'); slipCard.visible=true; sndClick(); });
+    }
+    actBar.style.display=actBar.children.length?'flex':'none';
+  }
 
   /* ---------- 密码盘 ---------- */
   function openKeypad(){
@@ -843,6 +1107,15 @@ GAMES.vault=function(stage, controls, api){
     msg.style.cssText='text-align:center;font-size:12px;color:#9fc7d2;min-height:18px;margin-top:8px;';
     function refresh(){ slotEls.forEach((d,i)=>d.textContent=input[i]||''); }
     function flashBad(){ slotEls.forEach(d=>{ d.style.borderColor='#e0665a'; d.style.background='rgba(224,102,90,.18)'; }); setTimeout(()=>slotEls.forEach(d=>{ d.style.borderColor='rgba(232,180,74,.45)'; d.style.background='rgba(232,180,74,.09)'; }),380); }
+    let shakeN=0;
+    function shake(){
+      if(shakeN) return; shakeN=1;
+      const steps=[-9,8,-6,4,-2,0]; let k=0;
+      const iv=setInterval(()=>{
+        box.style.transform='translateX('+steps[k]+'px)'; k++;
+        if(k>=steps.length){ clearInterval(iv); box.style.transform=''; shakeN=0; }
+      },55);
+    }
     function press(k){
       if(k==='del'){ input=input.slice(0,-1); }
       else if(k==='ok'){
@@ -852,7 +1125,7 @@ GAMES.vault=function(stage, controls, api){
           drawPad(true); padTex.needsUpdate=true; sndGood();
           setTimeout(()=>{ fx.classList.remove('show'); api.solve(); }, 950);
         } else {
-          sndBad(); flashBad();
+          sndBad(); flashBad(); shake();
           msg.style.color='#e0665a'; msg.textContent='不对。再看一遍每件物件留下的数字和位次。';
           input=''; refresh();
         }
@@ -910,15 +1183,25 @@ GAMES.vault=function(stage, controls, api){
     }
     camera.position.copy(cp); camera.lookAt(ct);
     books.forEach(b=>{
-      if(b.out===1){ b.mesh.position.z += (0.22-b.mesh.position.z)*Math.min(1,dt*6); }
+      const tz=b.pulled?0.42:(b===targetBook?0.16:0.06);
+      b.mesh.position.z += (tz-b.mesh.position.z)*Math.min(1,dt*5.5);
+      b.mesh.rotation.x += (((b.pulled)?-0.08:0)-b.mesh.rotation.x)*Math.min(1,dt*5.5);
+      b.mesh.rotation.y += (((b.pulled)?b.baseY+0.34:b.baseY)-b.mesh.rotation.y)*Math.min(1,dt*5.5);
+      if(b.hit) b.hit.position.z += ((b.pulled?0.3:0.1)-b.hit.position.z)*Math.min(1,dt*5.5);
     });
+    if(bookOpen){
+      bookOpen=Math.min(1,bookOpen+dt*2.2);
+      pageR.rotation.x=-Math.PI/2*(1-bookOpen);
+      slipCard.visible=bookOpen>0.85 && !slipFloatG.visible;
+    }
     if(clue.desk.drawer){
-      drawerGroup.position.z += (0.34-drawerGroup.position.z)*Math.min(1,dt*6);
+      drawerGroup.position.z += (0.44-drawerGroup.position.z)*Math.min(1,dt*6);
     }
-    if(clue.painting.flip){
-      paintGroup.rotation.y += (Math.PI-paintGroup.rotation.y)*Math.min(1,dt*6);
-      if(!backArt.visible) backArt.visible=true;
-    }
+    const paintTarget=clue.painting.flip?Math.PI:0;
+    paintGroup.rotation.y += (paintTarget-paintGroup.rotation.y)*Math.min(1,dt*6);
+    backArt.visible=clue.painting.flip;
+    const tickTarget=tFlip?Math.PI:0;
+    ticketView.rotation.y += (tickTarget-ticketView.rotation.y)*Math.min(1,dt*6);
     padM.emissiveIntensity=0.75+Math.sin(t*2.2)*0.3;
     padFaceM.emissiveIntensity=0.45+Math.sin(t*2.2)*0.18;
     shadeM.emissiveIntensity=1.35+Math.sin(t*1.5)*0.2;
@@ -1140,7 +1423,7 @@ GAMES.hanzi=function(stage, controls, api){
     const card=document.createElement('div');
     card.style.cssText='border-radius:16px;padding:13px 14px;border:1px solid rgba(232,180,74,.22);background:linear-gradient(135deg,rgba(232,180,74,.09),rgba(255,255,255,.02));transition:.2s;';
     const head=document.createElement('div');
-    head.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#5C4030;letter-spacing:1px;margin-bottom:8px;';
+    head.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#8b96ad;letter-spacing:1px;margin-bottom:8px;';
     head.innerHTML='<span>锁 · 第 '+['一','二','三','四'][idx]+' 格</span><span style="color:#4a5568">○</span>';
     const q=document.createElement('div');
     q.textContent=rd.q;

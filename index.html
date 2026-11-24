@@ -3819,6 +3819,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var IMG_BASE='img/';
 	var PAIR_FILES=["z12.jpg.jpg","z11.jpg.jpg","v11-2.jpg.jpg","home-banner1.jpg.jpg","menu-banner12.jpg.jpg","feature-banner13.jpg.jpg","contact-banner11.jpg.jpg","z1.jpg.jpg","z2.jpg.jpg"];
 	var PAIRS=PAIR_FILES.map(function(f,i){ return {id:i, img:/^https?:\/\//.test(f)?f:IMG_BASE+f}; });
+	PAIRS.forEach(function(p){ var pre=new Image(); pre.src=p.img; });
 	var PREVIEW_MS=5000;
 	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
 	var overlay=document.getElementById('mcOverlay'), confetti=document.getElementById('mcConfetti'), mcMoves=document.getElementById('mcMoves'), mcReplay=document.getElementById('mcReplay'), mcClose=document.getElementById('mcClose');

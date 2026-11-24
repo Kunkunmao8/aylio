@@ -628,9 +628,46 @@ function disposeRunner(group){
     if(o.material){ if(Array.isArray(o.material)) o.material.forEach(m=>m.dispose()); else o.material.dispose(); }
   });
 }
+const SPRITE_SRC={
+  sitong:{run:'parkour-sprites/sitong-run.webp',jump:'parkour-sprites/sitong-jump.webp',slide:'parkour-sprites/sitong-slide.webp'},
+  sunzheng:{run:'parkour-sprites/sunzheng-run.webp',jump:'parkour-sprites/sunzheng-jump.webp',slide:'parkour-sprites/sunzheng-slide.webp'}
+};
+let runnerSprite=null, spriteTex={}, spritePose='', spriteWho='';
+function loadSpriteTex(who,pose){
+  const key=who+'-'+pose; if(spriteTex[key]) return;
+  const im=new Image();
+  im.onload=function(){
+    try{
+      const cv=document.createElement('canvas'); cv.width=im.naturalWidth||im.width; cv.height=im.naturalHeight||im.height;
+      cv.getContext('2d').drawImage(im,0,0);
+      const tex=new THREE.CanvasTexture(cv);
+      if(THREE.SRGBColorSpace) tex.colorSpace=THREE.SRGBColorSpace;
+      tex.needsUpdate=true; spriteTex[key]=tex;
+      if(state.who===who && spritePose===pose) paintSprite(who,pose);
+    }catch(err){ window.__spriteErr=String(err); }
+  };
+  im.onerror=function(){ window.__spriteErr='loadfail '+SPRITE_SRC[who][pose]; };
+  im.src=SPRITE_SRC[who][pose];
+}
+function paintSprite(who,pose){
+  if(!runnerSprite) return;
+  const tex=spriteTex[who+'-'+pose];
+  const h=pose==='slide'?1.10:(pose==='jump'?1.74:1.82);
+  const asp=tex&&tex.image?tex.image.width/tex.image.height:0.55;
+  runnerSprite.material.map=tex||null;
+  runnerSprite.material.needsUpdate=true;
+  runnerSprite.scale.set(h*asp,h,1);
+  spritePose=pose; spriteWho=who;
+}
 function spawnRunnerModel(){
-  if(runner3D){ scene.remove(runner3D.root); disposeRunner(runner3D.root); }
-  runner3D=buildRunner(state.who); runner3D.root.scale.setScalar(1.0); scene.add(runner3D.root); placeRunner();
+  if(runner3D){ scene.remove(runner3D.root); disposeRunner(runner3D.root); runner3D=null; }
+  if(runnerSprite){ scene.remove(runnerSprite); if(runnerSprite.material) runnerSprite.material.dispose(); }
+  runnerSprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,alphaTest:0.02}));
+  runnerSprite.position.set(0,.90,0); scene.add(runnerSprite);
+  spritePose=''; spriteWho='';
+  paintSprite(state.who,'run');
+  ['run','jump','slide'].forEach(function(p){ loadSpriteTex(state.who,p); });
+  placeRunner();
 }
 const runnerImg=document.getElementById('runnerImg');
 const shadowEl=document.getElementById('runnerShadow');
@@ -638,6 +675,11 @@ if(runnerImg) runnerImg.style.display='none';
 if(shadowEl) shadowEl.style.display='none';
 
 function placeRunner(){
+  if(runnerSprite){
+    const pose=state.slideT>0?'slide':(state.jumpY>.03?'jump':'run');
+    const cy=pose==='slide'?.58:(pose==='jump'?.88:.91);
+    runnerSprite.position.set(state.x,cy+state.jumpY,0);
+  }
   if(!runner3D) return;
   runner3D.root.position.set(state.x,state.jumpY,0);
   const lift=Math.min(.72,state.jumpY*.42);
@@ -646,6 +688,26 @@ function placeRunner(){
   runnerShadow.scale.set(sc*.92,sc*.92,1);
   runnerShadow.material.opacity=.60*(1-Math.min(.65,lift));
   charLight.position.set(state.x,state.jumpY+2.6,1.2);
+}
+
+function poseSprite(t){
+  if(!runnerSprite) return;
+  const run=state.phase==='run';
+  const slide=run && state.slideT>0;
+  const jump=run && state.jumpY>.03;
+  const pose=slide?'slide':(jump?'jump':'run');
+  if(pose!==spritePose) paintSprite(state.who,pose);
+  let rot=0;
+  if(run && !slide){
+    rot=Math.sin(state.t*12.6)*.025;
+    if(jump) rot*=.35;
+  }
+  if(run && state.dodgeT>0){
+    const k=state.dodgeT/.34;
+    rot += -state.dodgeDir*.22*k;
+    runnerSprite.position.x = state.x + state.dodgeDir*.060*k;
+  }
+  runnerSprite.material.rotation=rot;
 }
 
 function poseRunner(t){
@@ -1152,7 +1214,7 @@ function animate(){
     spdTxt.textContent=(state.speed/16).toFixed(1)+'x';
   }
 
-  poseRunner(t);
+  poseRunner(t); poseSprite(t);
   renderer.render(scene,camera);
 }
 
@@ -1166,7 +1228,7 @@ bestTxt.textContent=state.best;
 applyTheme();
 animate();
 
-window.__run={ god:false, start:startGame, endGame, state, obstacles, coins, spawnRow, addObstacle, addCoinLine, spawnTrain, LANES, G, runnerImg, charTex, runner:()=>runner3D,
+window.__run={ god:false, start:startGame, endGame, state, obstacles, coins, spawnRow, addObstacle, addCoinLine, spawnTrain, LANES, G, runnerImg, charTex, runner:()=>runner3D, sprite:()=>runnerSprite, texs:()=>spriteTex,
   who:w=>{ state.who=w; spawnRunnerModel(); },
   setScene:s=>{ state.scene=s; applyTheme(); }, setPeriod:p=>{ state.period=p; applyTheme(); } };
 </script>

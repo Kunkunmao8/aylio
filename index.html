@@ -1181,13 +1181,23 @@ body.letter-lock{overflow:hidden;}
 .gamehall-top span:last-child{color:#8B6A58;}
 .gamehall-top .bulbs{display:inline-flex;gap:5px;margin-right:8px;vertical-align:middle;}
 .gamehall-top .bulbs i{width:6px;height:6px;border-radius:50%;background:#E7B45A;box-shadow:0 0 8px rgba(231,180,90,.55);}
-.gamehall-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;position:relative;z-index:1;}
+.gamehall-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:15px;position:relative;z-index:1;}
+.gamehall-grid .mini-game-card{grid-column:span 2;}
+
 .mini-game-card.wish{background:linear-gradient(145deg,#FFF8EB 0%,#F4E1C7 55%,#EDD2B2 100%);border-color:#DCB994;box-shadow:0 14px 34px rgba(135,74,38,.10);}
 .mini-game-card.wish:hover{border-color:#C99563;box-shadow:0 20px 44px rgba(135,74,38,.18);}
 .mini-game-card.wish .mg-eyebrow{color:#9A6A45;}
 .mini-game-card.wish .mg-icon{font-size:34px;filter:drop-shadow(0 5px 7px rgba(90,45,20,.16));}
+.mini-game-card.archive{grid-column:2/span 2;background:linear-gradient(145deg,#FFF8EC 0%,#EED9BE 55%,#DFC09B 100%);border-color:#D8BC96;box-shadow:0 14px 34px rgba(135,74,38,.10);}
+.mini-game-card.archive:hover{border-color:#C9A172;box-shadow:0 20px 44px rgba(135,74,38,.18);}
+.mini-game-card.archive .mg-eyebrow{color:#9A6A45;}
+.mini-game-card.archive .mg-go{color:#8E5A34;}
+.mini-game-card.riddle{grid-column:4/span 2;background:linear-gradient(145deg,#FBEBDD 0%,#EECDBB 55%,#DFAF99 100%);border-color:#D9AE97;box-shadow:0 14px 34px rgba(135,74,38,.10);}
+.mini-game-card.riddle:hover{border-color:#CB9076;box-shadow:0 20px 44px rgba(135,74,38,.18);}
+.mini-game-card.riddle .mg-eyebrow{color:#A06A58;}
+.mini-game-card.riddle .mg-go{color:#8E4A38;}
 .gamehall-foot{position:relative;z-index:1;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:16px 6px 2px;padding-top:13px;border-top:1px solid rgba(183,122,87,.18);font-size:11px;letter-spacing:1.2px;color:#9A7663;}
-@media(max-width:860px){.gamehall-grid{grid-template-columns:1fr;}.gamehall-room{padding:16px;border-radius:24px;}.gamehall-grid .mini-game-card{min-height:170px;}}
+@media(max-width:860px){.gamehall-grid{grid-template-columns:1fr;}.gamehall-room{padding:16px;border-radius:24px;}.gamehall-grid .mini-game-card{min-height:170px;grid-column:auto!important;}}
 
 /* 游戏厅卡片 */
 .mini-game-hub{max-width:1180px;margin:64px auto 8px;padding:0 28px;}
@@ -1213,7 +1223,7 @@ body.letter-lock{overflow:hidden;}
 .mini-game-card .mg-icon .mg-svg{width:44px;height:44px;display:block;margin-bottom:2px;filter:drop-shadow(0 4px 6px rgba(90,45,20,.12));}
 .mini-game-card .mg-icon .mg-art{height:46px;width:auto;display:block;margin-bottom:1px;filter:drop-shadow(0 5px 7px rgba(90,45,20,.16));}
 .mini-game-card.parkour::after{content:"";position:absolute;right:-34px;top:-38px;width:128px;height:128px;border-radius:50%;background:radial-gradient(circle,rgba(255,247,235,.62),rgba(255,247,235,0) 68%);pointer-events:none;}
-.gamehall-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;position:relative;z-index:1;}
+.gamehall-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:15px;position:relative;z-index:1;}
 
 .game-back-row{max-width:1180px;margin:0 auto;padding:22px 28px 0;}
 .game-back{display:inline-flex;align-items:center;gap:7px;padding:9px 17px;border:1px solid #E6CDB7;border-radius:999px;background:#FFF9F2;color:#8A563B;text-decoration:none;font-size:13.5px;letter-spacing:.5px;transition:.2s;}
@@ -1224,6 +1234,7 @@ body.letter-lock{overflow:hidden;}
 .embed-shell .game-iframe{position:relative;z-index:2;display:block;width:100%;border:0;background:#FCE8D6;}
 .blessing-frame{height:clamp(640px,90vh,980px);}
 .parkour-frame{height:clamp(520px,78vh,820px);opacity:0;transition:opacity .28s ease;}
+.archive-frame,.riddle-frame{height:clamp(620px,82vh,880px);background:#1A0F0B;}
 .parkour-frame.loaded{opacity:1;}
 .frame-loading{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;background:
   radial-gradient(520px 320px at 50% 0%,rgba(242,193,78,.24),rgba(242,193,78,0) 70%),
@@ -3728,7 +3739,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head gamehall-head">
 		<p class="gamehall-kicker">GAME LOBBY · 2026</p>
 		<h2>游戏厅</h2>
-		<p>三台机器，三个玩法。祝福树也搬进来了。</p>
+		<p>五台机器，五个玩法。祝福树也搬进来了。</p>
 	</div>
 	<section class="container">
 		<div class="gamehall-room">
@@ -3752,8 +3763,38 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 					<span class="mg-desc">把散落的回忆，一张张找回来。点开卡面，配成九对。</span>
 					<span class="mg-go">进入翻牌 →</span>
 				</button>
+				<button class="mini-game-card archive" type="button" data-game="archive">
+					<span class="mg-eyebrow">ARCHIVE · 4 CHAPTERS</span>
+					<strong class="mg-name">政瞳档案</strong>
+					<span class="mg-desc">双视角底片、光影拼图、数织星图、重力迷宫，四章一条线。</span>
+					<span class="mg-go">进入档案 →</span>
+				</button>
+				<button class="mini-game-card riddle" type="button" data-game="riddle">
+					<span class="mg-eyebrow">RIDDLE · 3 LOCKS</span>
+					<strong class="mg-name">政瞳谜厅</strong>
+					<span class="mg-desc">三把锁，三个谜面。看、想、试，把最后一道门打开。</span>
+					<span class="mg-go">进入谜厅 →</span>
+				</button>
 			</div>
-			<div class="gamehall-foot"><span>本机存档 · 换设备不同步</span><span>三台机器，随时开</span></div>
+			<div class="gamehall-foot"><span>本机存档 · 换设备不同步</span><span>五台机器，随时开</span></div>
+		</div>
+	</section>
+</div>
+<div class="page" id="archive">
+	<div class="game-back-row"><a class="game-back" href="#theater" data-game-back="theater">← 返回游戏厅</a></div>
+	<div class="pg-head"><h2>政瞳档案</h2><p>四章一条线 · 每轮题目重新生成</p></div>
+	<section class="container">
+		<div class="embed-shell">
+			<iframe class="game-iframe archive-frame" data-src="archive.html?v=1124n" title="政瞳档案 · 四章"></iframe>
+		</div>
+	</section>
+</div>
+<div class="page" id="riddle">
+	<div class="game-back-row"><a class="game-back" href="#theater" data-game-back="theater">← 返回游戏厅</a></div>
+	<div class="pg-head"><h2>政瞳谜厅</h2><p>三把锁 · 看、想、试，把最后一道门打开</p></div>
+	<section class="container">
+		<div class="embed-shell">
+			<iframe class="game-iframe riddle-frame" data-src="riddle.html?v=1124n" title="政瞳谜厅 · 三锁"></iframe>
 		</div>
 	</section>
 </div>
@@ -4914,7 +4955,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 
 	function activatePage(targetId, keepHash) {
-		var navTarget = (targetId === "game" || targetId === "parkour" || targetId === "blessing") ? "theater" : targetId;
+		var navTarget = (targetId === "game" || targetId === "parkour" || targetId === "blessing" || targetId === "archive" || targetId === "riddle") ? "theater" : targetId;
 		links.forEach(function (l) {
 			l.classList.toggle("active", l.getAttribute("data-target") === navTarget);
 		});
@@ -6604,11 +6645,13 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		});
 	}
 	window.addEventListener("zt:page", function(e){
-		if (e.detail === "blessing" || e.detail === "parkour") { loadEmbedded(e.detail); }
+		if (e.detail === "blessing" || e.detail === "parkour" || e.detail === "archive" || e.detail === "riddle") { loadEmbedded(e.detail); }
 	});
 	var activePage = document.querySelector(".page.active");
 	if (activePage && activePage.id === "parkour") { loadEmbedded("parkour"); }
 	if (activePage && activePage.id === "blessing") { loadEmbedded("blessing"); }
+	if (activePage && activePage.id === "archive") { loadEmbedded("archive"); }
+	if (activePage && activePage.id === "riddle") { loadEmbedded("riddle"); }
 })();
 </script>
 </body>

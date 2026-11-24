@@ -124,6 +124,14 @@ footer{color:#A98268!important;}
       <p>T H R E E · L O C K S</p>
     </div>
     <div class="cards" id="cards">
+      <div class="card" data-game="hanzi">
+        <div class="ic">漢</div>
+        <div>
+          <h3>字谜锁</h3>
+          <p>四道字谜四个转轮，猜中一个字，锁就松一格。</p>
+        </div>
+        <div class="st">未解 <i id="dotHanzi"></i></div>
+      </div>
       <div class="card" data-game="vault">
         <div class="ic">🗄️</div>
         <div>
@@ -139,14 +147,6 @@ footer{color:#A98268!important;}
           <p>一整句话被换成了陌生字母，靠几个已知字母把它读回来。</p>
         </div>
         <div class="st">未解 <i id="dotCipher"></i></div>
-      </div>
-      <div class="card" data-game="hanzi">
-        <div class="ic">漢</div>
-        <div>
-          <h3>字谜锁</h3>
-          <p>四道字谜四个转轮，猜中一个字，锁就松一格。</p>
-        </div>
-        <div class="st">未解 <i id="dotHanzi"></i></div>
       </div>
     </div>
     <div class="controls" style="margin-top:18px">
@@ -243,7 +243,7 @@ function syncDots(){
 }
 function solvedAll(){ return state.done.vault&&state.done.cipher&&state.done.hanzi; }
 
-const TAGS={vault:'第一厅 · 旧物仓', cipher:'第二厅 · 破译台', hanzi:'第三厅 · 字谜锁'};
+const TAGS={hanzi:'第一厅 · 字谜锁', vault:'第二厅 · 旧物仓', cipher:'第三厅 · 破译台'};
 const HINTS={
   vault:'点物件凑近查看：书架抽出夹纸条的书，抽屉拉开找车票，看钟面分针指着几，翻画框看背板。自己把数字和位次找齐，再去开门。',
   cipher:'每个怪字母下面留了一个空位。先填已经给出的字母，再看词的长度和重复位置，把整句话读出来。',
@@ -254,7 +254,7 @@ function openGame(game){
   if(!GAMES[game]){ setTip('还在加载，等一两秒再点。',true); return; }
   state.cur=game;
   playTag.textContent=TAGS[game];
-  playTitle.textContent={vault:'旧物仓',cipher:'破译台',hanzi:'字谜锁'}[game];
+  playTitle.textContent={hanzi:'字谜锁',vault:'旧物仓',cipher:'破译台'}[game];
   playHint.textContent=HINTS[game];
   playHint.style.display=(game==='vault')?'none':'';
   playStep.textContent='';
@@ -299,7 +299,7 @@ function shuffleArr(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){c
 function rndInt(rng,a,b){ return a+Math.floor(rng()*(b-a+1)); }
 
 /* ============================================================
-   第一厅 · 旧物仓（密室特写版：飞镜 + 物品级交互 + 音效震动）
+   第二厅 · 旧物仓（密室特写版：飞镜 + 物品级交互 + 音效震动）
    ============================================================ */
 function makeVaultLevel(seed){
   const rng=mulberry32((seed>>>0)||1);
@@ -1278,14 +1278,14 @@ GAMES.cipher=function(stage, controls, api){
   stage.appendChild(box);
 
   const cipherLine=document.createElement('div');
-  cipherLine.style.cssText='display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(232,180,74,.18);';
+  cipherLine.style.cssText='display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:12px;border-radius:14px;background:#FFF9EF;border:1px solid #D8B893;box-shadow:inset 0 2px 8px rgba(120,75,45,.06);';
   plain.split(' ').forEach(w=>{
     const pill=document.createElement('div');
-    pill.style.cssText='display:flex;gap:2px;padding:4px 6px;border-radius:6px;background:rgba(0,0,0,.25);';
+    pill.style.cssText='display:flex;gap:2px;padding:4px 6px;border-radius:6px;background:#F4E3D0;';
     w.split('').forEach(ch=>{
       const s=document.createElement('span');
       s.textContent=cipherOf[ch];
-      s.style.cssText='width:15px;text-align:center;font-family:ui-monospace,monospace;font-size:13px;color:#b9c8e0;';
+      s.style.cssText='width:15px;text-align:center;font-family:ui-monospace,monospace;font-size:14px;font-weight:800;color:#3D2417;';
       pill.appendChild(s);
     });
     cipherLine.appendChild(pill);
@@ -1299,14 +1299,14 @@ GAMES.cipher=function(stage, controls, api){
   const inputs={};
   cipherLetters.forEach(cl=>{
     const cell=document.createElement('div');
-    cell.style.cssText='display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);';
+    cell.style.cssText='display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:#FFF9EF;border:1px solid #D8B893;';
     const lab=document.createElement('span');
     lab.textContent=cl;
-    lab.style.cssText='font-family:ui-monospace,monospace;font-size:14px;color:#8fdcff;width:14px;';
+    lab.style.cssText='font-family:ui-monospace,monospace;font-size:15px;font-weight:800;color:#A9532D;width:14px;';
     const inp=document.createElement('input');
     inp.maxLength=1;
-    inp.style.cssText='width:26px;height:26px;text-align:center;border-radius:7px;border:1px solid rgba(232,180,74,.3);background:rgba(0,0,0,.35);color:#f3e8d3;font-size:14px;font-family:ui-monospace,monospace;text-transform:uppercase;';
-    if(user[cl]){ inp.value=user[cl]; inp.disabled=true; inp.style.color='#efc264'; inp.style.borderColor='rgba(232,180,74,.6)'; }
+    inp.style.cssText='width:28px;height:28px;text-align:center;border-radius:7px;border:1px solid #C9A172;background:#FFFDF8;color:#3D2417;font-size:15px;font-weight:800;font-family:ui-monospace,monospace;text-transform:uppercase;';
+    if(user[cl]){ inp.value=user[cl]; inp.disabled=true; inp.style.color='#8E4A2A'; inp.style.borderColor='#B45B33'; }
     inp.addEventListener('input',()=>{
       const v=(inp.value||'').toUpperCase().replace(/[^A-Z]/g,'');
       inp.value=v;
@@ -1329,7 +1329,7 @@ GAMES.cipher=function(stage, controls, api){
         const s=document.createElement('span');
         s.textContent = user[cipherOf[ch]] ? user[cipherOf[ch]] : '·';
         s.style.cssText='width:14px;text-align:center;font-family:ui-monospace,monospace;font-size:13px;'+
-          (user[cipherOf[ch]]?'color:#efc264;':'color:#4a5568;');
+          (user[cipherOf[ch]]?'color:#8E4A2A;font-weight:800':'color:#B59B85;');
         pill.appendChild(s);
       });
       preview.appendChild(pill);
@@ -1350,8 +1350,8 @@ GAMES.cipher=function(stage, controls, api){
     let wrong=0; cipherLetters.forEach(cl=>{ if(user[cl]!==trueMap[cl]) wrong++; });
     if(wrong===0){
       solved=true; check.disabled=hintB.disabled=true;
-      api.setTip('读通了：「'+plain+'」——第二厅的锁开了。');
-      preview.querySelectorAll('span').forEach(s=>{ s.style.color='#7fc98a'; });
+      api.setTip('读通了：「'+plain+'」——第三厅的锁开了。');
+      preview.querySelectorAll('span').forEach(s=>{ s.style.color='#6F7D4E'; });
       setTimeout(()=>api.solve(),1600);
     } else {
       api.setTip('还读不通，有 '+wrong+' 个字母对错位。看看单词长度和重复的位置。',true);
@@ -1364,7 +1364,7 @@ GAMES.cipher=function(stage, controls, api){
     const cl=left[Math.floor(Math.random()*left.length)];
     user[cl]=trueMap[cl];
     inputs[cl].value=user[cl]; inputs[cl].disabled=true;
-    inputs[cl].style.color='#efc264'; inputs[cl].style.borderColor='rgba(232,180,74,.6)';
+    inputs[cl].style.color='#8E4A2A'; inputs[cl].style.borderColor='#B45B33';
     drawPreview();
     api.setTip('“'+cl+'” 就是 “'+trueMap[cl]+'”，帮你标上了。');
   };
@@ -1373,7 +1373,7 @@ GAMES.cipher=function(stage, controls, api){
     cipherLetters.forEach(cl=>{
       if(lvl.anchors.indexOf(cl)>=0) return;
       delete user[cl]; inputs[cl].value=''; inputs[cl].disabled=false;
-      inputs[cl].style.color='#f3e8d3'; inputs[cl].style.borderColor='rgba(232,180,74,.3)';
+      inputs[cl].style.color='#3D2417'; inputs[cl].style.borderColor='#C9A172';
     });
     drawPreview(); api.setTip('');
   };
@@ -1389,7 +1389,7 @@ GAMES.cipher=function(stage, controls, api){
   };
 };
 /* ============================================================
-   第三厅 · 字谜锁
+   第一厅 · 字谜锁
    ============================================================ */
 const RIDDLES=[
   {q:'一口咬掉牛尾巴', a:'告', hint:'“牛”去掉尾巴，再加一个“口”。'},
@@ -1423,15 +1423,15 @@ GAMES.hanzi=function(stage, controls, api){
     const card=document.createElement('div');
     card.style.cssText='border-radius:16px;padding:13px 14px;border:1px solid rgba(232,180,74,.22);background:linear-gradient(135deg,rgba(232,180,74,.09),rgba(255,255,255,.02));transition:.2s;';
     const head=document.createElement('div');
-    head.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#8b96ad;letter-spacing:1px;margin-bottom:8px;';
-    head.innerHTML='<span>锁 · 第 '+['一','二','三','四'][idx]+' 格</span><span style="color:#4a5568">○</span>';
+    head.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#8A6753;letter-spacing:1px;margin-bottom:8px;';
+    head.innerHTML='<span>锁 · 第 '+['一','二','三','四'][idx]+' 格</span><span style="color:#B08364">○</span>';
     const q=document.createElement('div');
     q.textContent=rd.q;
-    q.style.cssText='font-size:15px;letter-spacing:1.5px;margin-bottom:11px;color:#f3e8d3;';
+    q.style.cssText='font-size:15px;letter-spacing:1.5px;margin-bottom:11px;color:#3D2417;font-weight:700;';
     const opts=document.createElement('div');
     opts.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
     const hint=document.createElement('div');
-    hint.style.cssText='font-size:11.5px;color:#8fdcff;line-height:1.7;margin-top:9px;display:none;';
+    hint.style.cssText='font-size:11.5px;color:#8E4A2A;line-height:1.7;margin-top:9px;display:none;';
 
     let wrongs=0, done=false;
     const chars=shuffleArr([rd.a, ...shuffleArr(allChars.filter(c=>c!==rd.a),rng).slice(0,5)],rng);
@@ -1439,7 +1439,7 @@ GAMES.hanzi=function(stage, controls, api){
     chars.forEach(ch=>{
       const b=document.createElement('button');
       b.textContent=ch;
-      b.style.cssText='height:44px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);color:#dbe4f2;font-size:19px;font-family:inherit;cursor:pointer;transition:.14s;';
+      b.style.cssText='height:44px;border-radius:11px;border:1px solid #D8B893;background:#FFFDF8;color:#3D2417;font-size:19px;font-weight:700;font-family:inherit;cursor:pointer;transition:.14s;';
       b.onclick=()=>{
         if(done) return;
         if(ch===rd.a){
@@ -1447,7 +1447,7 @@ GAMES.hanzi=function(stage, controls, api){
           card.style.borderColor='rgba(232,180,74,.75)';
           card.style.background='linear-gradient(135deg,rgba(232,180,74,.26),rgba(255,255,255,.04))';
           head.lastElementChild.textContent='🔓'; head.lastElementChild.style.color='#efc264';
-          q.style.color='#efc264';
+          q.style.color='#8E4A2A';
           Object.keys(btns).forEach(k=>{ btns[k].disabled=true; btns[k].style.opacity=k===rd.a?'1':'0.3'; });
           b.style.borderColor='#efc264'; b.style.background='linear-gradient(180deg,#efc264,#d9a33a)'; b.style.color='#2a1d08';
           api.setTip('“'+rd.a+'”——一格打开了。（'+solvedCount+'/4）');

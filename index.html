@@ -3,15 +3,15 @@
 <head>
 <script>
 (function(){
-  var COSBASE='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+  var LOCALBASE='data/';
   var DATA='data/';
   var LS='aylio_gh:';
   var nativeFetch=window.fetch.bind(window);
   window.fetch=function(input,init){
     init=init||{};
     var url=(typeof input==='string')?input:((input&&input.url)||'');
-    if(url.indexOf(COSBASE)===0){
-      var path=url.slice(COSBASE.length);
+    if(url.indexOf(LOCALBASE)===0){
+      var path=url.slice(LOCALBASE.length);
       if(String(init.method||'GET').toUpperCase()==='PUT'){
         try{ localStorage.setItem(LS+path, typeof init.body==='string'?init.body:''); }catch(e){}
         return Promise.resolve(new Response('{}',{status:200,headers:{'Content-Type':'application/json'}}));
@@ -1046,7 +1046,7 @@ img{cursor:zoom-in;}
 	if(sess&&sess.mail){ g.parentNode.removeChild(g); return; }
 	document.documentElement.style.overflow='hidden';
 
-	var U='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/auth/users.json';
+	var U='data/auth/users.json';
 	var CFG={};
 	function mailcfg(){ return window.AYLIO_MAIL||{}; }
 	var pendCode='', pendMail='';
@@ -1961,7 +1961,7 @@ a{color:inherit;}
 <script>
 var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免登录版 */
 (function(){
-	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+	var HOST='data/';
 	var DEFAULT_COVER='img/pillow-banner.jpg';
 	var ROOM=HOST+'pillow/';
 	var MAN=ROOM+'_index.json';
@@ -2877,7 +2877,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 
 <script>
 (function(){
-	var HOST='https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/';
+	var HOST='data/';
 	var DEFAULT_COVER='img/5.jpg.jpg';
 	var USERS=HOST+'auth/users.json';
 	var SKEY='aylio_pillow_user';
@@ -4774,7 +4774,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <script>
 (function(){
 	var TO = 'aylio-1010@foxmail.com';
-	var MSGBASE = 'https://aylio-media-1538364358.cos.ap-guangzhou.myqcloud.com/msg/';
+	var MSGBASE = 'data/msg/';
 	var MSGKEY = '1a93510507047761e6f61e5013f0dd69';
 	var form = document.getElementById('feedbackForm');
 	if(!form){return;}
@@ -5798,7 +5798,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	var CFG=window.AYLIO_CLOUD||{};
 	var form=document.getElementById('clipForm');
 	if(!CFG.bucket||!form) return;
-	var BASE='https://'+CFG.bucket+'.cos.'+(CFG.region||'ap-guangzhou')+'.myqcloud.com/clips/';
+	var BASE='data/clips/';
 	var MAN=BASE+'_index.json';
 	var listEl=document.getElementById('clipList'), tipEl=document.getElementById('clipTip');
 	var titleEl=document.getElementById('clipTitle');

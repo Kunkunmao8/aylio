@@ -2982,9 +2982,13 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		var n=$('onlineNum');
 		supaList('presence/').then(function(rows){
 			var files=(rows||[]).filter(function(x){ return x&&x.name; });
+			var now=Date.now();
 			return Promise.all(files.slice(0,200).map(function(f){
 				var p=f.name.indexOf('presence/')===0?f.name:('presence/'+f.name);
-				return supaDownload(p).catch(function(){ return null; });
+				return supaDownload(p).then(function(x){
+					if(x&&x.id&&(now-(x.ts||0))>120000) presenceDel(p);
+					return x;
+				}).catch(function(){ return null; });
 			}));
 		}).then(function(list){
 			var now=Date.now(), seen={}, arr=[];

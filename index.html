@@ -857,6 +857,189 @@ img{cursor:zoom-in;}
 	.album-grid.chrono .album-links a{background:#FBEBDD!important;color:#BF5B2E!important;border:1px solid #F0D5BF!important;pointer-events:auto!important;}
 	.album-grid.chrono .album-cover{height:auto;max-height:70vh;object-fit:contain;background:#FDF3E9;}
 }
+
+/* ================= 一封家书 ================= */
+#contact .letter-entry{
+	width:100%;display:flex;align-items:center;gap:22px;
+	margin:0 0 28px;padding:20px 24px;
+	background:linear-gradient(145deg,#3A241A 0%,#5A3222 55%,#6B3E2A 100%);
+	border:1px solid #6E4633;border-radius:22px;
+	box-shadow:0 18px 38px rgba(58,36,26,.20);
+	cursor:pointer;text-align:left;font-family:inherit;
+	transition:transform .25s ease,box-shadow .25s ease;
+}
+#contact .letter-entry:hover{transform:translateY(-3px);box-shadow:0 24px 48px rgba(58,36,26,.26);}
+#contact .letter-entry:active{transform:translateY(0);}
+#contact .le-env{
+	position:relative;flex:0 0 auto;width:104px;height:68px;
+	background:#E2B58E;border-radius:9px;
+	box-shadow:0 10px 22px rgba(0,0,0,.22),inset 0 -8px 18px rgba(120,60,30,.12);
+	overflow:hidden;
+}
+#contact .le-env::before{
+	content:"";position:absolute;left:0;top:0;width:100%;height:56%;
+	background:linear-gradient(160deg,#F0CDAA,#D8A77E);
+	clip-path:polygon(0 0,100% 0,50% 100%);
+}
+#contact .le-env::after{
+	content:"";position:absolute;left:0;bottom:0;width:100%;height:64%;
+	background:linear-gradient(160deg,#D8A77E,#CF9C70);
+	clip-path:polygon(0 0,50% 46%,100% 0,100% 100%,0 100%);
+}
+#contact .le-seal{
+	position:absolute;z-index:2;left:50%;top:50%;transform:translate(-50%,-40%);
+	width:30px;height:30px;border-radius:50%;background:#A34E2A;color:#F8E7D2;
+	font-size:12px;line-height:30px;text-align:center;font-weight:700;
+	box-shadow:0 3px 8px rgba(80,30,10,.25),inset 0 0 0 1px rgba(255,230,205,.35);
+}
+#contact .letter-entry-txt{min-width:0;color:#FFF9F1;}
+#contact .le-kicker{display:block;font-size:10.5px;letter-spacing:3px;color:#D9AE8A;margin-bottom:5px;}
+#contact .le-title{display:block;font-size:23px;letter-spacing:4px;font-weight:600;color:#FFF9F1;line-height:1.3;}
+#contact .le-sub{display:block;font-size:13px;letter-spacing:1px;color:#E8CDB7;margin-top:6px;}
+#contact .le-arrow{margin-left:auto;color:#F0C49B;font-size:25px;flex:0 0 auto;}
+
+.letter-ov{
+	position:fixed;inset:0;z-index:120;
+	display:flex;align-items:center;justify-content:center;
+	padding:24px;background:#150D09;
+	opacity:0;visibility:hidden;pointer-events:none;
+	transition:opacity .35s ease,visibility .35s ease;
+}
+.letter-ov.show{opacity:1;visibility:visible;pointer-events:auto;}
+.letter-ov::before{
+	content:"";position:absolute;inset:0;pointer-events:none;
+	background:
+		radial-gradient(circle at 50% 44%,rgba(232,178,128,.28),transparent 33%),
+		radial-gradient(circle at 50% 50%,transparent 42%,rgba(0,0,0,.72) 100%);
+}
+.letter-ov::after{
+	content:"";position:absolute;inset:0;pointer-events:none;opacity:.22;
+	background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
+	mix-blend-mode:soft-light;
+}
+.letter-stage{
+	position:relative;width:min(900px,94vw);height:min(730px,88vh);
+	display:flex;align-items:center;justify-content:center;
+	perspective:1000px;
+}
+.letter-scene,.letter-count{
+	position:absolute;top:8px;color:#D8B08B;font-size:10px;letter-spacing:2.2px;
+	font-family:"Helvetica Neue",Arial,sans-serif;opacity:.8;z-index:3;
+}
+.letter-scene{left:8px;}
+.letter-count{right:8px;}
+.letter-env-wrap{
+	position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;
+	cursor:pointer;transition:opacity .55s ease,transform .55s ease;
+}
+.letter-stage.opened .letter-env-wrap{opacity:0;transform:translateY(54px) scale(.88);pointer-events:none;}
+.letter-env-big{
+	position:relative;width:min(548px,82vw);aspect-ratio:1.55;
+	background:linear-gradient(160deg,#E4BB94,#D3A075);
+	border-radius:13px;overflow:hidden;
+	box-shadow:0 34px 70px rgba(0,0,0,.45),inset 0 0 0 1px rgba(255,236,214,.35);
+}
+.letter-flap{
+	position:absolute;left:0;top:0;width:100%;height:57%;
+	background:linear-gradient(160deg,#F0CDAA,#D9A87E);
+	clip-path:polygon(0 0,100% 0,50% 100%);
+	transform-origin:top center;transition:transform .9s cubic-bezier(.22,.8,.3,1);
+	z-index:4;backface-visibility:hidden;
+}
+.letter-stage.tearing .letter-flap,.letter-stage.opened .letter-flap{transform:rotateX(180deg);}
+.letter-pocket{
+	position:absolute;left:0;right:0;bottom:0;height:68%;
+	background:linear-gradient(160deg,#D8A77E,#CA9568);
+	clip-path:polygon(0 20%,50% 0,100% 20%,100% 100%,0 100%);
+	border-radius:0 0 13px 13px;z-index:3;
+}
+.letter-seal-big{
+	position:absolute;z-index:5;left:50%;top:52%;transform:translate(-50%,-50%);
+	width:64px;height:64px;border-radius:50%;
+	background:radial-gradient(circle at 35% 30%,#C2653B,#8F3F22);
+	color:#F8E7D2;font-size:22px;line-height:64px;text-align:center;font-weight:700;
+	box-shadow:0 6px 16px rgba(80,30,10,.3),inset 0 0 0 2px rgba(255,225,195,.22);
+	transition:opacity .35s ease,transform .35s ease;
+}
+.letter-stage.opened .letter-seal-big{opacity:0;transform:translate(-50%,-50%) scale(.6);}
+.letter-addr{
+	position:absolute;z-index:6;left:26px;bottom:22px;color:#5E3925;
+	font-family:"Kaiti SC","STKaiti","KaiTi",serif;
+}
+.letter-addr b{display:block;font-size:21px;letter-spacing:2px;font-weight:600;}
+.letter-addr span{display:block;margin-top:5px;font-size:10px;letter-spacing:2px;color:#8A5C40;font-family:"Helvetica Neue",Arial,sans-serif;}
+.letter-tip{
+	margin-top:20px;color:#E9CFB8;font-size:12.5px;letter-spacing:2px;
+	border-bottom:1px dashed rgba(233,207,184,.45);padding-bottom:6px;
+	animation:letterTip 2.2s ease-in-out infinite;
+}
+@keyframes letterTip{0%,100%{opacity:.55;transform:translateY(0);}50%{opacity:1;transform:translateY(-2px);}}
+.letter-stage.tearing .letter-env-wrap{animation:letterShake .5s ease;}
+@keyframes letterShake{0%,100%{transform:translateX(0) rotate(0);}20%{transform:translateX(-5px) rotate(-.8deg);}45%{transform:translateX(5px) rotate(.8deg);}70%{transform:translateX(-3px) rotate(-.4deg);}}
+
+.letter-paper{
+	position:absolute;z-index:7;left:50%;top:50%;
+	width:min(620px,88vw);max-height:80vh;overflow:auto;
+	padding:46px 52px 34px;
+	background:
+		repeating-linear-gradient(0deg,rgba(137,96,61,.075) 0 1px,transparent 1px 32px),
+		linear-gradient(135deg,#FBF5E7,#F5EAD6);
+	border-radius:4px;
+	box-shadow:0 30px 70px rgba(0,0,0,.36),inset 0 0 50px rgba(150,105,60,.10);
+	transform:translate(-50%,-50%) translateY(70px) rotate(-.6deg) scale(.96);
+	opacity:0;pointer-events:none;
+	transition:opacity .75s ease .25s,transform .8s cubic-bezier(.2,.75,.25,1) .2s;
+	scrollbar-width:thin;
+}
+.letter-stage.opened .letter-paper{opacity:1;transform:translate(-50%,-50%) translateY(0) rotate(0) scale(1);pointer-events:auto;}
+.letter-paper h2{
+	margin:0 0 4px;text-align:center;color:#4A2E1E;
+	font-family:"Kaiti SC","STKaiti","KaiTi",serif;
+	font-size:36px;letter-spacing:8px;font-weight:600;
+}
+.letter-paper .lp-sub{text-align:center;color:#8A6046;font-size:13px;letter-spacing:2px;margin:0 0 28px;}
+.letter-paper p{
+	margin:0 0 17px;color:#4B3324;font-size:16px;line-height:2.02;
+	font-family:"Kaiti SC","STKaiti","KaiTi",serif;
+	letter-spacing:.3px;text-align:justify;
+}
+.letter-paper .lp-sign{text-align:right;color:#6B4630;font-size:16px;letter-spacing:3px;margin-top:26px;}
+.letter-paper .lp-actions{display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap;}
+.letter-paper .lp-actions button{
+	border:1px solid #D8B99B;background:#FFF9EF;color:#7A4F35;
+	border-radius:999px;padding:8px 18px;font:inherit;font-size:12.5px;cursor:pointer;
+}
+.letter-paper .lp-actions button:hover{border-color:#BF5B2E;color:#BF5B2E;}
+.letter-x{
+	position:absolute;right:16px;top:12px;width:34px;height:34px;
+	border:0;background:transparent;color:#A67B5D;font-size:23px;cursor:pointer;line-height:1;
+}
+.letter-close{
+	position:absolute;right:8px;bottom:8px;z-index:8;
+	border:1px solid rgba(234,210,188,.35);background:rgba(30,18,12,.35);
+	color:#F0D8C1;border-radius:999px;padding:7px 16px;font:inherit;
+	font-size:12px;letter-spacing:1px;cursor:pointer;
+}
+.letter-close:hover{background:rgba(50,30,20,.55);}
+body.letter-lock{overflow:hidden;}
+@media(max-width:600px){
+	#contact .letter-entry{gap:14px;padding:16px 16px;border-radius:18px;}
+	#contact .le-env{width:78px;height:52px;}
+	#contact .le-title{font-size:19px;letter-spacing:3px;}
+	#contact .le-sub{font-size:12px;}
+	#contact .le-arrow{font-size:20px;}
+	.letter-ov{padding:12px;}
+	.letter-stage{height:92vh;}
+	.letter-env-big{width:92vw;border-radius:11px;}
+	.letter-addr{left:16px;bottom:14px;}
+	.letter-addr b{font-size:16px;}
+	.letter-tip{margin-top:14px;font-size:11.5px;}
+	.letter-paper{width:92vw;max-height:84vh;padding:44px 24px 28px;}
+	.letter-paper h2{font-size:29px;letter-spacing:5px;}
+	.letter-paper p{font-size:15px;line-height:1.95;margin-bottom:15px;}
+	.letter-seal-big{width:52px;height:52px;line-height:52px;font-size:18px;}
+}
+
 </style>
 <style>
 #authGate{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:22px;overflow-y:auto;background:radial-gradient(120% 120% at 50% 0%,#FFF7EE 0%,#FCE9D8 46%,#F1D6BF 100%);}
@@ -1672,6 +1855,23 @@ a{color:inherit;}
 #pillow .composer .send{padding:0 14px;font-size:13px;}
 }
 
+#pillow .composer{flex-wrap:wrap;}
+#pillow .composer-preview{
+	order:-1;flex:0 0 100%;display:flex;align-items:center;gap:10px;
+	padding:8px 12px;border:1px solid #F0D8C6;border-radius:11px;
+	background:#FFF7F1;color:#8A5D46;font-size:12.5px;line-height:1.5;
+}
+#pillow .composer-preview.hide{display:none !important;}
+#pillow .pending-thumb{width:42px;height:42px;flex:0 0 auto;border-radius:8px;object-fit:cover;background:#1b120c;display:block;}
+#pillow .pending-thumb.hide{display:none !important;}
+#pillow .pending-txt{flex:1;min-width:0;}
+#pillow .pending-x{
+	flex:0 0 auto;width:28px;height:28px;border:0;border-radius:50%;
+	background:#F6E3D4;color:#A05230;font-size:16px;line-height:28px;cursor:pointer;
+	font-family:inherit;padding:0;
+}
+
+
 /* ================= 我的 ================= */
 #mine .mine-wrap{display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:start;}
 #mine .mine-card{background:#fff;border:1px solid #F1DDCC;border-radius:18px;padding:26px 20px 22px;text-align:center;box-shadow:0 8px 24px rgba(150,74,30,.06);}
@@ -1895,6 +2095,12 @@ a{color:inherit;}
 			<button class="send" id="btnSend" type="button">发布</button>
 			<input type="file" id="fileImg" accept="image/*" class="hide">
 			<input type="file" id="fileVid" accept="video/*" class="hide">
+			<div class="composer-preview hide" id="composerPreview">
+				<img class="pending-thumb" id="pendingImg" alt="已选图片">
+				<video class="pending-thumb hide" id="pendingVid" muted playsinline></video>
+				<span class="pending-txt" id="pendingTxt">已选图片，可以继续写文字，再点发布</span>
+				<button class="pending-x" id="pendingX" type="button" aria-label="取消已选文件">×</button>
+			</div>
 		</div>
 		<div class="up" id="upTip"></div>
 
@@ -2622,19 +2828,70 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			});
 		});
 	}
-	function sendText(){
-		var t=txtEl.value.trim();
-		if(!t) return;
+	var pendingFile=null, pendingKind='', pendingURL='';
+	var previewBar=null, pendingImgEl=null, pendingVidEl=null, pendingTxtEl=null;
+	function paintPending(){
+		if(!previewBar){ previewBar=$('composerPreview'); pendingImgEl=$('pendingImg'); pendingVidEl=$('pendingVid'); pendingTxtEl=$('pendingTxt'); }
+		if(!previewBar) return;
+		if(!pendingFile){ previewBar.classList.add('hide'); if(pendingImgEl) pendingImgEl.classList.add('hide'); if(pendingVidEl){ pendingVidEl.classList.add('hide'); pendingVidEl.removeAttribute('src'); } return; }
+		previewBar.classList.remove('hide');
+		if(pendingKind==='video'){
+			if(pendingImgEl) pendingImgEl.classList.add('hide');
+			if(pendingVidEl){ pendingVidEl.classList.remove('hide'); pendingVidEl.src=pendingURL; }
+			if(pendingTxtEl) pendingTxtEl.textContent='已选视频，可以继续写文字，再点发布';
+		}else{
+			if(pendingVidEl){ pendingVidEl.classList.add('hide'); pendingVidEl.removeAttribute('src'); }
+			if(pendingImgEl){ pendingImgEl.classList.remove('hide'); pendingImgEl.src=pendingURL; }
+			if(pendingTxtEl) pendingTxtEl.textContent='已选图片，可以继续写文字，再点发布';
+		}
+	}
+	function clearPending(){
+		if(pendingURL){ try{ URL.revokeObjectURL(pendingURL); }catch(e){} }
+		pendingFile=null; pendingKind=''; pendingURL='';
+		paintPending();
+	}
+	function stageFile(file,type){
 		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
-		var msg={id:Date.now()+'-'+rand(5),who:myName(),uid:ME.mail||'',text:t,ts:Date.now()};
-		mineIds.push(msg.id);
-		btnSend.disabled=true;
-		post(msg).then(function(){
-			return supaWritePost(msg).catch(function(){});
-		}).then(function(){
-			txtEl.value=''; btnSend.disabled=false;
-			paint(dedupe([msg]),true); refresh();
-		}).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'发送失败'; });
+		var limit= type==='video' ? 50*1024*1024 : 20*1024*1024;
+		if(file.size>limit){ alert(type==='video'?'视频请控制在 50MB 以内':'图片请控制在 20MB 以内'); return; }
+		clearPending();
+		pendingFile=file; pendingKind=type;
+		try{ pendingURL=URL.createObjectURL(file); }catch(e){ pendingURL=''; }
+		paintPending();
+		upTip.textContent='';
+		try{ txtEl.focus(); }catch(e){}
+	}
+	function sendPost(){
+		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
+		var t=txtEl.value.trim();
+		if(!t && !pendingFile) return;
+		var f=pendingFile, k=pendingKind;
+		btnSend.disabled=true; upTip.textContent=(f?'正在上传并发布…':'正在发布…');
+		function commit(msg, shared){
+			mineIds.push(msg.id);
+			return post(msg).then(function(){
+				if(shared) return supaWritePost(msg).catch(function(){});
+			}).then(function(){
+				txtEl.value=''; clearPending(); btnSend.disabled=false;
+				paint(dedupe([msg]),true); refresh();
+				upTip.textContent='发出去了';
+				setTimeout(function(){ if(upTip.textContent==='发出去了') upTip.textContent=''; },2000);
+			});
+		}
+		if(f){
+			upload(f,k).then(function(url){
+				var msg={id:Date.now()+'-'+rand(5),who:myName(),uid:ME.mail||'',ts:Date.now()};
+				if(k==='video') msg.video=url; else msg.img=url;
+				if(t) msg.text=t;
+				return commit(msg, !!t || /^https?:/.test(String(url||'')));
+			}).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'没发出去'; });
+		}else{
+			var msg={id:Date.now()+'-'+rand(5),who:myName(),uid:ME.mail||'',text:t,ts:Date.now()};
+			commit(msg,true).catch(function(e){ btnSend.disabled=false; upTip.textContent=e.message||'发送失败'; });
+		}
+	}
+	function sendText(){
+		sendPost();
 	}
 	function upload(file, kind){
 		if(kind==='image'){
@@ -2659,33 +2916,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			fr.readAsDataURL(file);
 		});
 	}
-	function sendFile(file, kind){
-		if(NEED_LOGIN && !ME.mail){ alert('先登录再留言'); return; }
-		var limit= kind==='video' ? 50*1024*1024 : 20*1024*1024;
-		if(file.size>limit){ alert(kind==='video'?'视频请控制在 50MB 以内':'图片请控制在 20MB 以内'); return; }
-		upTip.textContent='正在上传，别关页面…';
-		upload(file,kind).then(function(url){
-			var msg={id:Date.now()+'-'+rand(5),who:myName(),uid:ME.mail||'',ts:Date.now()};
-			if(kind==='video') msg.video=url; else msg.img=url;
-			var t=txtEl.value.trim(); if(t) { msg.text=t; txtEl.value=''; }
-			mineIds.push(msg.id);
-			return post(msg).then(function(){
-				if(kind==='image' && /^https?:/.test(String(msg.img||''))) return supaWritePost(msg).catch(function(){});
-			}).then(function(){
-				upTip.textContent='发出去了';
-				paint(dedupe([msg]),true); refresh();
-				setTimeout(function(){ upTip.textContent=''; },2000);
-			});
-		}).catch(function(e){ upTip.textContent=e.message||'没发出去'; });
-	}
-
 	/* ---------- 绑定 ---------- */
-	btnSend.onclick=sendText;
+	btnSend.onclick=sendPost;
 	txtEl.addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendText(); } });
 	btnImg.onclick=function(){ fileImg.click(); };
+	document.getElementById('pendingX') && (document.getElementById('pendingX').onclick=function(){ clearPending(); });
 	btnVid.onclick=function(){ fileVid.click(); };
-	fileImg.addEventListener('change',function(){ var f=fileImg.files&&fileImg.files[0]; fileImg.value=''; if(f) sendFile(f,'image'); });
-	fileVid.addEventListener('change',function(){ var f=fileVid.files&&fileVid.files[0]; fileVid.value=''; if(f) sendFile(f,'video'); });
+	fileImg.addEventListener('change',function(){ var f=fileImg.files&&fileImg.files[0]; fileImg.value=''; if(f) stageFile(f,'image'); });
+	fileVid.addEventListener('change',function(){ var f=fileVid.files&&fileVid.files[0]; fileVid.value=''; if(f) stageFile(f,'video'); });
 	nickIn.addEventListener('input',function(){ save('aylio_pillow_nick',nickIn.value.trim()); paintWho(); });
 
 	/* ---------- 启动 ---------- */
@@ -2708,8 +2946,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	window.addEventListener('hashchange',function(){ if(/#pillow/.test(location.hash)) loadUsersMap(); });
 	document.addEventListener('visibilitychange',function(){ if(!document.hidden) loadUsersMap(); });
 
-	/* ---------- 在线人数（同一份 online.json，60 秒内有心跳就算在线） ---------- */
-	var ONLINE=HOST+'pillow/online.json';
+	/* ---------- 在线人数（Supabase 公共桶 presence 心跳，75 秒内算在线） ---------- */
 	var SID=(function(){
 		try{
 			var s=sessionStorage.getItem('aylio_sid');
@@ -2717,20 +2954,54 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			return s;
 		}catch(e){ return 's'+Date.now()+Math.random().toString(36).slice(2,7); }
 	})();
-	function beatOnline(){
-		var now=Date.now();
-		fetch(ONLINE,{cache:'no-store'}).then(function(r){ return r.ok?r.json():[]; }).catch(function(){ return []; })
-			.then(function(list){
-				var arr=(list||[]).filter(function(x){ return x&&x.id&&(now-(x.ts||0))<60000; });
-				arr=arr.filter(function(x){ return x.id!==SID; });
-				arr.push({id:SID,ts:now});
-				if(arr.length>300) arr=arr.slice(arr.length-300);
-				var n=$('onlineNum'); if(n) n.textContent=arr.length;
-				return fetch(ONLINE,{method:'PUT',headers:{'Content-Type':'application/json','Cache-Control':'no-cache'},body:JSON.stringify(arr)}).catch(function(){});
-			});
+	var P_FILE=null, P_BUSY=false, P_COUNT_BUSY=false;
+	function presencePut(name,obj){
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+name.split('/').map(encodeURIComponent).join('/'),{
+			method:'POST',headers:supaHeaders({'Content-Type':'application/json','x-upsert':'false'}),
+			body:JSON.stringify(obj)
+		}).then(function(r){ if(!r.ok) throw new Error('presence '+r.status); });
 	}
-	beatOnline();
-	setInterval(beatOnline,20000);
+	function presenceDel(name){
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+name.split('/').map(encodeURIComponent).join('/'),{
+			method:'DELETE',headers:supaHeaders({'Content-Type':'application/json'}),
+			body:'{}'
+		}).catch(function(){});
+	}
+	function presenceBeat(){
+		if(P_BUSY) return;
+		P_BUSY=true;
+		var name='presence/'+SID+'-'+Date.now()+'.json';
+		presencePut(name,{id:SID,who:(ME&&ME.name)||'访客',ts:Date.now()}).then(function(){
+			var old=P_FILE; P_FILE=name;
+			if(old && old!==name) presenceDel(old);
+		}).catch(function(){}).then(function(){ P_BUSY=false; });
+	}
+	function presenceCount(){
+		if(P_COUNT_BUSY) return;
+		P_COUNT_BUSY=true;
+		var n=$('onlineNum');
+		supaList('presence/').then(function(rows){
+			var files=(rows||[]).filter(function(x){ return x&&x.name; });
+			return Promise.all(files.slice(0,200).map(function(f){
+				var p=f.name.indexOf('presence/')===0?f.name:('presence/'+f.name);
+				return supaDownload(p).catch(function(){ return null; });
+			}));
+		}).then(function(list){
+			var now=Date.now(), seen={}, arr=[];
+			(list||[]).forEach(function(x){
+				if(!x||!x.id||(now-(x.ts||0))>75000) return;
+				if(!seen[x.id] || x.ts>(seen[x.id].ts||0)){ seen[x.id]=x; }
+			});
+			for(var k in seen) arr.push(seen[k]);
+			if(n) n.textContent=arr.length>0?arr.length:1;
+		}).catch(function(){}).then(function(){ P_COUNT_BUSY=false; });
+	}
+	(function startPresence(){
+		var n=$('onlineNum'); if(n) n.textContent='1';
+		presenceBeat(); presenceCount();
+		setInterval(presenceBeat,15000);
+		setInterval(presenceCount,15000);
+	})();
 
 	showComposer();
 	refresh();
@@ -3563,6 +3834,15 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		</div>
 	</section>
 	<section class="container">
+		<button type="button" class="letter-entry" id="letterEntry" aria-label="打开一封家书">
+			<span class="le-env" aria-hidden="true"><span class="le-seal">瞳</span></span>
+			<span class="letter-entry-txt">
+				<span class="le-kicker">A LETTER FOR YOU · SCENE 03</span>
+				<span class="le-title">一封家书</span>
+				<span class="le-sub">致 小枕头们 · 点开信封</span>
+			</span>
+			<span class="le-arrow" aria-hidden="true">→</span>
+		</button>
 		<div class="section-head">
 			<h3 class="section-title">留言反馈</h3>
 			<span class="section-note">每周四 14:00—16:00 收信</span>
@@ -3622,6 +3902,40 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			</div>
 		</div>
 	</section>
+</div>
+
+<div class="letter-ov" id="letterModal" aria-hidden="true">
+	<div class="letter-stage" id="letterStage">
+		<div class="letter-scene">SCENE 03 — THE ENVELOPE</div>
+		<div class="letter-count">03 / 24</div>
+		<div class="letter-env-wrap" id="letterEnv" role="button" tabindex="0" aria-label="撕开信封">
+			<div class="letter-env-big">
+				<div class="letter-flap"></div>
+				<div class="letter-pocket"></div>
+				<div class="letter-seal-big">瞳</div>
+				<div class="letter-addr"><b>致 小枕头们</b><span>A LETTER FOR YOU · FOR 小枕头</span></div>
+			</div>
+			<div class="letter-tip">轻点信封，撕开封口</div>
+		</div>
+		<div class="letter-paper">
+			<button type="button" class="letter-x" id="letterX" aria-label="关闭">×</button>
+			<h2>一封家书</h2>
+			<p class="lp-sub">致 小枕头们</p>
+			<p>小枕头们，我们的相遇或许是偶然的；因为角色，因为直播或者因为你们不经意看到的一个视频。</p>
+			<p>但留下来，和我们一起走这段路不是一种理所当然，而是一份我们非常尊重的双向选择。</p>
+			<p>这个篇章才刚刚开始。</p>
+			<p>以后我们会去很多不同的地方，一起体验更多的第一次。</p>
+			<p>“瞳行政”已经开启，接下来，无论季节都想邀请你们继续与我们同行。</p>
+			<p>慢慢来，不要急，未来的路还很长。</p>
+			<p>谢谢你们选择了我们。</p>
+			<p class="lp-sign">政瞳之家</p>
+			<div class="lp-actions">
+				<button type="button" id="letterAgain">再看一遍信封</button>
+				<button type="button" id="letterClose2">回到联系我们</button>
+			</div>
+		</div>
+		<button type="button" class="letter-close" id="letterClose">关闭</button>
+	</div>
 </div>
 <div class="modal" id="meetModal">
 	<div class="meet-modal-inner">
@@ -6125,6 +6439,50 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 		sEl.innerHTML=pad(secs)+'<span class="dc-unit">秒</span>';
 	}
 	tick(); setInterval(tick,1000);
+})();
+</script>
+
+<script>
+(function(){
+	var entry=document.getElementById('letterEntry');
+	var modal=document.getElementById('letterModal');
+	var stage=document.getElementById('letterStage');
+	var env=document.getElementById('letterEnv');
+	if(!entry||!modal||!stage||!env) return;
+	var opened=false, tearing=false;
+	function resetLetter(){
+		opened=false; tearing=false;
+		stage.classList.remove('opened','tearing');
+		modal.setAttribute('aria-hidden','true');
+		document.body.classList.remove('letter-lock');
+	}
+	function openLetter(){
+		resetLetter();
+		modal.classList.add('show');
+		modal.setAttribute('aria-hidden','false');
+		document.body.classList.add('letter-lock');
+	}
+	function tearLetter(){
+		if(opened||tearing) return;
+		tearing=true; stage.classList.add('tearing');
+		setTimeout(function(){ opened=true; stage.classList.add('opened'); }, 520);
+	}
+	function closeLetter(){
+		modal.classList.remove('show');
+		modal.setAttribute('aria-hidden','true');
+		document.body.classList.remove('letter-lock');
+		setTimeout(resetLetter,260);
+	}
+	entry.addEventListener('click',openLetter);
+	env.addEventListener('click',tearLetter);
+	env.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tearLetter(); } });
+	var x=document.getElementById('letterX'), c=document.getElementById('letterClose'), c2=document.getElementById('letterClose2'), again=document.getElementById('letterAgain');
+	if(x) x.onclick=closeLetter;
+	if(c) c.onclick=closeLetter;
+	if(c2) c2.onclick=closeLetter;
+	if(again) again.onclick=function(){ resetLetter(); };
+	modal.addEventListener('click',function(e){ if(e.target===modal) closeLetter(); });
+	document.addEventListener('keydown',function(e){ if(e.key==='Escape' && modal.classList.contains('show')) closeLetter(); });
 })();
 </script>
 </body>

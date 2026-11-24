@@ -265,7 +265,7 @@ try{
   const parts=new Array(6);
   let done=0;
   await Promise.all([1,2,3,4,5,6].map(async i=>{
-    parts[i-1]=await fetchText('./three-chunks/part-'+i+'.js?v=1124e');
+    parts[i-1]=await fetchText('./three-chunks/part-'+i+'.js?v=1124f');
     done++;
     if(btn) btn.textContent='3D 引擎加载中… '+done+'/6';
   }));

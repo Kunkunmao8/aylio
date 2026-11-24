@@ -1205,6 +1205,8 @@ body.letter-lock{overflow:hidden;}
 .mini-game-card.parkour .mg-desc{color:#7D5540;}
 .mini-game-card.parkour .mg-go{color:#8E3F1E;}
 .mini-game-card.parkour .mg-icon{filter:drop-shadow(0 4px 7px rgba(122,58,28,.18));}
+.mini-game-card .mg-icon .mg-svg{width:44px;height:44px;display:block;margin-bottom:2px;filter:drop-shadow(0 4px 6px rgba(90,45,20,.12));}
+.mini-game-card .mg-icon .mg-art{height:46px;width:auto;display:block;margin-bottom:1px;filter:drop-shadow(0 5px 7px rgba(90,45,20,.16));}
 .mini-game-card.parkour::after{content:"";position:absolute;right:-34px;top:-38px;width:128px;height:128px;border-radius:50%;background:radial-gradient(circle,rgba(255,247,235,.62),rgba(255,247,235,0) 68%);pointer-events:none;}
 .gamehall-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;position:relative;z-index:1;}
 
@@ -3721,28 +3723,25 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head gamehall-head">
 		<p class="gamehall-kicker">GAME LOBBY · 2026</p>
 		<h2>游戏厅</h2>
-		<p>三台机器，三个房间。祝福树也搬进来了。</p>
+		<p>三台机器，三个玩法。祝福树也搬进来了。</p>
 	</div>
 	<section class="container">
 		<div class="gamehall-room">
 			<div class="gamehall-top"><span><span class="bulbs"><i></i><i></i><i></i><i></i></span>政瞳游戏厅</span><span>OPEN · 随时进来</span></div>
 			<div class="mini-game-grid gamehall-grid">
 				<button class="mini-game-card wish" type="button" data-game="blessing">
-					<span class="mg-icon">🌳</span>
 					<span class="mg-eyebrow">WISH TREE · 200 张牌</span>
 					<strong class="mg-name">政瞳祝福树</strong>
 					<span class="mg-desc">一棵可以转着看的树，挂满写好的祝福牌。点开一枚，读一句，再挂回去。</span>
 					<span class="mg-go">进入祝福树 →</span>
 				</button>
 				<button class="mini-game-card parkour" type="button" data-game="parkour">
-					<span class="mg-icon">🏃</span>
 					<span class="mg-eyebrow">RAIL RUN · ENDLESS</span>
 					<strong class="mg-name">政瞳跑酷</strong>
 					<span class="mg-desc">三条轨、疾驰的列车、昼夜和四个场景。←→ 闪身，↑ 跳跃，↓ 下滑。</span>
 					<span class="mg-go">进入跑酷 →</span>
 				</button>
 				<button class="mini-game-card memory" type="button" data-game="game">
-					<span class="mg-icon">🃏</span>
 					<span class="mg-eyebrow">MEMORY · 9 PAIRS</span>
 					<strong class="mg-name">翻牌游戏</strong>
 					<span class="mg-desc">把散落的回忆，一张张找回来。点开卡面，配成九对。</span>

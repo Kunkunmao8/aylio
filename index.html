@@ -1129,7 +1129,7 @@ body.letter-lock{overflow:hidden;}
 .memory-card.flipped .memory-inner{transform:rotateY(180deg);}
 .memory-card.matched{cursor:default;}
 .memory-face{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;overflow:hidden;}
-.memory-back{background:linear-gradient(145deg,#BF5B2E,#A65A33);box-shadow:0 6px 16px rgba(166,90,51,.22);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.86);font-size:24px;letter-spacing:2px;}
+.memory-back{background:#A9542C url('img/card-back.jpg') center/cover no-repeat;box-shadow:0 6px 16px rgba(166,90,51,.22);}
 .memory-front{background:#fff;border:1px solid #F2DDCB;transform:rotateY(180deg);box-shadow:0 6px 16px rgba(150,74,30,.12);}
 .memory-front img{width:100%;height:100%;object-fit:cover;display:block;}
 .memory-card.matched .memory-front{outline:3px solid #D07C48;}
@@ -3898,7 +3898,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			var el=document.createElement('div');
 			el.className='memory-card'; el.dataset.id=card.id;
 			var n=card.note;
-			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front"><img src="'+n.src+'" alt="'+n.t+'" loading="lazy"></div></div>';
+			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back"></div><div class="memory-face memory-front"><img src="'+n.src+'" alt="'+n.t+'" loading="lazy"></div></div>';
 			el.addEventListener('click',function(){ flip(el); });
 			board.appendChild(el);
 		});
@@ -4273,7 +4273,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				<div class="album-info">
 					<div class="album-date">2026.11.24</div>
 					<h5>回家就是最幸福的事</h5>
-					<p>长春 Vlog 2.0。他掌镜，从白天一路拍回家；她在旁边拆台，说他一件厚衣服都没给自己带。晚上没有动物，就去找动物花灯，牛、大象、考拉、蜜蜂一个个认过去。评论区说「好平凡好幸福」，他写：回家就是最幸福的事。</p>
+					<p>长春 Vlog 2.0。他掌镜，从白天一路拍回家；他在旁边拆台，说他一件厚衣服都没给自己带。晚上没有动物，就去找动物花灯，牛、大象、考拉、蜜蜂一个个认过去。评论区说「好平凡好幸福」，他写：回家就是最幸福的事。</p>
 					<div class="album-links"><a href="https://weibo.com/7862709856/5368859198751392" target="_blank" rel="noopener">微博</a></div>
 				</div>
 			</div>
@@ -4950,7 +4950,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				<div class="album-info">
 					<div class="album-date">2026.11.21</div>
 					<h5>家庭会议 #37</h5>
-					<p>11.21 双人直播，上下两场连播。前半段还在「重返相亲现场」，后半段已经变成妻管严现场；她听到「这里有个很帅的人」，嘴角就没下来过，做戒指 reaction 又把两个人拉回十个月前。评论说：看完有被政瞳的正缘震撼到。</p>
+					<p>11.21 双人直播，上下两场合起来近 98 分钟。上半场「重返相亲现场」，他一句「这里有个很帅的人」，把孙政听得嘴角一直没下来；下半场画风变成妻管严现场，做戒指 reaction 又把两个人拉回十个月前。评论里反复刷的两句是「真的好药好甜」和「孙政就是这样宠吕思瞳」。</p>
 					<div class="album-links"><a href="https://b23.tv/JTnLXsw" target="_blank" rel="noopener">B站</a></div>
 				</div>
 			</div>

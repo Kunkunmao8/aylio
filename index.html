@@ -3681,7 +3681,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳祝福树</h2><p>把想说的话挂上去，等它亮起来</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe blessing-frame" src="blessing.html" title="政瞳祝福树 · 3D" loading="lazy"></iframe>
+			<iframe class="game-iframe blessing-frame" data-src="blessing.html" title="政瞳祝福树 · 3D"></iframe>
 		</div>
 	</section>
 </div>
@@ -3780,7 +3780,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳跑酷</h2><p>点进画面，方向键 / 触屏按键开始跑</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe parkour-frame" src="parkour.html" title="政瞳跑酷" loading="lazy" allow="autoplay"></iframe>
+			<iframe class="game-iframe parkour-frame" data-src="parkour.html" title="政瞳跑酷" allow="autoplay"></iframe>
 		</div>
 	</section>
 </div>
@@ -3864,7 +3864,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		deck.forEach(function(card){
 			var el=document.createElement('div');
 			el.className='memory-card'; el.dataset.id=card.id;
-			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front"><img class="no-zoom" loading="lazy" src="'+card.img+'" alt="配对照片" draggable="false"></div></div>';
+			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front"><img class="no-zoom" loading="eager" src="'+card.img+'" alt="配对照片" draggable="false"></div></div>';
 			el.addEventListener('click',function(){ flip(el); });
 			board.appendChild(el);
 		});
@@ -6589,6 +6589,17 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 			go(this.getAttribute("data-game-back"));
 		});
 	});
+	function loadEmbedded(id){
+		var frame = document.querySelector("#" + id + " iframe[data-src]");
+		if (frame && !frame.getAttribute("src")) {
+			frame.setAttribute("src", frame.getAttribute("data-src"));
+		}
+	}
+	window.addEventListener("zt:page", function(e){
+		if (e.detail === "blessing" || e.detail === "parkour") { loadEmbedded(e.detail); }
+	});
+	var activePage = document.querySelector(".page.active");
+	if (activePage && (activePage.id === "blessing" || activePage.id === "parkour")) { loadEmbedded(activePage.id); }
 })();
 </script>
 </body>

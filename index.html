@@ -1178,17 +1178,19 @@ body.letter-lock{overflow:hidden;}
 .mini-game-card .mg-name{font-size:25px;line-height:1.25;letter-spacing:2px;font-weight:700;margin-top:2px;}
 .mini-game-card .mg-desc{font-size:13px;line-height:1.65;color:#8A6753;margin-top:2px;}
 .mini-game-card .mg-go{margin-top:auto;padding-top:16px;font-size:13px;letter-spacing:1px;color:#A9532D;font-weight:700;}
-.mini-game-card.parkour{background:linear-gradient(145deg,#1D2B46 0%,#0E1728 100%);border-color:#33445F;color:#FFF2DD;box-shadow:0 14px 34px rgba(16,25,44,.22);}
-.mini-game-card.parkour:hover{border-color:#7E94B6;box-shadow:0 20px 44px rgba(16,25,44,.32);}
-.mini-game-card.parkour .mg-eyebrow{color:#9DB2CE;}
-.mini-game-card.parkour .mg-desc{color:#B7C7DB;}
-.mini-game-card.parkour .mg-go{color:#F2C14E;}
-.mini-game-card.parkour .mg-icon{filter:drop-shadow(0 3px 8px rgba(242,193,78,.26));}
+.mini-game-card.parkour{background:linear-gradient(145deg,#FBE1CB 0%,#EEC09B 55%,#E5AE86 100%);border-color:#D9A079;color:#4A2E21;box-shadow:0 14px 34px rgba(135,74,38,.12);}
+.mini-game-card.parkour:hover{border-color:#C9865D;box-shadow:0 20px 44px rgba(135,74,38,.20);}
+.mini-game-card.parkour .mg-eyebrow{color:#A15E38;}
+.mini-game-card.parkour .mg-desc{color:#7D5540;}
+.mini-game-card.parkour .mg-go{color:#8E3F1E;}
+.mini-game-card.parkour .mg-icon{filter:drop-shadow(0 4px 7px rgba(122,58,28,.18));}
+.mini-game-card.parkour::after{content:"";position:absolute;right:-34px;top:-38px;width:128px;height:128px;border-radius:50%;background:radial-gradient(circle,rgba(255,247,235,.62),rgba(255,247,235,0) 68%);pointer-events:none;}
 
 .game-back-row{max-width:1180px;margin:0 auto;padding:22px 28px 0;}
 .game-back{display:inline-flex;align-items:center;gap:7px;padding:9px 17px;border:1px solid #E6CDB7;border-radius:999px;background:#FFF9F2;color:#8A563B;text-decoration:none;font-size:13.5px;letter-spacing:.5px;transition:.2s;}
 .game-back:hover{background:#F8E7D6;color:#5A3524;border-color:#D7A57D;}
 
+#blessing .blessing-page{padding-top:24px;}
 .embed-shell{position:relative;border:1px solid #E6D0BC;border-radius:24px;overflow:hidden;background:#0B1322;box-shadow:0 24px 58px rgba(112,58,28,.14);}
 .embed-shell .game-iframe{display:block;width:100%;border:0;background:#0B1322;}
 .blessing-frame{height:clamp(640px,90vh,980px);}
@@ -3678,10 +3680,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 </script>
 
 <div class="page" id="blessing">
-	<div class="pg-head"><h2>政瞳祝福树</h2><p>把想说的话挂上去，等它亮起来</p></div>
-	<section class="container">
+	<section class="container blessing-page">
 		<div class="embed-shell">
-			<iframe class="game-iframe blessing-frame" data-src="blessing.html" title="政瞳祝福树 · 3D"></iframe>
+			<iframe class="game-iframe blessing-frame" data-src="blessing.html?v=1124a" title="政瞳祝福树 · 3D"></iframe>
 		</div>
 	</section>
 </div>
@@ -3780,7 +3781,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳跑酷</h2><p>点进画面，方向键 / 触屏按键开始跑</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe parkour-frame" data-src="parkour.html" title="政瞳跑酷" allow="autoplay"></iframe>
+			<iframe class="game-iframe parkour-frame" data-src="parkour.html?v=1124a" title="政瞳跑酷" allow="autoplay"></iframe>
 		</div>
 	</section>
 </div>

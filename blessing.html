@@ -78,6 +78,11 @@
     max-width:560px;margin:20px auto 0;background:rgba(255,251,246,.9);border:1px solid var(--line);
     border-radius:22px;padding:18px 16px;box-shadow:0 18px 40px rgba(120,65,35,.12);backdrop-filter:blur(7px);
   }
+  .searchrow{display:flex;gap:8px;margin-bottom:10px;}
+  .panel input.search{flex:1;min-width:0;}
+  .lockbtn{padding:0 16px;border-radius:12px;border:1px solid #C98E62;background:#FFF9F1;color:#9A4B28;font-family:inherit;font-size:12.5px;cursor:pointer;transition:.2s;white-space:nowrap;}
+  .lockbtn:hover{background:#F7E3CE;}
+  .lockbtn.on{background:linear-gradient(135deg,#E0A15E,#C56F3D);border-color:#C56F3D;color:#FFF9F1;box-shadow:0 0 14px rgba(224,161,94,.45);}
   .panel .row{display:flex;gap:10px;flex-wrap:wrap;}
   .panel input{
     padding:12px 14px;border-radius:12px;border:1px solid #E2C6AD;
@@ -105,6 +110,9 @@
   .note-box .nv-text{font-size:16px;line-height:1.8;color:#4A2E08;word-break:break-word;}
   .note-box .nv-time{font-size:10.5px;color:#A98444;margin-top:12px;}
   .note-box .nv-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:14px;}
+  .nv-lock{background:rgba(242,193,78,.18);border:1px solid #C99A3E;color:#8A5A12;border-radius:999px;padding:7px 15px;font-size:12.5px;cursor:pointer;font-family:inherit;display:none;}
+  .nv-lock:hover{background:rgba(242,193,78,.32);}
+  .nv-lock.on{background:#E09A2E;border-color:#E09A2E;color:#FFF9F1;}
   .nv-del{background:none;border:1px solid #C99A3E;color:#8A5A12;border-radius:999px;padding:7px 15px;font-size:12.5px;cursor:pointer;font-family:inherit;}
   .nv-del:hover{background:rgba(201,154,62,.16);}
   .nv-close{background:#E09A2E;border:1px solid #E09A2E;color:#fff;border-radius:999px;padding:7px 18px;font-size:12.5px;cursor:pointer;font-family:inherit;}
@@ -126,6 +134,8 @@
     .panel{padding:14px 12px;border-radius:16px;}
     .panel .row{flex-direction:column;gap:8px;}
     .panel input.name,.panel input.text{flex:1 1 auto;width:100%;min-width:0;}
+    .searchrow{flex-direction:column;}
+    .lockbtn{padding:10px 14px;}
     .btn{width:100%;}
   }
 </style>
@@ -155,6 +165,10 @@
   </div>
 
   <div class="panel">
+    <div class="searchrow">
+      <input class="search" id="wallSearch" type="search" placeholder="搜索昵称或祝福关键字…" autocomplete="off" />
+      <button class="lockbtn" id="btnLock" type="button">锁定我的卡片</button>
+    </div>
     <div class="row">
       <input class="name" id="noteName" placeholder="你的昵称" maxlength="12" />
       <input class="text" id="noteText" placeholder="写一句祝福，挂到树上…" maxlength="60" />
@@ -172,6 +186,7 @@
     <div class="nv-text" id="nvText"></div>
     <div class="nv-time" id="nvTime"></div>
     <div class="nv-actions">
+      <button class="nv-lock" id="nvLock">锁定这张</button>
       <button class="nv-del" id="nvDel">摘下这只</button>
       <button class="nv-close" id="nvClose">收好</button>
     </div>
@@ -657,7 +672,44 @@ function cardTexture(name){
   return tex;
 }
 
-let cardObjs = [];   // {sprite, note, base:{pos}, ph, born}
+let cardObjs = [];   // {sprite, note, base:{pos}, ph, born, glow}
+let searchQuery = '';
+const MY_TS_KEY = 'aylio_my_note_ts';
+function readMyTs(){
+  try{ return localStorage.getItem(MY_TS_KEY) || ''; }catch(e){ return ''; }
+}
+function findMyNote(notes){
+  const ts = readMyTs();
+  let mine = ts ? notes.find(x=>String(x.ts)===ts) : null;
+  if(!mine){
+    const nm = (document.getElementById('noteName')?.value || '').trim();
+    if(nm) mine = notes.find(x=>(x.name||'')===nm);
+  }
+  return mine || null;
+}
+function updateLockBtn(){
+  const btn = document.getElementById('btnLock');
+  if(!btn) return;
+  const mine = findMyNote(loadWall());
+  const on = !!(mine && mine.locked);
+  btn.classList.toggle('on', on);
+  btn.textContent = on ? '取消锁定' : '锁定我的卡片';
+}
+function toggleLock(ts){
+  const arr = loadWall();
+  const item = arr.find(x=>String(x.ts)===String(ts));
+  if(!item) return;
+  const next = !item.locked;
+  saveWall(arr.map(x=>String(x.ts)===String(ts) ? Object.assign({}, x, {locked: next}) : x));
+  if(next){ try{ localStorage.setItem(MY_TS_KEY, String(ts)); }catch(e){} }
+  buildCards(false);
+  if(currentNote && String(currentNote.ts)===String(ts)){
+    const live = loadWall().find(x=>String(x.ts)===String(ts));
+    if(live){ currentNote = live; openNote(live); }
+  }
+  updateLockBtn();
+  tipTxt.textContent = next ? '已锁定你的小枕头，它会在树上发光 ✨' : '已取消锁定';
+}
 const raycaster = new THREE.Raycaster();
 raycaster.near = 0;
 
@@ -668,36 +720,44 @@ function slotPos(i, n){
   const u = (1 - Math.sqrt(1 - t)) * 0.9;   // 按树冠面积分布：下密上疏，顶部留给星
   const y = 1.25 + u*(TREE_H*0.86) + (Math.random()-0.5)*0.26;
   const ang = i*GOLDEN + (Math.random()-0.5)*0.12;
-  const depth = 0.93 + Math.random()*0.3;        // 有的靠里有的靠外，形成前后层次
-  const rad = radiusAtY(y) * depth + 0.1;
+  const depth = 1.18 + Math.random()*0.12;       // 一律挂在树冠外缘，避免被针叶吞掉
+  const rad = radiusAtY(y) * depth + 0.48;
   return new THREE.Vector3(Math.cos(ang)*rad, y, Math.sin(ang)*rad);
 }
 
 function buildCards(isNew){
-  cardObjs.forEach(o=>{ cardLayer.remove(o.sprite); });
+  cardObjs.forEach(o=>{ cardLayer.remove(o.sprite); if(o.glow) cardLayer.remove(o.glow); });
   cardObjs = [];
   texCache.clear();
 
-  const notes = loadWall().slice(0, MAX_CARDS).reverse();
+  const allNotes = loadWall().slice(0, MAX_CARDS);
+  document.getElementById('countTxt').textContent = allNotes.length;
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = q ? allNotes.filter(note=>((note.name||'')+' '+(note.text||'')).toLowerCase().indexOf(q)>=0) : allNotes;
+  const notes = filtered.slice(0, MAX_CARDS).reverse();
   const n = notes.length;
-  document.getElementById('countTxt').textContent = n;
   const loading = document.getElementById('loading');
 
   notes.forEach((note, i)=>{
     const name = (note.name || '小枕头').slice(0,4);
     const tex = cardTexture(name);
-    const mat = new THREE.SpriteMaterial({
-      map: tex, transparent: true, alphaTest: 0.25, depthWrite: true, depthTest: true,
-      toneMapped: false, fog: false, color: 0xffffff
+    // 用朝向相机的平面牌，比 Sprite 更稳：不会被深度剔除，也方便做光晕
+    const mat = new THREE.MeshBasicMaterial({
+      map: tex, transparent: true, alphaTest: 0.22, depthWrite: true, depthTest: true,
+      toneMapped: false, fog: false, side: THREE.DoubleSide,
+      color: note.locked ? 0xFFF1D2 : 0xF7E7CE
     });
-    mat.rotation = (Math.random()-0.5)*0.22;
-    const sp = new THREE.Sprite(mat);
+    const sp = new THREE.Mesh(new THREE.PlaneGeometry(1,1), mat);
+    sp.quaternion.copy(camera.quaternion);
     const base = slotPos(i, n);
     // 牌越多越小，避免把树糊成一片橘色
-    const dense = Math.max(0, Math.min(1, (n - 40)/160));
-    const s0 = 0.52 - dense*0.18;
+    const dense = Math.max(0, Math.min(1, (n - 30)/170));
+    const s0 = (n <= 30 ? 1.9 : 1.32) - dense*0.55;
     const s = s0 * (0.94 + Math.random()*0.12);
     sp.scale.set(s, s*0.86, 1);
+    sp.userData.roll=(Math.random()-0.5)*0.22;
+    sp.userData.sx=s; sp.userData.sy=s*0.86;
+    sp.rotateZ(sp.userData.roll);
     sp.position.copy(base);
     sp.userData.note = note;
     sp.userData.base = base.clone();
@@ -705,7 +765,20 @@ function buildCards(isNew){
     sp.userData.born = isNew && i === n-1 ? performance.now() : 0;
 
     cardLayer.add(sp);
-    cardObjs.push({sprite: sp, note, base, ph: sp.userData.ph, dropped: sp.userData.born > 0});
+
+    // 被锁定的卡片：额外加一层暖金色光晕，并缓慢呼吸
+    let glow = null;
+    if(note.locked){
+      glow = new THREE.Mesh(new THREE.PlaneGeometry(1,1), new THREE.MeshBasicMaterial({
+        map: glowTex, color: 0xFFC56B, transparent: true, opacity: .55,
+        blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, fog: false, side: THREE.DoubleSide
+      }));
+      glow.quaternion.copy(camera.quaternion);
+      glow.position.copy(base); glow.position.z -= 0.06;
+      glow.scale.set(s*2.05, s*2.05, 1);
+      cardLayer.add(glow);
+    }
+    cardObjs.push({sprite: sp, note, base, ph: sp.userData.ph, dropped: sp.userData.born > 0, glow});
   });
 }
 
@@ -760,7 +833,7 @@ canvas.addEventListener('pointerup', e=>{
 const noteView = document.getElementById('noteView');
 const nvName = document.getElementById('nvName'), nvText = document.getElementById('nvText'),
       nvTime = document.getElementById('nvTime'), nvDel = document.getElementById('nvDel'),
-      nvClose = document.getElementById('nvClose');
+      nvClose = document.getElementById('nvClose'), nvLock = document.getElementById('nvLock');
 let currentNote = null;
 
 function openNote(n){
@@ -769,8 +842,14 @@ function openNote(n){
   nvName.textContent = '@' + (n.name || '小枕头');
   nvText.textContent = n.text;
   nvTime.textContent = n.ts ? new Date(n.ts).toLocaleString('zh-CN',{hour12:false}) : '';
+  const mine = findMyNote(loadWall());
+  const own = !!(mine && String(mine.ts)===String(n.ts));
+  nvLock.style.display = own ? 'inline-block' : 'none';
+  nvLock.classList.toggle('on', !!n.locked);
+  nvLock.textContent = n.locked ? '取消锁定' : '锁定这张';
   noteView.classList.add('show');
 }
+nvLock.onclick = ()=>{ if(currentNote) toggleLock(currentNote.ts); };
 nvClose.onclick = ()=> noteView.classList.remove('show');
 noteView.addEventListener('click', e=>{ if(e.target === noteView) noteView.classList.remove('show'); });
 nvDel.onclick = ()=>{
@@ -789,15 +868,35 @@ noteSend.onclick = ()=>{
   const txt = noteText.value.trim();
   if(!txt){ noteText.focus(); return; }
   const arr = loadWall();
-  arr.unshift({name: noteName.value.trim() || '小枕头', text: txt, ts: Date.now()});
+  const mine = {name: noteName.value.trim() || '小枕头', text: txt, ts: Date.now(), locked: false};
+  arr.unshift(mine);
   saveWall(arr);
+  try{ localStorage.setItem(MY_TS_KEY, String(mine.ts)); }catch(e){}
   buildCards(true);
+  updateLockBtn();
   noteText.value = '';
-  tipTxt.textContent = '已挂上树，可以拖一下树看看 :)';
+  tipTxt.textContent = '已挂上树，点「锁定我的卡片」可以让它发光 ✨';
 };
 noteText.addEventListener('keydown', e=>{ if(e.key === 'Enter') noteSend.click(); });
 
+/* 搜索昵称 / 祝福内容 */
+const wallSearch = document.getElementById('wallSearch');
+let searchTimer = null;
+if(wallSearch){
+  wallSearch.addEventListener('input', ()=>{
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(()=>{ searchQuery = wallSearch.value.trim(); buildCards(false); }, 220);
+  });
+  wallSearch.addEventListener('search', ()=>{ searchQuery = wallSearch.value.trim(); buildCards(false); });
+}
+document.getElementById('btnLock').onclick = ()=>{
+  const mine = findMyNote(loadWall());
+  if(!mine){ tipTxt.textContent = '先在上面挂一句祝福，再锁定它'; return; }
+  toggleLock(mine.ts);
+};
+
 buildCards(false);
+updateLockBtn();
 if(renderer) document.getElementById('loading').classList.add('hide');
 
 /* 对外状态（也方便二次开发接小程序/其他页面） */
@@ -845,13 +944,23 @@ function animate(){
   cardObjs.forEach(o=>{
     o.sprite.position.x = o.base.x + Math.sin(t*1.1 + o.ph)*0.05;
     o.sprite.position.z = o.base.z + Math.cos(t*0.9 + o.ph)*0.05;
+    o.sprite.quaternion.copy(camera.quaternion);
+    o.sprite.rotateZ(o.sprite.userData.roll || 0);
+    if(o.glow){
+      o.glow.quaternion.copy(camera.quaternion);
+      const gp = 1 + 0.11*Math.sin(t*2.4 + o.ph);
+      o.glow.position.copy(o.sprite.position); o.glow.position.z -= 0.06;
+      o.glow.scale.set(o.sprite.scale.x*2.05*gp, o.sprite.scale.y*2.15*gp, 1);
+      o.glow.material.opacity = 0.40 + 0.20*Math.sin(t*2.4 + o.ph);
+    }
     if(o.dropped){
       const dt = (now - o.sprite.userData.born) / 1000;
       const e = Math.min(1, dt/1.0);
       const ease = 1 - Math.pow(1-e, 3);
       o.sprite.position.y = o.base.y + (1-ease)*9;
-      o.sprite.scale.setScalar(0.7 + 0.3*ease);
-      if(e >= 1){ o.dropped = false; o.sprite.userData.born = 0; o.sprite.scale.set(1,1,1); }
+      const k = 0.7 + 0.3*ease;
+      o.sprite.scale.set(o.sprite.userData.sx*k, o.sprite.userData.sy*k, 1);
+      if(e >= 1){ o.dropped = false; o.sprite.userData.born = 0; o.sprite.scale.set(o.sprite.userData.sx, o.sprite.userData.sy, 1); }
     }
   });
 

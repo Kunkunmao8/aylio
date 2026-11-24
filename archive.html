@@ -135,8 +135,15 @@ html,body{background:#FBF3E9!important;color:#4A2E21!important;}
 .fxcard{background:linear-gradient(180deg,#FFF9F0,#F3E0CB)!important;border-color:#D9B48C!important;box-shadow:0 24px 60px rgba(90,45,20,.18)!important;}
 .bigbtn,.cbtn.primary{background:linear-gradient(180deg,#D68B5D,#B45B33)!important;color:#FFF9F3!important;box-shadow:0 8px 20px rgba(180,91,51,.22)!important;}
 .cbtn,.bigbtn.ghost{background:rgba(180,91,51,.08)!important;border-color:rgba(180,91,51,.35)!important;color:#4A2E21!important;box-shadow:none!important;}
-.nocell{background:rgba(122,75,48,.08)!important;color:#8A6753!important;}
-.nocell.cross{color:#B49A83!important;}
+.nogrid{background:#FFFAF1!important;border-color:#D8B893!important;gap:3px!important;padding:7px!important;box-shadow:inset 0 2px 8px rgba(120,75,45,.08)!important;}
+.nocell{background:#EFDCC3!important;border:1px solid #D5B18A!important;color:#5A3B26!important;font-weight:700!important;border-radius:4px!important;}
+.nocell:hover{background:#E7CDA7!important;}
+.nocell.cross{background:#E2CDB2!important;color:#8B5C3B!important;}
+.nocell.on{background:linear-gradient(180deg,#D98E5F,#B85E35)!important;color:#FFF8EC!important;border-color:#A9532D!important;box-shadow:0 0 8px rgba(180,91,51,.32)!important;}
+.nocell.bad{background:#C3604E!important;color:#fff!important;}
+.nocell.hint{outline:2px solid #B45B33!important;outline-offset:1px!important;}
+.noclue{color:#65432D!important;font-weight:700!important;background:#FBF0DF!important;border-radius:2px!important;}
+.noclue.done{color:#B45B33!important;background:#F6E3CB!important;}
 .card{background:linear-gradient(135deg,rgba(214,139,93,.14),rgba(255,249,241,.82))!important;border-color:rgba(180,91,51,.24)!important;}
 .card .ic{background:radial-gradient(circle at 30% 25%,#FFF4E5,#EBCDB2)!important;border-color:rgba(180,91,51,.28)!important;}
 </style>
@@ -497,7 +504,7 @@ GAMES.dual=function(stage, controls, api, level){
     ctx.restore(); ctx.globalAlpha=1;
   }
   function symbol(x,y,rad,kind){
-    ctx.strokeStyle='rgba(222,233,248,.85)'; ctx.lineWidth=1.6; ctx.beginPath();
+    ctx.strokeStyle='rgba(104,66,42,.88)'; ctx.lineWidth=2; ctx.beginPath();
     if(kind===0){ ctx.arc(x,y,rad,0,Math.PI*2); }
     else if(kind===1){ ctx.moveTo(x,y-rad); ctx.lineTo(x+rad*0.92,y+rad*0.68); ctx.lineTo(x-rad*0.92,y+rad*0.68); ctx.closePath(); }
     else if(kind===2){ ctx.rect(x-rad*0.8,y-rad*0.8,rad*1.6,rad*1.6); }
@@ -508,20 +515,27 @@ GAMES.dual=function(stage, controls, api, level){
   function draw(){
     ctx.setTransform(K,0,0,K,0,0);
     ctx.clearRect(0,0,S,S);
-    ctx.fillStyle='rgba(255,255,255,0.035)'; ctx.fillRect(0,0,S,S);
-    ctx.strokeStyle='rgba(255,255,255,0.07)'; ctx.lineWidth=1;
+    ctx.fillStyle='#FFF9EF'; ctx.fillRect(0,0,S,S);
+    // 每一格都画出来：浅底 + 深一档的格线，浅色页面上也能一眼看清
+    for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      ctx.fillStyle=((r+c)%2 ? '#F6E7D2' : '#FDF3E3');
+      ctx.fillRect(PAD+c*cell+1,PAD+r*cell+1,cell-2,cell-2);
+    }
+    ctx.strokeStyle='rgba(150,100,64,.42)'; ctx.lineWidth=1.2;
     for(let i=0;i<=N;i++){
       const p=PAD+i*cell;
       ctx.beginPath(); ctx.moveTo(p,PAD); ctx.lineTo(p,S-PAD); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(PAD,p); ctx.lineTo(S-PAD,p); ctx.stroke();
     }
+    ctx.strokeStyle='rgba(150,100,64,.62)'; ctx.lineWidth=1.4;
+    ctx.strokeRect(PAD,PAD,S-PAD*2,S-PAD*2);
     const vis = view==='A'?Akeys:Bkeys;
     for(let r=0;r<N;r++)for(let c=0;c<N;c++){
       const kk=key(r,c);
       const x=PAD+c*cell+cell/2, y=PAD+r*cell+cell/2, rad=cell*0.31;
       if(vis.has(kk)){
         if(revealed && interKeys.has(kk)){
-          ctx.fillStyle='#efc264'; ctx.textAlign='center'; ctx.textBaseline='middle';
+          ctx.fillStyle='#9E4F28'; ctx.textAlign='center'; ctx.textBaseline='middle';
           ctx.font='800 '+(cell*0.4)+'px system-ui,sans-serif';
           ctx.fillText(String(digitOf[kk]),x,y);
         } else if(view==='A'){
@@ -531,9 +545,9 @@ GAMES.dual=function(stage, controls, api, level){
         }
       }
       if(marks.has(kk)){
-        ctx.fillStyle='rgba(239,194,100,.14)';
+        ctx.fillStyle='rgba(180,91,51,.16)';
         ctx.beginPath(); ctx.arc(x,y,cell*0.43,0,Math.PI*2); ctx.fill();
-        ctx.strokeStyle='#efc264'; ctx.lineWidth=2;
+        ctx.strokeStyle='#B45B33'; ctx.lineWidth=2.2;
         ctx.beginPath(); ctx.arc(x,y,cell*0.43,0,Math.PI*2); ctx.stroke();
       }
     }

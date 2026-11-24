@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>政瞳谜厅 · 三锁</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>" />
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  :root{--ink:#080d18;--ink2:#101a2c;--gold:#e8b44a;--cream:#f3e8d3;--dim:#8b96ad;--cyan:#6fd6e8;--red:#e0665a;--green:#7fc98a;}
+  html,body{height:100%;}
+  body{background:var(--ink);color:var(--cream);font-family:"PingFang SC","Noto Sans SC",system-ui,-apple-system,sans-serif;overflow:hidden;}
+  .app{position:relative;width:100%;height:100%;overflow:hidden;display:flex;justify-content:center;}
+  .wrap{position:relative;width:100%;max-width:540px;height:100%;overflow:hidden;}
+  .screen{position:absolute;inset:0;display:flex;flex-direction:column;overflow-y:auto;padding:24px 20px 30px;
+    background:radial-gradient(ellipse at 25% 0%,rgba(232,180,74,.10),transparent 55%),
+      radial-gradient(ellipse at 90% 90%,rgba(111,214,232,.07),transparent 50%),
+      linear-gradient(180deg,#0c1322 0%,#080d18 100%);
+    transition:opacity .26s,transform .26s;}
+  .screen.off{opacity:0;transform:translateY(10px);pointer-events:none;}
+  .screen.hide{display:none;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--dim);letter-spacing:1px;flex:0 0 auto;}
+  .topbar button{background:none;border:none;color:var(--dim);font-family:inherit;font-size:12px;cursor:pointer;padding:4px 0;}
+  .topbar button:hover{color:var(--gold);}
+
+  /* 菜单 */
+  .menuhead{text-align:center;padding:18px 0 8px;flex:0 0 auto;}
+  .menuhead .seal{width:60px;height:60px;margin:0 auto 14px;border-radius:50%;border:2px solid rgba(232,180,74,.55);
+    display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--gold);box-shadow:0 0 24px rgba(232,180,74,.2) inset;position:relative;}
+  .menuhead .seal::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px dashed rgba(232,180,74,.25);animation:spin 26s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .menuhead h1{font-size:29px;letter-spacing:4px;font-weight:800;}
+  .menuhead h1 em{font-style:normal;color:var(--gold);}
+  .menuhead p{margin-top:8px;font-size:12px;letter-spacing:2.5px;color:var(--dim);}
+  .cards{display:flex;flex-direction:column;gap:12px;margin-top:20px;flex:1;}
+  .card{position:relative;border-radius:18px;padding:16px 16px 15px;border:1px solid rgba(232,180,74,.2);
+    background:linear-gradient(135deg,rgba(232,180,74,.10),rgba(255,255,255,.03));
+    display:flex;gap:14px;align-items:center;cursor:pointer;transition:.18s;overflow:hidden;}
+  .card:hover{border-color:rgba(232,180,74,.55);transform:translateY(-1px);}
+  .card .ic{width:52px;height:52px;border-radius:14px;background:radial-gradient(circle at 30% 25%,#2a3a56,#131c2c);
+    display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid rgba(232,180,74,.25);flex:0 0 auto;}
+  .card h3{font-size:15px;letter-spacing:1px;margin-bottom:5px;}
+  .card p{font-size:11.5px;line-height:1.7;color:#7A5B47;}
+  .card .st{margin-left:auto;font-size:10px;color:var(--gold);text-align:right;flex:0 0 auto;letter-spacing:1px;}
+  .card .st i{display:block;width:8px;height:8px;border-radius:50%;background:rgba(232,180,74,.25);margin:6px 0 0 auto;}
+  .card .st i.on{background:var(--gold);box-shadow:0 0 8px rgba(232,180,74,.6);}
+
+  /* 通用 */
+  .playhead{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--dim);letter-spacing:1px;flex:0 0 auto;}
+  .playhead button{background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;font-family:inherit;padding:4px 0;}
+  .h3{font-size:18px;letter-spacing:1.5px;margin:12px 0 6px;flex:0 0 auto;}
+  .sub{font-size:12px;line-height:1.9;color:#7A5B47;margin-bottom:12px;flex:0 0 auto;}
+  .stagebox{position:relative;width:100%;display:flex;justify-content:center;flex:0 0 auto;}
+  .controls{margin-top:12px;display:flex;flex-direction:column;gap:9px;align-items:center;flex:0 0 auto;}
+  .row{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;align-items:center;width:100%;}
+  .cbtn{padding:10px 18px;border-radius:12px;border:1px solid rgba(232,180,74,.35);background:rgba(232,180,74,.08);
+    color:var(--cream);font-size:13px;cursor:pointer;font-family:inherit;transition:.15s;}
+  .cbtn:hover{background:rgba(232,180,74,.18);}
+  .cbtn:active{transform:scale(.96);}
+  .cbtn.primary{background:linear-gradient(180deg,#efc264,#d9a33a);color:#2a1d08;border:none;font-weight:700;}
+  .cbtn:disabled{opacity:.4;cursor:not-allowed;}
+  .tip{margin-top:10px;font-size:12.5px;color:var(--gold);min-height:20px;text-align:center;line-height:1.7;flex:0 0 auto;}
+  .tip.bad{color:var(--red);}
+  .bigbtn{padding:12px 34px;border:none;border-radius:999px;background:linear-gradient(180deg,#efc264,#d9a33a);
+    color:#2a1d08;font-size:14.5px;letter-spacing:2px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px rgba(232,180,74,.26);}
+  .bigbtn.ghost{background:transparent;color:var(--cream);border:1px solid rgba(232,180,74,.5);box-shadow:none;font-weight:600;}
+  .bigbtn:active{transform:translateY(2px);}
+
+  /* 弹层 */
+  .fx{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;background:rgba(4,8,15,.72);backdrop-filter:blur(4px);padding:22px;}
+  .fx.show{display:flex;}
+  .fxcard{width:min(340px,94%);background:linear-gradient(180deg,#141d31,#0e1526);border:1px solid rgba(232,180,74,.35);
+    border-radius:20px;padding:22px 20px;box-shadow:0 24px 60px rgba(0,0,0,.55);animation:pop .3s cubic-bezier(.2,1.4,.4,1);max-height:88%;overflow:auto;}
+  @keyframes pop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
+  .fxcard h4{font-size:16px;letter-spacing:2px;margin-bottom:10px;text-align:center;}
+  .fxcard p{font-size:13px;line-height:1.95;color:#c8d2e4;}
+  .fxcard .paper{background:linear-gradient(180deg,#f3e8d3,#e6d8bd);color:#2b2417;border-radius:10px;padding:14px;font-size:12.5px;line-height:2;
+    box-shadow:inset 0 0 30px rgba(120,96,50,.18);margin:8px 0 2px;}
+  .fxcard .paper b{color:#8a5a12;}
+  .fxcard .bigbtn{margin:16px auto 0;display:block;padding:9px 26px;font-size:13px;}
+
+  footer{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+</style>
+<style id="aylio-cream">
+:root{--ink:#FBF3E9;--ink2:#F4E3D0;--gold:#B45B33;--gold2:#8E4A2A;--cream:#4A2E21;--dim:#8A6753;--cyan:#A9532D;--red:#A7412E;--green:#6F7D4E;}
+html,body{background:#FBF3E9!important;color:#4A2E21!important;}
+.stagewrap,.wrap{max-width:100%!important;}
+.stagebox canvas{filter:brightness(1.06) sepia(.12) saturate(1.02);}
+.hintline,.sub,.card p,.cover .desc,.story .lines,.fxcard p{color:#5C4030!important;}
+.story .lines p.dim{color:#8A6753!important;}
+.legend span,.tab{color:#7A5B47!important;}
+.screen{background:radial-gradient(ellipse at 20% 0%,rgba(214,139,93,.12),transparent 55%),radial-gradient(ellipse at 90% 90%,rgba(180,91,51,.06),transparent 50%),linear-gradient(180deg,#FFF9F1 0%,#F5E6D4 100%)!important;}
+.fx{background:rgba(74,46,33,.45)!important;}
+.fxcard{background:linear-gradient(180deg,#FFF9F0,#F3E0CB)!important;border-color:#D9B48C!important;box-shadow:0 24px 60px rgba(90,45,20,.18)!important;}
+.bigbtn,.cbtn.primary{background:linear-gradient(180deg,#D68B5D,#B45B33)!important;color:#FFF9F3!important;box-shadow:0 8px 20px rgba(180,91,51,.22)!important;}
+.cbtn,.bigbtn.ghost{background:rgba(180,91,51,.08)!important;border-color:rgba(180,91,51,.35)!important;color:#4A2E21!important;box-shadow:none!important;}
+.nocell{background:rgba(122,75,48,.08)!important;color:#8A6753!important;}
+.nocell.cross{color:#B49A83!important;}
+.card{background:linear-gradient(135deg,rgba(214,139,93,.14),rgba(255,249,241,.82))!important;border-color:rgba(180,91,51,.24)!important;}
+.card .ic{background:radial-gradient(circle at 30% 25%,#FFF4E5,#EBCDB2)!important;border-color:rgba(180,91,51,.28)!important;}
+</style>
+</head>
+<body>
+<div class="app"><div class="wrap">
+
+  <div class="screen" id="scMenu">
+    <div class="menuhead">
+      <div class="seal">🔐</div>
+      <h1>政瞳<em>谜厅</em></h1>
+      <p>T H R E E · L O C K S</p>
+    </div>
+    <div class="cards" id="cards">
+      <div class="card" data-game="vault">
+        <div class="ic">🗄️</div>
+        <div>
+          <h3>旧物仓</h3>
+          <p>四件旧物各藏一位密码，按它们留下的位次排成四位数。</p>
+        </div>
+        <div class="st">未解 <i id="dotVault"></i></div>
+      </div>
+      <div class="card" data-game="cipher">
+        <div class="ic">🔡</div>
+        <div>
+          <h3>破译台</h3>
+          <p>一整句话被换成了陌生字母，靠几个已知字母把它读回来。</p>
+        </div>
+        <div class="st">未解 <i id="dotCipher"></i></div>
+      </div>
+      <div class="card" data-game="hanzi">
+        <div class="ic">漢</div>
+        <div>
+          <h3>字谜锁</h3>
+          <p>四道字谜四个转轮，猜中一个字，锁就松一格。</p>
+        </div>
+        <div class="st">未解 <i id="dotHanzi"></i></div>
+      </div>
+    </div>
+    <div class="controls" style="margin-top:18px">
+      <button class="bigbtn ghost" id="btnReset">清空进度</button>
+    </div>
+  </div>
+
+  <div class="screen hide" id="scPlay">
+    <div class="playhead">
+      <button id="btnBack">← 回谜厅</button>
+      <span id="playTag">第一厅</span>
+      <span id="playStep"></span>
+    </div>
+    <h3 class="h3" id="playTitle"></h3>
+    <p class="sub" id="playHint"></p>
+    <div class="stagebox" id="stage"></div>
+    <div class="controls" id="controls"></div>
+    <div class="tip" id="tip"></div>
+  </div>
+
+  <div class="screen hide" id="scEnd">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+      <div style="font-size:38px;color:var(--gold);margin-bottom:14px">🔓</div>
+      <h2 style="font-size:25px;letter-spacing:4px;margin-bottom:14px;">三锁齐开</h2>
+      <p style="font-size:13.5px;line-height:2.05;color:#c9d2e2;max-width:330px" id="endText"></p>
+      <button class="bigbtn ghost" id="btnEndBack" style="margin-top:24px">回谜厅</button>
+    </div>
+  </div>
+
+  <div class="fx" id="fx">
+    <div class="fxcard">
+      <h4 id="fxTitle">线索</h4>
+      <div id="fxBody"></div>
+      <button class="bigbtn" id="fxOk">知道了</button>
+    </div>
+  </div>
+
+  <footer>© 2026 政瞳之家 · 谜厅</footer>
+</div></div>
+
+<script type="module">
+let THREE;
+try { THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js'); }
+catch(e) { THREE = await import('https://unpkg.com/three@0.160.0/build/three.module.js'); }
+
+const SAVE_KEY='aylio_hall_v1';
+const state={ done:{vault:false,cipher:false,hanzi:false}, mounted:null, cur:null };
+
+/* DOM */
+const scMenu=document.getElementById('scMenu'), scPlay=document.getElementById('scPlay'), scEnd=document.getElementById('scEnd');
+const stage=document.getElementById('stage'), controls=document.getElementById('controls'), tipEl=document.getElementById('tip');
+const fx=document.getElementById('fx'), fxTitle=document.getElementById('fxTitle'), fxBody=document.getElementById('fxBody');
+const playTag=document.getElementById('playTag'), playTitle=document.getElementById('playTitle'),
+      playHint=document.getElementById('playHint'), playStep=document.getElementById('playStep');
+
+function show(el){
+  [scMenu,scPlay,scEnd].forEach(s=>{
+    if(s===el){ s.classList.remove('hide'); requestAnimationFrame(()=>s.classList.remove('off')); }
+    else { s.classList.add('off'); setTimeout(()=>{ if(s.classList.contains('off')&&s!==el) s.classList.add('hide'); },190); }
+  });
+}
+function setTip(m,bad){ tipEl.textContent=m||''; tipEl.classList.toggle('bad',!!bad); }
+function showFx(title, html, cb){
+  fxTitle.textContent=title;
+  fxBody.innerHTML='';
+  if(typeof html==='string'){ const p=document.createElement('div'); p.innerHTML=html; fxBody.appendChild(p); }
+  else fxBody.appendChild(html);
+  fxCb=cb||null;
+  fx.classList.add('show');
+}
+let fxCb=null;
+document.getElementById('fxOk').onclick=()=>{
+  fx.classList.remove('show');
+  const cb=fxCb; fxCb=null;
+  if(cb) cb();
+};
+
+function save(){
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state.done));
+  syncDots();
+}
+function load(){
+  try{ const o=JSON.parse(localStorage.getItem(SAVE_KEY)||'{}'); state.done=Object.assign(state.done,o||{}); }catch(e){}
+}
+function syncDots(){
+  ['vault','cipher','hanzi'].forEach(k=>{
+    const d=document.getElementById('dot'+(k==='vault'?'Vault':k==='cipher'?'Cipher':'Hanzi'));
+    if(d) d.classList.toggle('on', !!state.done[k]);
+    const st=d&&d.parentElement;
+    if(st) st.textContent=state.done[k]?'已解 ':'未解 ';
+    if(st) st.appendChild(d);
+  });
+}
+function solvedAll(){ return state.done.vault&&state.done.cipher&&state.done.hanzi; }
+
+const TAGS={vault:'第一厅 · 旧物仓', cipher:'第二厅 · 破译台', hanzi:'第三厅 · 字谜锁'};
+const HINTS={
+  vault:'点物件凑近查看：书架抽出夹纸条的书，抽屉拉开找车票，看钟面分针指着几，翻画框看背板。自己把数字和位次找齐，再去开门。',
+  cipher:'每个怪字母下面留了一个空位。先填已经给出的字母，再看词的长度和重复位置，把整句话读出来。',
+  hanzi:'每道字谜只对应一个字。想清楚拆字和会意，再点候选字；点错锁会晃一下。'
+};
+
+function openGame(game){
+  state.cur=game;
+  playTag.textContent=TAGS[game];
+  playTitle.textContent={vault:'旧物仓',cipher:'破译台',hanzi:'字谜锁'}[game];
+  playHint.textContent=HINTS[game];
+  playStep.textContent='';
+  stage.innerHTML=''; controls.innerHTML=''; setTip('');
+  show(scPlay); scPlay.scrollTop=0;
+  if(state.mounted&&state.mounted.destroy){ try{ state.mounted.destroy(); }catch(e){} }
+  state.mounted=null;
+  const api={ solve:()=>onSolve(game), setStep:t=>{ playStep.textContent=t; }, setTip };
+  state.mounted=GAMES[game](stage,controls,api);
+}
+function onSolve(game){
+  setTip('');
+  state.done[game]=true; save();
+  showFx('这一厅开了', '「'+playTitle.textContent+'」解开了。走廊尽头又亮起一盏灯。', ()=>{
+    if(solvedAll()) openEnd(); else show(scMenu);
+  });
+}
+function openEnd(){
+  document.getElementById('endText').innerHTML='三把锁同时弹开。<br />门后不是走廊，是一间更小的房间：<br />桌上摊着两年前那张信纸，边上多了一行新写的字——<br /><br />“你们终于把这里逛完了。”<br /><br />字迹还很新。';
+  show(scEnd);
+}
+document.getElementById('btnBack').onclick=()=>{
+  if(state.mounted&&state.mounted.destroy){ try{ state.mounted.destroy(); }catch(e){} }
+  state.mounted=null; show(scMenu);
+};
+document.getElementById('btnEndBack').onclick=()=>show(scMenu);
+document.getElementById('btnReset').onclick=()=>{
+  state.done={vault:false,cipher:false,hanzi:false};
+  localStorage.removeItem(SAVE_KEY);
+  syncDots();
+};
+document.querySelectorAll('.card').forEach(c=>{
+  c.addEventListener('click',()=>openGame(c.dataset.game));
+});
+
+load(); syncDots();
+const GAMES={};
+const GEN={};
+/* 通用随机工具 */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffleArr(arr,rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function rndInt(rng,a,b){ return a+Math.floor(rng()*(b-a+1)); }
+
+/* ============================================================
+   第一厅 · 旧物仓（密室特写版：飞镜 + 物品级交互 + 音效震动）
+   ============================================================ */
+function makeVaultLevel(seed){
+  const rng=mulberry32((seed>>>0)||1);
+  const pool=shuffleArr([1,2,3,4,5,6,7,8,9],rng);
+  const ord=shuffleArr([1,2,3,4],rng);
+  const ids=['shelf','desk','clock','painting'];
+  const data={};
+  ids.forEach((id,i)=>{ data[id]={d:pool[i], p:ord[i]}; });
+  // 钟面：分针指向的数字即数字线索 d；mm = d*5
+  const time={hh:rndInt(rng,1,9), mm:data.clock.d*5};
+  return {data, time};
+}
+
+GAMES.vault=function(stage, controls, api){
+  const lvl=makeVaultLevel(Math.floor(Math.random()*2147483000));
+  let code='';
+  for(let p=1;p<=4;p++){
+    for(const id in lvl.data) if(lvl.data[id].p===p) code+=lvl.data[id].d;
+  }
+
+  /* ---------- 音效 / 震动 ---------- */
+  let AC=null;
+  function ac(){ try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); return AC; }catch(e){ return null; } }
+  function tone(freq,dur,type='sine',gain=.16,delay=0){
+    const a=ac(); if(!a) return;
+    const o=a.createOscillator(), g=a.createGain();
+    o.type=type; o.frequency.value=freq;
+    const t=a.currentTime+delay;
+    g.gain.setValueAtTime(gain,t); g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur);
+  }
+  const sndClick=()=>tone(660,.07,'triangle',.1);
+  const sndOpen =()=>{ tone(392,.12,'triangle',.14); tone(523,.16,'triangle',.14,.09); };
+  const sndBad  =()=>{ tone(150,.16,'square',.12); tone(110,.2,'square',.12,.12); if(navigator.vibrate) navigator.vibrate(90); };
+  const sndGood =()=>{ tone(523,.14,'triangle',.16); tone(659,.14,'triangle',.16,.1); tone(784,.22,'triangle',.16,.2); };
+
+  const S=Math.max(290, Math.min(stage.clientWidth||380, 560));
+  const H=Math.round(S*0.9);
+  const host=document.createElement('div');
+  host.style.cssText='position:relative;width:'+S+'px;height:'+H+'px;border-radius:16px;overflow:hidden;border:1px solid rgba(232,180,74,.22);background:#2A1B12;box-shadow:inset 0 0 60px rgba(40,20,10,.55);';
+  stage.appendChild(host);
+
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+  renderer.setSize(S,H,false);
+  renderer.setClearColor(0x2A1B12,1);
+  renderer.shadowMap.enabled=true;
+  renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.62;
+  renderer.domElement.style.cssText='display:block;width:100%;height:100%;cursor:pointer;';
+  host.appendChild(renderer.domElement);
+  const vig=document.createElement('div');
+  vig.style.cssText='position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 85% at 50% 42%,transparent 38%,rgba(40,20,10,.58) 100%);';
+  host.appendChild(vig);
+  const hoverLbl=document.createElement('div');
+  hoverLbl.style.cssText='position:absolute;left:0;bottom:9px;width:100%;text-align:center;font-size:11.5px;letter-spacing:1px;color:#d8c7a4;opacity:0;transition:.18s;pointer-events:none;text-shadow:0 2px 6px #000;';
+  host.appendChild(hoverLbl);
+
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0x2A1B12,14,30);
+  const camera=new THREE.PerspectiveCamera(44,S/H,0.1,60);
+
+  /* ---------- 灯光 ---------- */
+  scene.add(new THREE.HemisphereLight(0xffd9b8,0x3A2418,1.08));
+  const key=new THREE.SpotLight(0xffd6a0,26,16,0.72,0.55,1.6);
+  key.position.set(0.55,3.55,0.95); key.target.position.set(-0.3,0.9,-1.1);
+  key.castShadow=true; key.shadow.mapSize.set(1024,1024); key.shadow.bias=-0.0009;
+  scene.add(key, key.target);
+  const fill=new THREE.DirectionalLight(0xffb98a,0.72); fill.position.set(-5,5,4); scene.add(fill);
+  const lampGlow=new THREE.PointLight(0xffca7d,4.2,6.5,1.8); lampGlow.position.set(0.9,1.28,0.55); scene.add(lampGlow);
+
+  const geos=[], mats=[];
+  const keep=(g,m)=>{ if(g)geos.push(g); if(m) (Array.isArray(m)?m:[m]).forEach(x=>x&&mats.push(x)); };
+  const std=(o)=>new THREE.MeshStandardMaterial(o);
+
+  const woodTex=(()=>{
+    const c=document.createElement('canvas'); c.width=c.height=256;
+    const x=c.getContext('2d');
+    x.fillStyle='#6b4a2c'; x.fillRect(0,0,256,256);
+    for(let i=0;i<46;i++){
+      x.strokeStyle='rgba(0,0,0,'+(0.05+Math.random()*0.1)+')';
+      x.lineWidth=1+Math.random()*2.4;
+      x.beginPath(); const yy=Math.random()*256;
+      x.moveTo(0,yy); x.bezierCurveTo(80,yy+(Math.random()-.5)*14,170,yy+(Math.random()-.5)*14,256,yy+(Math.random()-.5)*10); x.stroke();
+    }
+    for(let i=0;i<260;i++){ x.fillStyle='rgba(255,220,170,'+(0.02+Math.random()*0.05)+')'; x.fillRect(Math.random()*256,Math.random()*256,2,1); }
+    const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.wrapS=t.wrapT=THREE.RepeatWrapping;
+    return t;
+  })();
+
+  /* ---------- 房间 ---------- */
+  const floorM=std({map:woodTex,color:0xb99a72,roughness:.92});
+  const floorG=new THREE.PlaneGeometry(7.4,6.4);
+  const floor=new THREE.Mesh(floorG,floorM); floor.rotation.x=-Math.PI/2; floor.position.set(0,0,-0.6); floor.receiveShadow=true; scene.add(floor);
+  keep(floorG,floorM);
+
+  const rugC=document.createElement('canvas'); rugC.width=128; rugC.height=128;
+  const rc=rugC.getContext('2d');
+  rc.fillStyle='#2a3550'; rc.fillRect(0,0,128,128);
+  rc.strokeStyle='rgba(232,180,74,.55)'; rc.lineWidth=3; rc.strokeRect(9,9,110,110);
+  rc.strokeStyle='rgba(232,180,74,.28)'; rc.lineWidth=2; rc.strokeRect(18,18,92,92);
+  for(let i=0;i<6;i++){ rc.fillStyle='rgba(232,180,74,.16)'; rc.beginPath(); rc.arc(64,64,40-i*6,0,Math.PI*2); rc.stroke(); }
+  const rugTex=new THREE.CanvasTexture(rugC); rugTex.colorSpace=THREE.SRGBColorSpace;
+  const rugM=std({map:rugTex,roughness:1}); const rugG=new THREE.PlaneGeometry(2.5,1.85);
+  const rug=new THREE.Mesh(rugG,rugM); rug.rotation.x=-Math.PI/2; rug.position.set(-0.15,0.012,-0.35); rug.receiveShadow=true; scene.add(rug);
+  keep(rugG,rugM);
+
+  const wallTex=(()=>{
+    const c=document.createElement('canvas'); c.width=c.height=256;
+    const x=c.getContext('2d');
+    x.fillStyle='#28303f'; x.fillRect(0,0,256,256);
+    for(let i=0;i<256;i+=32){ x.fillStyle='rgba(0,0,0,.12)'; x.fillRect(i,0,2,256); }
+    for(let i=0;i<900;i++){ x.fillStyle='rgba(255,255,255,'+(Math.random()*0.04)+')'; x.fillRect(Math.random()*256,Math.random()*256,2,2); }
+    const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; t.wrapS=t.wrapT=THREE.RepeatWrapping; t.repeat.set(3,2);
+    return t;
+  })();
+  const wallM2=std({map:wallTex,color:0xC9A98A,roughness:.95});
+  const backG=new THREE.PlaneGeometry(7.4,3.9);
+  const back=new THREE.Mesh(backG,wallM2); back.position.set(0,1.95,-3.55); back.receiveShadow=true; scene.add(back);
+  const leftG=new THREE.PlaneGeometry(6.4,3.9);
+  const left=new THREE.Mesh(leftG,wallM2.clone()); left.rotation.y=Math.PI/2; left.position.set(-3.65,1.95,-0.6); left.receiveShadow=true; scene.add(left);
+  keep(backG,wallM2); keep(leftG,left.material);
+  const baseM=std({color:0x171d28,roughness:.8});
+  const base1=new THREE.Mesh(new THREE.BoxGeometry(7.4,0.16,0.08),baseM); base1.position.set(0,0.08,-3.51); scene.add(base1);
+  const base2=new THREE.Mesh(new THREE.BoxGeometry(0.08,0.16,6.4),baseM); base2.position.set(-3.61,0.08,-0.6); scene.add(base2);
+  keep(base1.geometry,baseM);
+
+  /* ---------- 书柜 ---------- */
+  const shelfGroup=new THREE.Group(); shelfGroup.position.set(-2.6,0,-1.32); scene.add(shelfGroup);
+  const woodM=std({map:woodTex,color:0xc9a273,roughness:.78});
+  const woodDarkM=std({map:woodTex,color:0x8a6a48,roughness:.85});
+  const SW=1.16, SH=2.34, SD=0.52;
+  const sideG=new THREE.BoxGeometry(0.06,SH,SD);
+  [-SW/2+0.03, SW/2-0.03].forEach(x=>{
+    const p=new THREE.Mesh(sideG,woodM); p.position.set(x,SH/2,0); p.castShadow=true; p.receiveShadow=true; shelfGroup.add(p);
+  });
+  const backG2=new THREE.BoxGeometry(SW,SH,0.04);
+  const sb=new THREE.Mesh(backG2,woodDarkM); sb.position.set(0,SH/2,-SD/2+0.02); shelfGroup.add(sb);
+  const shelfG=new THREE.BoxGeometry(SW-0.1,0.045,SD-0.04);
+  [0.06,0.64,1.22,1.80,SH-0.03].forEach(y=>{
+    const p=new THREE.Mesh(shelfG,woodM); p.position.set(0,y,0); p.castShadow=true; p.receiveShadow=true; shelfGroup.add(p);
+    keep(shelfG,woodM);
+  });
+  keep(sideG,woodM); keep(backG2,woodDarkM);
+
+  const bookCols=[0x8f3b34,0x2f5d6b,0x7a6a2f,0x4e3a6b,0x35604a,0xa8542f,0x25405e,0x6d4560];
+  const books=[];
+  [0.11,0.69,1.27,1.85].forEach((y,row)=>{
+    let x=-SW/2+0.1;
+    const n=6+((row*3)%3);
+    for(let i=0;i<n;i++){
+      const bw=0.055+rndInt(Math.random,0,1)*0.03;
+      const bh=0.34+rndInt(Math.random,0,1)*0.12;
+      if(x+bw>SW/2-0.08) break;
+      const g=new THREE.BoxGeometry(bw,bh,0.3);
+      const m=std({color:bookCols[(row*3+i)%bookCols.length],roughness:.82});
+      const b=new THREE.Mesh(g,m);
+      b.position.set(x+bw/2,y+bh/2+0.024,0.06);
+      if(i%5===4) b.rotation.z=0.2;
+      b.castShadow=true;
+      b.userData.sub={g:'shelf', kind:'book', target:false, bookId:books.length};
+      shelfGroup.add(b); keep(g,m);
+      books.push({mesh:b, out:0, target:false, baseZ:0.06});
+      x+=bw+0.008;
+    }
+  });
+  const targetBook=books[Math.floor(Math.random()*books.length)];
+  targetBook.target=true; targetBook.mesh.userData.sub.target=true;
+  // 目标书里夹着的纸条（抽出后可见）
+  const slipG=new THREE.PlaneGeometry(0.16,0.11);
+  const slipM=std({color:0xe8dfc9,roughness:.95,side:THREE.DoubleSide});
+  const slip=new THREE.Mesh(slipG,slipM); slip.visible=false;
+  slip.userData.sub={g:'shelf', kind:'slip'};
+  shelfGroup.add(slip); keep(slipG,slipM);
+
+  /* ---------- 写字台 ---------- */
+  const deskGroup=new THREE.Group(); deskGroup.position.set(0.42,0,0.18); scene.add(deskGroup);
+  const topM=std({map:woodTex,color:0xd0a87a,roughness:.6});
+  const topG=new THREE.BoxGeometry(1.62,0.075,0.86);
+  const top=new THREE.Mesh(topG,topM); top.position.y=0.76; top.castShadow=true; top.receiveShadow=true; deskGroup.add(top);
+  const legG=new THREE.BoxGeometry(0.07,0.74,0.07);
+  [[-0.74,-0.35],[0.74,-0.35],[-0.74,0.35],[0.74,0.35]].forEach(([x,z])=>{
+    const l=new THREE.Mesh(legG,woodM); l.position.set(x,0.37,z); l.castShadow=true; deskGroup.add(l);
+  });
+  keep(topG,topM); keep(legG,null);
+  // 抽屉（可拉开）
+  const drawerGroup=new THREE.Group(); drawerGroup.position.set(0,0.53,0.44); deskGroup.add(drawerGroup);
+  const drawerM=std({map:woodTex,color:0xb98f5c,roughness:.7});
+  const drawerG=new THREE.BoxGeometry(0.62,0.23,0.06);
+  const drawerFront=new THREE.Mesh(drawerG,drawerM); drawerFront.castShadow=true; drawerGroup.add(drawerFront);
+  const knobG=new THREE.SphereGeometry(0.032,12,10);
+  const knobM=std({color:0xe6c47c,roughness:.3,metalness:.85});
+  const knob=new THREE.Mesh(knobG,knobM); knob.position.set(0,0,0.05); drawerGroup.add(knob);
+  drawerFront.userData.sub={g:'desk', kind:'drawer'};
+  knob.userData.sub={g:'desk', kind:'drawer'};
+  keep(drawerG,drawerM); keep(knobG,knobM);
+  // 车票（抽屉内，拉开后可点）
+  const ticketC=document.createElement('canvas'); ticketC.width=160; ticketC.height=72;
+  const tc=ticketC.getContext('2d');
+  tc.fillStyle='#e3d7b6'; tc.fillRect(0,0,160,72);
+  tc.strokeStyle='#7a6a45'; tc.lineWidth=2; tc.strokeRect(4,4,152,64);
+  tc.fillStyle='#5a4c30'; tc.font='600 15px ui-monospace,monospace';
+  tc.fillText('NO. 0'+lvl.data.desk.d,18,34);
+  tc.font='11px sans-serif'; tc.fillText('单程 · 旧站',18,54);
+  tc.setLineDash([4,3]); tc.beginPath(); tc.moveTo(112,8); tc.lineTo(112,64); tc.stroke();
+  const ticketTex=new THREE.CanvasTexture(ticketC); ticketTex.colorSpace=THREE.SRGBColorSpace;
+  const ticketG=new THREE.PlaneGeometry(0.3,0.135);
+  const ticketM=std({map:ticketTex,roughness:.9,side:THREE.DoubleSide});
+  const ticket=new THREE.Mesh(ticketG,ticketM); ticket.position.set(0,0.02,0.02); ticket.visible=false;
+  ticket.userData.sub={g:'desk', kind:'ticket'};
+  drawerGroup.add(ticket); keep(ticketG,ticketM);
+  // 台灯
+  const lampBaseG=new THREE.CylinderGeometry(0.14,0.17,0.045,20);
+  const brassM=std({color:0xc9a05a,roughness:.35,metalness:.9});
+  const lampBase=new THREE.Mesh(lampBaseG,brassM); lampBase.position.set(0.52,0.82,-0.22); deskGroup.add(lampBase);
+  const stemG=new THREE.CylinderGeometry(0.018,0.018,0.52,10);
+  const stem=new THREE.Mesh(stemG,brassM); stem.position.set(0.52,1.08,-0.22); deskGroup.add(stem);
+  const shadeG=new THREE.CylinderGeometry(0.09,0.2,0.2,18,1,true);
+  const shadeM=std({color:0xf0d6a4,emissive:0xffb65c,emissiveIntensity:1.5,roughness:.6,side:THREE.DoubleSide});
+  const shade=new THREE.Mesh(shadeG,shadeM); shade.position.set(0.52,1.32,-0.22); deskGroup.add(shade);
+  lampGlow.position.set(0.94,1.36,-0.04);
+  keep(lampBaseG,brassM); keep(stemG,brassM); keep(shadeG,shadeM);
+  const paperM=std({color:0xe8dfc9,roughness:.95});
+  for(let i=0;i<2;i++){
+    const g=new THREE.PlaneGeometry(0.3,0.22);
+    const p=new THREE.Mesh(g,paperM); p.rotation.x=-Math.PI/2; p.rotation.z=(Math.random()-.5)*0.6;
+    p.position.set(-0.32+i*0.06,0.802+i*0.002,0.06-i*0.04); p.receiveShadow=true;
+    p.userData.sub={g:'desk', kind:'flavor'};
+    deskGroup.add(p); keep(g,paperM);
+  }
+  const penG=new THREE.CylinderGeometry(0.012,0.012,0.2,8);
+  const penM=std({color:0x2a2a2a,roughness:.5});
+  const pen=new THREE.Mesh(penG,penM); pen.rotation.z=Math.PI/2; pen.rotation.y=0.4; pen.position.set(-0.6,0.812,-0.18);
+  pen.userData.sub={g:'desk', kind:'flavor'}; deskGroup.add(pen); keep(penG,penM);
+  const keyRingG=new THREE.TorusGeometry(0.038,0.008,8,16);
+  const keyRingM=std({color:0xd8b16a,roughness:.4,metalness:.8});
+  const keyRing=new THREE.Mesh(keyRingG,keyRingM); keyRing.rotation.x=-Math.PI/2; keyRing.position.set(-0.08,0.805,0.28);
+  keyRing.userData.sub={g:'desk', kind:'flavor'}; deskGroup.add(keyRing); keep(keyRingG,keyRingM);
+
+  /* ---------- 钟 ---------- */
+  const clockGroup=new THREE.Group(); clockGroup.position.set(-1.15,2.42,-3.54); scene.add(clockGroup);
+  const clockC=document.createElement('canvas'); clockC.width=clockC.height=200;
+  const cctx=clockC.getContext('2d');
+  (function drawClock(){
+    cctx.clearRect(0,0,200,200);
+    cctx.fillStyle='#efe3c6'; cctx.beginPath(); cctx.arc(100,100,96,0,Math.PI*2); cctx.fill();
+    cctx.strokeStyle='#3a2f1d'; cctx.lineWidth=4; cctx.stroke();
+    cctx.fillStyle='#3a2f1d'; cctx.font='600 13px sans-serif'; cctx.textAlign='center'; cctx.textBaseline='middle';
+    for(let n=1;n<=12;n++){
+      const a=n*Math.PI/6;
+      cctx.fillText(n,100+Math.sin(a)*66,100-Math.cos(a)*66);
+    }
+    const ha=(lvl.time.hh%12+lvl.time.mm/60)*Math.PI/6, ma=lvl.time.mm*Math.PI/30;
+    cctx.strokeStyle='#2b2417';
+    cctx.lineWidth=9; cctx.beginPath(); cctx.moveTo(100,100); cctx.lineTo(100+Math.sin(ha)*48,100-Math.cos(ha)*48); cctx.stroke();
+    cctx.lineWidth=6; cctx.beginPath(); cctx.moveTo(100,100); cctx.lineTo(100+Math.sin(ma)*70,100-Math.cos(ma)*70); cctx.stroke();
+    cctx.fillStyle='#2b2417'; cctx.beginPath(); cctx.arc(100,100,7,0,Math.PI*2); cctx.fill();
+  })();
+  const clockTex=new THREE.CanvasTexture(clockC); clockTex.colorSpace=THREE.SRGBColorSpace; clockTex.anisotropy=4;
+  const faceG=new THREE.CylinderGeometry(0.34,0.34,0.05,40);
+  const faceM=std({color:0x4b3a22,roughness:.7});
+  const faceTopM=std({map:clockTex,roughness:.85});
+  const face=new THREE.Mesh(faceG,[faceM,faceTopM,faceM]);
+  face.rotation.x=Math.PI/2; face.castShadow=true;
+  face.userData.sub={g:'clock', kind:'face'};
+  clockGroup.add(face);
+  const rimG=new THREE.TorusGeometry(0.355,0.028,10,40);
+  const rim=new THREE.Mesh(rimG,brassM);
+  rim.userData.sub={g:'clock', kind:'rim'};
+  clockGroup.add(rim);
+  keep(faceG,[faceM,faceTopM]); keep(rimG,null);
+
+  /* ---------- 画框 ---------- */
+  const paintC=document.createElement('canvas'); paintC.width=260; paintC.height=190;
+  const px=paintC.getContext('2d');
+  px.fillStyle='#14243b'; px.fillRect(0,0,260,190);
+  px.fillStyle='#1d3a52'; px.beginPath(); px.moveTo(0,120); px.bezierCurveTo(60,70,110,150,260,92); px.lineTo(260,190); px.lineTo(0,190); px.fill();
+  px.fillStyle='#2f5a63'; px.beginPath(); px.moveTo(0,150); px.bezierCurveTo(80,124,150,176,260,132); px.lineTo(260,190); px.lineTo(0,190); px.fill();
+  const sun=px.createRadialGradient(196,54,4,196,54,56); sun.addColorStop(0,'#ffe6ae'); sun.addColorStop(.5,'rgba(255,196,110,.45)'); sun.addColorStop(1,'rgba(255,180,90,0)');
+  px.fillStyle=sun; px.beginPath(); px.arc(196,54,56,0,Math.PI*2); px.fill();
+  px.fillStyle='#fff0cb'; px.beginPath(); px.arc(196,54,13,0,Math.PI*2); px.fill();
+  for(let i=0;i<160;i++){ px.fillStyle='rgba(255,240,210,'+(0.05+Math.random()*0.16)+')'; px.fillRect(Math.random()*260,Math.random()*150,1.6,1.6); }
+  const paintTex=new THREE.CanvasTexture(paintC); paintTex.colorSpace=THREE.SRGBColorSpace;
+  // 背板（翻面后可见）
+  const backC=document.createElement('canvas'); backC.width=260; backC.height=190;
+  const bx=backC.getContext('2d');
+  bx.fillStyle='#3a2f1f'; bx.fillRect(0,0,260,190);
+  bx.strokeStyle='rgba(232,180,74,.4)'; bx.lineWidth=3; bx.strokeRect(10,10,240,170);
+  bx.fillStyle='#e8d9ae'; bx.font='600 34px ui-monospace,monospace'; bx.textAlign='center';
+  bx.fillText(lvl.data.painting.d,130,96);
+  bx.font='13px sans-serif'; bx.fillStyle='#c9b684'; bx.fillText('刻在背板角落的数字',130,140);
+  const backTex=new THREE.CanvasTexture(backC); backTex.colorSpace=THREE.SRGBColorSpace;
+
+  const paintGroup=new THREE.Group(); paintGroup.position.set(0.62,1.98,-3.54); scene.add(paintGroup);
+  const canvasG=new THREE.PlaneGeometry(1.0,0.74);
+  const canvasM=std({map:paintTex,roughness:.9,emissive:0xffffff,emissiveMap:paintTex,emissiveIntensity:.22});
+  const canvasArt=new THREE.Mesh(canvasG,canvasM);
+  canvasArt.userData.sub={g:'painting', kind:'front'};
+  paintGroup.add(canvasArt);
+  const backG3=new THREE.PlaneGeometry(1.0,0.74);
+  const backM3=std({map:backTex,roughness:.9,side:THREE.DoubleSide});
+  const backArt=new THREE.Mesh(backG3,backM3); backArt.rotation.y=Math.PI; backArt.visible=false;
+  backArt.userData.sub={g:'painting', kind:'board'};
+  paintGroup.add(backArt);
+  const frameM=std({color:0xb08a4e,roughness:.42,metalness:.55});
+  [[0,0.42,1.14,0.07],[0,-0.42,1.14,0.07],[0.56,0,0.07,0.9],[-0.56,0,0.07,0.9]].forEach(([x,y,w,h])=>{
+    const g=new THREE.BoxGeometry(w,h,0.06); const b=new THREE.Mesh(g,frameM); b.position.set(x,y,0.02); b.castShadow=true;
+    b.userData.sub={g:'painting', kind:'frame'};
+    paintGroup.add(b); keep(g,frameM);
+  });
+  const nameplateG=new THREE.BoxGeometry(0.3,0.06,0.02);
+  const np=new THREE.Mesh(nameplateG,std({color:0xe4d3a8,roughness:.9}));
+  np.position.set(-0.42,-0.455,0.045); paintGroup.add(np);
+  keep(canvasG,canvasM); keep(backG3,backM3);
+
+  /* ---------- 门 ---------- */
+  const doorGroup=new THREE.Group(); doorGroup.position.set(2.0,0,-3.52); scene.add(doorGroup);
+  const doorG=new THREE.BoxGeometry(1.3,2.62,0.1);
+  const doorM=std({color:0x33455f,roughness:.5,metalness:.3});
+  const door=new THREE.Mesh(doorG,doorM); door.position.y=1.31; door.castShadow=true; door.receiveShadow=true;
+  door.userData.sub={g:'door', kind:'door'};
+  doorGroup.add(door);
+  const jambG=new THREE.BoxGeometry(1.44,2.74,0.06);
+  const jamb=new THREE.Mesh(jambG,std({color:0x141b28,roughness:.8})); jamb.position.set(0,1.35,-0.06); doorGroup.add(jamb);
+  const handleG=new THREE.SphereGeometry(0.045,12,10);
+  const handle=new THREE.Mesh(handleG,brassM); handle.position.set(-0.44,1.28,0.09); doorGroup.add(handle);
+  const trimM=std({color:0xc9a05a,roughness:.4,metalness:.7,emissive:0x2a1a06,emissiveIntensity:.4});
+  [[0,2.6,1.42,0.06],[0,-0.02,1.42,0.06],[0.7,1.3,0.06,2.68],[-0.7,1.3,0.06,2.68]].forEach(([x,y,w,h])=>{
+    const g=new THREE.BoxGeometry(w,h,0.09); const t=new THREE.Mesh(g,trimM); t.position.set(x,y,0.03); doorGroup.add(t); keep(g,trimM);
+  });
+  keep(doorG,doorM); keep(jambG,null); keep(handleG,null);
+
+  const padC=document.createElement('canvas'); padC.width=200; padC.height=140;
+  const pc=padC.getContext('2d');
+  function drawPad(done){
+    pc.fillStyle='#08101f'; pc.fillRect(0,0,200,140);
+    pc.strokeStyle='rgba(232,180,74,.55)'; pc.lineWidth=4; pc.strokeRect(4,4,192,132);
+    pc.fillStyle=done?'#7fc98a':'#5fd0e8';
+    for(let i=0;i<4;i++){ pc.fillRect(30+i*38,60,24,6); }
+    pc.fillStyle='rgba(160,200,230,.7)'; pc.font='600 15px ui-monospace,monospace'; pc.fillText('PASSWORD',52,112);
+  }
+  drawPad(false);
+  const padTex=new THREE.CanvasTexture(padC); padTex.colorSpace=THREE.SRGBColorSpace;
+  const padG=new THREE.BoxGeometry(0.34,0.24,0.035);
+  const padM=std({color:0x0b1526,emissive:0x2a6fa8,emissiveIntensity:.9,roughness:.4});
+  const padBox=new THREE.Mesh(padG,padM); padBox.position.set(0.46,1.42,0.085);
+  padBox.userData.sub={g:'door', kind:'door'};
+  doorGroup.add(padBox);
+  const padFaceG=new THREE.PlaneGeometry(0.33,0.23);
+  const padFaceM=std({map:padTex,emissive:0xffffff,emissiveMap:padTex,emissiveIntensity:.55,roughness:.5});
+  const padFace=new THREE.Mesh(padFaceG,padFaceM); padFace.position.set(0.46,1.42,0.104);
+  padFace.userData.sub={g:'door', kind:'door'};
+  doorGroup.add(padFace);
+  keep(padG,padM); keep(padFaceG,padFaceM);
+
+  /* ---------- 环境点缀 ---------- */
+  const ceilingLampG=new THREE.ConeGeometry(0.26,0.2,20,1,true);
+  const ceilingLamp=new THREE.Mesh(ceilingLampG,std({color:0x2a3242,emissive:0xffca7d,emissiveIntensity:.35,side:THREE.DoubleSide}));
+  ceilingLamp.position.set(0.5,3.66,1.15); scene.add(ceilingLamp);
+  const cordG=new THREE.CylinderGeometry(0.008,0.008,0.5,6);
+  const cord=new THREE.Mesh(cordG,std({color:0x0d1018})); cord.position.set(0.5,3.82,1.15); scene.add(cord);
+  keep(ceilingLampG,null); keep(cordG,null);
+  const crateM=std({map:woodTex,color:0x9a7442,roughness:.9});
+  [[-1.55,0.28,1.55,0.56,0.22],[2.55,0.22,0.55,0.46,-0.3],[-0.05,0.18,1.95,0.36,0.35]].forEach(([x,y,z,s,ry])=>{
+    const g=new THREE.BoxGeometry(s,s,0.9*s);
+    const c=new THREE.Mesh(g,crateM); c.position.set(x,y,z); c.rotation.y=ry; c.castShadow=true; c.receiveShadow=true; scene.add(c);
+    keep(g,crateM);
+  });
+  const dustG=new THREE.BufferGeometry();
+  const dp=[];
+  for(let i=0;i<90;i++) dp.push((Math.random()-.5)*5.6, Math.random()*3.2, (Math.random()-.5)*4.6);
+  dustG.setAttribute('position',new THREE.Float32BufferAttribute(dp,3));
+  const dustM=new THREE.PointsMaterial({color:0xffd9a0,size:0.022,transparent:true,opacity:.42,depthWrite:false});
+  const dust=new THREE.Points(dustG,dustM); scene.add(dust);
+  keep(dustG,dustM);
+
+  /* ---------- 视图 / 飞镜 ---------- */
+  const VIEWS={
+    room:{pos:new THREE.Vector3(1.95,2.42,5.35), tgt:new THREE.Vector3(-0.55,1.26,-1.65)},
+    shelf:{pos:new THREE.Vector3(-1.45,1.62,-0.1), tgt:new THREE.Vector3(-2.6,1.22,-1.32)},
+    desk:{pos:new THREE.Vector3(0.42,1.72,2.05), tgt:new THREE.Vector3(0.42,0.7,0.18)},
+    clock:{pos:new THREE.Vector3(-1.15,2.5,-1.25), tgt:new THREE.Vector3(-1.15,2.42,-3.5)},
+    painting:{pos:new THREE.Vector3(0.62,2.0,-1.25), tgt:new THREE.Vector3(0.62,1.98,-3.54)}
+  };
+  let view='room', camT=1;
+  const cp=VIEWS.room.pos.clone(), ct=VIEWS.room.tgt.clone();
+  const cp0=cp.clone(), ct0=ct.clone();
+  function gotoView(v,label){
+    view=v; camT=0; cp0.copy(cp); ct0.copy(ct);
+    if(v==='room'){ focusBar.style.display='none'; }
+    else { focusBar.style.display='flex'; if(label) focusBarLabel.textContent=label; }
+  }
+
+  /* ---------- 线索状态 ---------- */
+  const clue={
+    shelf:{book:false, slip:false, done:false},
+    desk:{drawer:false, ticket:false, done:false},
+    clock:{face:false, rim:false, done:false},
+    painting:{flip:false, board:false, done:false}
+  };
+  const TITLES={shelf:'书架', desk:'写字台', clock:'墙上的钟', painting:'墙上的画框', door:'门 · 四位密码'};
+  const HOVER={shelf:'凑近书架看看', desk:'凑近写字台看看', clock:'看一下钟面', painting:'看一下画框', door:'点门去解密码'};
+
+  function countDone(){ let n=0; for(const k in clue) if(clue[k].done) n++; return n; }
+  function refreshStep(){ api.setStep('线索 '+countDone()+'/4'); }
+  function finishClue(g){
+    if(clue[g].done) return;
+    clue[g].done=true;
+    refreshStep();
+    sndOpen();
+  }
+
+  /* ---------- 交互细节 ---------- */
+  function inspectShelf(sub){
+    const c=clue.shelf;
+    if(sub.kind==='book'){
+      const b=books[sub.bookId];
+      if(!b.target){ showFx('空书','书页上只有一道折痕，什么都没夹着。'); sndClick(); return; }
+      if(!c.book){
+        c.book=true;
+        b.out=1; sndOpen();
+        showFx('抽出的书','书被抽出来，封底的纸边上印着一个数字。书页里还夹着一张纸条。');
+        slip.visible=true;
+        slip.position.set(b.mesh.position.x,b.mesh.position.y+0.02,b.mesh.position.z+0.12);
+      } else {
+        showFx('这本书','封底纸边上印着 <b>'+lvl.data.shelf.d+'</b>。纸条上还写着一行小字。');
+      }
+      return;
+    }
+    if(sub.kind==='slip'){
+      if(!c.book){ showFx('纸条','纸条还夹在书里，先把那本书抽出来。'); return; }
+      c.slip=true;
+      finishClue('shelf');
+      showFx('纸条','纸条上写着：<b>第 '+lvl.data.shelf.p+' 位</b>。<br />这一格的线索齐了：数字 <b>'+lvl.data.shelf.d+'</b>，排在第 <b>'+lvl.data.shelf.p+'</b> 位。');
+    }
+  }
+  function inspectDesk(sub){
+    const c=clue.desk;
+    if(sub.kind==='flavor'){ showFx('桌上的杂物','普通的纸、笔和一把旧钥匙，和这里的门锁对不上。'); sndClick(); return; }
+    if(sub.kind==='drawer'){
+      if(!c.drawer){ c.drawer=true; sndOpen(); ticket.visible=true; showFx('拉开的抽屉','抽屉滑开，里面躺着一张旧车票。'); }
+      else showFx('抽屉','车票躺在抽屉底，背面好像还写了字。');
+      return;
+    }
+    if(sub.kind==='ticket'){
+      if(!c.drawer){ showFx('车票','抽屉还没拉开。'); return; }
+      if(!c.ticket){
+        c.ticket=true;
+        showFx('旧车票','车票号末位是 <b>'+lvl.data.desk.d+'</b>。翻到背面，铅笔写着：<b>第 '+lvl.data.desk.p+' 位</b>。');
+        finishClue('desk');
+      } else showFx('车票','车票号 <b>'+lvl.data.desk.d+'</b>，第 <b>'+lvl.data.desk.p+'</b> 位。');
+    }
+  }
+  function inspectClock(sub){
+    const c=clue.clock;
+    if(sub.kind==='face'){
+      if(!c.face){
+        c.face=true;
+        showFx('停住的钟','钟停在 <b>'+lvl.time.hh+':'+String(lvl.time.mm).padStart(2,'0')+'</b>。分针正指着 <b>'+lvl.data.clock.d+'</b>。');
+      } else showFx('钟面','分针指着 <b>'+lvl.data.clock.d+'</b>。钟圈边上好像刻了东西。');
+      return;
+    }
+    if(sub.kind==='rim'){
+      c.rim=true;
+      finishClue('clock');
+      showFx('钟圈边缘','铜圈内侧刻着一行小字：<b>第 '+lvl.data.clock.p+' 位</b>。<br />这一格的线索齐了：分针指 <b>'+lvl.data.clock.d+'</b>，排在第 <b>'+lvl.data.clock.p+'</b> 位。');
+    }
+  }
+  function inspectPainting(sub){
+    const c=clue.painting;
+    if(sub.kind==='front'){
+      showFx('画的正面','两片山坡和一颗落日。画框背面好像还贴着东西。'); sndClick(); return;
+    }
+    if(sub.kind==='frame'){
+      if(!c.flip){ c.flip=true; sndOpen(); showFx('翻过画框','画框被翻到背面。背板角落刻着数字。'); }
+      return;
+    }
+    if(sub.kind==='board'){
+      if(!c.flip){ showFx('背板','得先把画框翻过来。'); return; }
+      if(!c.board){
+        c.board=true;
+        finishClue('painting');
+        showFx('背板标签','背板刻着 <b>'+lvl.data.painting.d+'</b>，旁边标签写：<b>第 '+lvl.data.painting.p+' 位</b>。');
+      } else showFx('背板','数字 <b>'+lvl.data.painting.d+'</b>，第 <b>'+lvl.data.painting.p+'</b> 位。');
+    }
+  }
+
+  /* ---------- 射线拾取 ---------- */
+  const ray=new THREE.Raycaster();
+  const mouse=new THREE.Vector2();
+  const clock4=new THREE.Clock();
+  let raf=null, hovered=null, solved=false;
+
+  function pickGroup(ev){
+    const rect=renderer.domElement.getBoundingClientRect();
+    mouse.x=((ev.clientX-rect.left)/rect.width)*2-1;
+    mouse.y=-((ev.clientY-rect.top)/rect.height)*2+1;
+    ray.setFromCamera(mouse,camera);
+    const hits=ray.intersectObject(scene,true);
+    for(const h of hits){
+      let o=h.object;
+      if(!o.visible) continue;
+      while(o&&!o.userData.sub) o=o.parent;
+      if(o&&o.userData.sub) return o.userData.sub;
+    }
+    return null;
+  }
+  function setHover(sub){
+    const key=sub?sub.g:null;
+    if(hovered===key) return;
+    hovered=key;
+    renderer.domElement.style.cursor=key?'pointer':'default';
+    if(key){ hoverLbl.textContent=HOVER[key]||''; hoverLbl.style.opacity='1'; }
+    else hoverLbl.style.opacity='0';
+  }
+  renderer.domElement.addEventListener('pointermove',ev=>setHover(pickGroup(ev)));
+  renderer.domElement.addEventListener('pointerleave',()=>setHover(null));
+  renderer.domElement.addEventListener('pointerdown',ev=>{
+    const sub=pickGroup(ev);
+    if(!sub) return;
+    if(sub.g==='door'){ openKeypad(); return; }
+    if(view==='room'){
+      gotoView(sub.g, TITLES[sub.g]); sndClick();
+      return;
+    }
+    if(sub.g==='shelf') inspectShelf(sub);
+    else if(sub.g==='desk') inspectDesk(sub);
+    else if(sub.g==='clock') inspectClock(sub);
+    else if(sub.g==='painting') inspectPainting(sub);
+  });
+
+  /* ---------- 特写顶栏 ---------- */
+  const focusBar=document.createElement('div');
+  focusBar.style.cssText='position:absolute;left:12px;top:12px;right:12px;align-items:center;justify-content:space-between;z-index:5;display:none;';
+  focusBar.innerHTML='<button class="cbtn" style="padding:7px 13px;font-size:12px">← 全景</button><span id="focusLbl" style="font-size:12px;letter-spacing:2px;color:#e8d9ae"></span><span style="width:70px"></span>';
+  host.appendChild(focusBar);
+  const focusBarLabel=focusBar.querySelector('#focusLbl');
+  focusBar.querySelector('button').onclick=()=>{ gotoView('room'); sndClick(); };
+
+  /* ---------- 密码盘 ---------- */
+  function openKeypad(){
+    if(solved) return;
+    let input='';
+    const box=document.createElement('div');
+    const slots=document.createElement('div');
+    slots.style.cssText='display:flex;gap:10px;justify-content:center;margin:6px 0 4px;';
+    const slotEls=[];
+    for(let i=0;i<4;i++){
+      const d=document.createElement('div');
+      d.style.cssText='width:46px;height:56px;border-radius:11px;border:1px solid rgba(232,180,74,.45);display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:700;color:#efc264;background:rgba(232,180,74,.09);font-family:ui-monospace,monospace;transition:.15s;';
+      slots.appendChild(d); slotEls.push(d);
+    }
+    const grid=document.createElement('div');
+    grid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px;';
+    const msg=document.createElement('div');
+    msg.style.cssText='text-align:center;font-size:12px;color:#9fc7d2;min-height:18px;margin-top:8px;';
+    function refresh(){ slotEls.forEach((d,i)=>d.textContent=input[i]||''); }
+    function flashBad(){ slotEls.forEach(d=>{ d.style.borderColor='#e0665a'; d.style.background='rgba(224,102,90,.18)'; }); setTimeout(()=>slotEls.forEach(d=>{ d.style.borderColor='rgba(232,180,74,.45)'; d.style.background='rgba(232,180,74,.09)'; }),380); }
+    function press(k){
+      if(k==='del'){ input=input.slice(0,-1); }
+      else if(k==='ok'){
+        if(input.length<4){ msg.style.color='#e0a45a'; msg.textContent='要输满四位。'; return; }
+        if(input===code){
+          solved=true; msg.style.color='#7fc98a'; msg.textContent='咔——门开了。';
+          drawPad(true); padTex.needsUpdate=true; sndGood();
+          setTimeout(()=>{ fx.classList.remove('show'); api.solve(); }, 950);
+        } else {
+          sndBad(); flashBad();
+          msg.style.color='#e0665a'; msg.textContent='不对。再看一遍每件物件留下的数字和位次。';
+          input=''; refresh();
+        }
+        return;
+      }
+      else if(input.length<4) input+=k;
+      refresh();
+      msg.style.color='#9fc7d2'; msg.textContent=input.length?'已输入 '+input.length+' / 4':'点数字输入密码';
+    }
+    ['1','2','3','4','5','6','7','8','9','del','0','ok'].forEach(k=>{
+      const b=document.createElement('button');
+      b.className='cbtn';
+      b.style.cssText='height:44px;font-size:15px;font-family:ui-monospace,monospace;padding:0;';
+      b.textContent = k==='del'?'⌫':k==='ok'?'开':' '+k+' ';
+      b.onclick=()=>press(k);
+      grid.appendChild(b);
+    });
+    box.append(slots, grid, msg);
+    refresh();
+    msg.textContent='点数字输入密码';
+    showFx('门 · 四位密码', box);
+  }
+
+  /* ---------- 底部按钮 ---------- */
+  const rowWrap=document.createElement('div'); rowWrap.className='row';
+  const noteBtn=document.createElement('button'); noteBtn.className='cbtn'; noteBtn.textContent='线索本';
+  const doorBtn=document.createElement('button'); doorBtn.className='cbtn primary'; doorBtn.textContent='去开门';
+  rowWrap.append(noteBtn,doorBtn); controls.appendChild(rowWrap);
+  doorBtn.onclick=()=>openKeypad();
+  noteBtn.onclick=()=>{
+    const n=countDone();
+    if(!n){ api.setTip('还没找到线索：先点房间里的书架、写字台、钟和画框，凑近了再翻找。',true); return; }
+    let html='';
+    for(const k in clue){
+      if(!clue[k].done) continue;
+      const v=lvl.data[k];
+      html+='<div class="paper" style="margin-bottom:8px"><b>'+TITLES[k]+'</b><br/>数字 '+v.d+' · 第 '+v.p+' 位</div>';
+    }
+    showFx('线索本（'+n+'/4）', html);
+  };
+
+  refreshStep();
+  api.setTip('点房间里的物件凑近查看：书架、写字台、钟、画框。');
+
+  /* ---------- 动画循环 ---------- */
+  function loop(){
+    raf=requestAnimationFrame(loop);
+    const dt=Math.min(clock4.getDelta(),0.05);
+    const t=clock4.getElapsedTime();
+    if(camT<1){
+      camT=Math.min(1,camT+dt/0.55);
+      const e=1-Math.pow(1-camT,3);
+      cp.lerpVectors(cp0,VIEWS[view].pos,e);
+      ct.lerpVectors(ct0,VIEWS[view].tgt,e);
+    }
+    camera.position.copy(cp); camera.lookAt(ct);
+    books.forEach(b=>{
+      if(b.out===1){ b.mesh.position.z += (0.22-b.mesh.position.z)*Math.min(1,dt*6); }
+    });
+    if(clue.desk.drawer){
+      drawerGroup.position.z += (0.34-drawerGroup.position.z)*Math.min(1,dt*6);
+    }
+    if(clue.painting.flip){
+      paintGroup.rotation.y += (Math.PI-paintGroup.rotation.y)*Math.min(1,dt*6);
+      if(!backArt.visible) backArt.visible=true;
+    }
+    padM.emissiveIntensity=0.75+Math.sin(t*2.2)*0.3;
+    padFaceM.emissiveIntensity=0.45+Math.sin(t*2.2)*0.18;
+    shadeM.emissiveIntensity=1.35+Math.sin(t*1.5)*0.2;
+    dust.position.y=Math.sin(t*0.25)*0.12;
+    dust.rotation.y=t*0.02;
+    renderer.render(scene,camera);
+  }
+  loop();
+
+  return {
+    destroy(){
+      cancelAnimationFrame(raf);
+      geos.forEach(g=>g&&g.dispose&&g.dispose());
+      mats.forEach(m=>m&&m.dispose&&m.dispose());
+      renderer.dispose();
+    },
+    autoSolve(){
+      solved=true;
+      clue.shelf={book:true,slip:true,done:true};
+      clue.desk={drawer:true,ticket:true,done:true};
+      clue.clock={face:true,rim:true,done:true};
+      clue.painting={flip:true,board:true,done:true};
+      refreshStep();
+      setTimeout(()=>api.solve(),1200);
+    },
+    code,
+    debug:{
+      gotoView:(x)=>gotoView(x), focus:()=>view, clue,
+      targetBook: targetBook.mesh.userData.sub.bookId,
+      act:(g,kind)=>{
+        if(g==='shelf') inspectShelf({g:'shelf',kind,bookId:targetBook.mesh.userData.sub.bookId});
+        else if(g==='desk') inspectDesk({g:'desk',kind});
+        else if(g==='clock') inspectClock({g:'clock',kind});
+        else if(g==='painting') inspectPainting({g:'painting',kind});
+      }
+    }
+  };
+};
+/* ============================================================
+   第二厅 · 破译台（字母替换密码）
+   ============================================================ */
+const CIPHER_SENTENCES=[
+  'THE MOON KEEPS ITS OWN TIME',
+  'A QUIET ROOM HOLDS THE LOUDEST SECRET',
+  'EVERY LOCK WAS ONCE A DOOR',
+  'WE LEFT A LETTER IN THE OLD BOX',
+  'TIME IS A ROOM WITH NO WINDOWS',
+  'THE CAT SLEEPS WHERE THE STARS FALL',
+  'NOTHING HERE IS NEW BUT THE DUST',
+  'FOUR KEYS AND ONE SMALL LAMP'
+];
+function makeCipherLevel(seed){
+  const rng=mulberry32((seed>>>0)||1);
+  const plain=CIPHER_SENTENCES[Math.floor(rng()*CIPHER_SENTENCES.length)];
+  const letters=[...new Set(plain.replace(/ /g,'').split(''))];
+  const alpha2=shuffleArr('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''),rng);
+  const cipherOf={}; letters.forEach((L,i)=>{ cipherOf[L]=alpha2[i]; });
+  const cipherLetters=[...new Set(letters.map(L=>cipherOf[L]))];
+  const anchors=shuffleArr(cipherLetters.slice(),rng).slice(0, Math.min(3,cipherLetters.length-1));
+  return {plain, letters, cipherOf, cipherLetters, anchors};
+}
+
+GAMES.cipher=function(stage, controls, api){
+  const lvl=makeCipherLevel(Math.floor(Math.random()*2147483000));
+  const plain=lvl.plain;
+  const cipherOf=lvl.cipherOf;
+  const cipherLetters=lvl.cipherLetters;
+  const trueMap={}; cipherLetters.forEach(cl=>{ for(const p in cipherOf) if(cipherOf[p]===cl) trueMap[cl]=p; });
+  const user={};
+  lvl.anchors.forEach(cl=>{ user[cl]=trueMap[cl]; });
+
+  const box=document.createElement('div');
+  box.style.cssText='width:100%;display:flex;flex-direction:column;gap:12px;';
+  stage.appendChild(box);
+
+  const cipherLine=document.createElement('div');
+  cipherLine.style.cssText='display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(232,180,74,.18);';
+  plain.split(' ').forEach(w=>{
+    const pill=document.createElement('div');
+    pill.style.cssText='display:flex;gap:2px;padding:4px 6px;border-radius:6px;background:rgba(0,0,0,.25);';
+    w.split('').forEach(ch=>{
+      const s=document.createElement('span');
+      s.textContent=cipherOf[ch];
+      s.style.cssText='width:15px;text-align:center;font-family:ui-monospace,monospace;font-size:13px;color:#b9c8e0;';
+      pill.appendChild(s);
+    });
+    cipherLine.appendChild(pill);
+  });
+
+  const preview=document.createElement('div');
+  preview.style.cssText='display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:4px 0;min-height:30px;';
+  const keyGrid=document.createElement('div');
+  keyGrid.style.cssText='display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:6px;';
+
+  const inputs={};
+  cipherLetters.forEach(cl=>{
+    const cell=document.createElement('div');
+    cell.style.cssText='display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);';
+    const lab=document.createElement('span');
+    lab.textContent=cl;
+    lab.style.cssText='font-family:ui-monospace,monospace;font-size:14px;color:#8fdcff;width:14px;';
+    const inp=document.createElement('input');
+    inp.maxLength=1;
+    inp.style.cssText='width:26px;height:26px;text-align:center;border-radius:7px;border:1px solid rgba(232,180,74,.3);background:rgba(0,0,0,.35);color:#f3e8d3;font-size:14px;font-family:ui-monospace,monospace;text-transform:uppercase;';
+    if(user[cl]){ inp.value=user[cl]; inp.disabled=true; inp.style.color='#efc264'; inp.style.borderColor='rgba(232,180,74,.6)'; }
+    inp.addEventListener('input',()=>{
+      const v=(inp.value||'').toUpperCase().replace(/[^A-Z]/g,'');
+      inp.value=v;
+      if(v) user[cl]=v; else delete user[cl];
+      drawPreview();
+    });
+    cell.append(lab,inp);
+    keyGrid.appendChild(cell);
+    inputs[cl]=inp;
+  });
+
+  box.append(cipherLine, preview, keyGrid);
+
+  function drawPreview(){
+    preview.innerHTML='';
+    plain.split(' ').forEach(w=>{
+      const pill=document.createElement('div');
+      pill.style.cssText='display:flex;gap:2px;padding:3px 5px;border-radius:6px;';
+      w.split('').forEach(ch=>{
+        const s=document.createElement('span');
+        s.textContent = user[cipherOf[ch]] ? user[cipherOf[ch]] : '·';
+        s.style.cssText='width:14px;text-align:center;font-family:ui-monospace,monospace;font-size:13px;'+
+          (user[cipherOf[ch]]?'color:#efc264;':'color:#4a5568;');
+        pill.appendChild(s);
+      });
+      preview.appendChild(pill);
+    });
+  }
+
+  const row1=document.createElement('div'); row1.className='row';
+  const check=document.createElement('button'); check.className='cbtn primary'; check.textContent='破译';
+  const hintB=document.createElement('button'); hintB.className='cbtn'; hintB.textContent='提示一个字母';
+  const clearB=document.createElement('button'); clearB.className='cbtn'; clearB.textContent='重置';
+  row1.append(check,hintB,clearB); controls.appendChild(row1);
+
+  let solved=false;
+  check.onclick=()=>{
+    if(solved) return;
+    let filled=0; cipherLetters.forEach(cl=>{ if(user[cl]) filled++; });
+    if(filled<cipherLetters.length){ api.setTip('还有 '+(cipherLetters.length-filled)+' 个字母空着。',true); return; }
+    let wrong=0; cipherLetters.forEach(cl=>{ if(user[cl]!==trueMap[cl]) wrong++; });
+    if(wrong===0){
+      solved=true; check.disabled=hintB.disabled=true;
+      api.setTip('读通了：「'+plain+'」——第二厅的锁开了。');
+      preview.querySelectorAll('span').forEach(s=>{ s.style.color='#7fc98a'; });
+      setTimeout(()=>api.solve(),1600);
+    } else {
+      api.setTip('还读不通，有 '+wrong+' 个字母对错位。看看单词长度和重复的位置。',true);
+    }
+  };
+  hintB.onclick=()=>{
+    if(solved) return;
+    const left=cipherLetters.filter(cl=>user[cl]!==trueMap[cl]);
+    if(!left.length){ api.setTip('已经全对了，按下“破译”。'); return; }
+    const cl=left[Math.floor(Math.random()*left.length)];
+    user[cl]=trueMap[cl];
+    inputs[cl].value=user[cl]; inputs[cl].disabled=true;
+    inputs[cl].style.color='#efc264'; inputs[cl].style.borderColor='rgba(232,180,74,.6)';
+    drawPreview();
+    api.setTip('“'+cl+'” 就是 “'+trueMap[cl]+'”，帮你标上了。');
+  };
+  clearB.onclick=()=>{
+    if(solved) return;
+    cipherLetters.forEach(cl=>{
+      if(lvl.anchors.indexOf(cl)>=0) return;
+      delete user[cl]; inputs[cl].value=''; inputs[cl].disabled=false;
+      inputs[cl].style.color='#f3e8d3'; inputs[cl].style.borderColor='rgba(232,180,74,.3)';
+    });
+    drawPreview(); api.setTip('');
+  };
+
+  drawPreview();
+  api.setStep(cipherLetters.length+' 个怪字母');
+  return {
+    destroy(){},
+    autoSolve(){
+      cipherLetters.forEach(cl=>{ user[cl]=trueMap[cl]; if(inputs[cl]){ inputs[cl].value=user[cl]; } });
+      drawPreview(); check.click();
+    }
+  };
+};
+/* ============================================================
+   第三厅 · 字谜锁
+   ============================================================ */
+const RIDDLES=[
+  {q:'一口咬掉牛尾巴', a:'告', hint:'“牛”去掉尾巴，再加一个“口”。'},
+  {q:'十张口，一颗心', a:'思', hint:'“田”里有十个口，底下放一颗心。'},
+  {q:'日月同辉', a:'明', hint:'日与月并排站着。'},
+  {q:'山外有山', a:'出', hint:'两座山叠起来。'},
+  {q:'三日同天', a:'晶', hint:'三个“日”堆成三角。'},
+  {q:'八十八', a:'米', hint:'上面八，中间十，下面八。'},
+  {q:'九十九', a:'白', hint:'“百”字头上少一横。'},
+  {q:'田上一棵草', a:'苗', hint:'草字头压着一块田。'},
+  {q:'江边一只鸟', a:'鸿', hint:'三点水旁边站着一只鸟。'},
+  {q:'两棵树', a:'林', hint:'木 + 木。'},
+  {q:'三棵树', a:'森', hint:'三个“木”字挤在一起。'},
+  {q:'门里有口', a:'问', hint:'门字框里放一个“口”。'},
+  {q:'上不在上，下不在下', a:'卡', hint:'“上”“下”各取一半，上下合成。'},
+  {q:'女子相伴', a:'好', hint:'女 + 子。'},
+  {q:'人在云上', a:'会', hint:'人字盖在云上。'},
+  {q:'一口咬定', a:'交', hint:'“咬”字去口，剩下“交”。'}
+];
+GAMES.hanzi=function(stage, controls, api){
+  const rng=mulberry32(Math.floor(Math.random()*2147483000));
+  const bank=shuffleArr(RIDDLES.slice(),rng).slice(0,4);
+  const allChars=RIDDLES.map(r=>r.a);
+  let solvedCount=0;
+
+  const wrap=document.createElement('div');
+  wrap.style.cssText='width:100%;display:flex;flex-direction:column;gap:10px;';
+  stage.appendChild(wrap);
+
+  const cards=bank.map((rd,idx)=>{
+    const card=document.createElement('div');
+    card.style.cssText='border-radius:16px;padding:13px 14px;border:1px solid rgba(232,180,74,.22);background:linear-gradient(135deg,rgba(232,180,74,.09),rgba(255,255,255,.02));transition:.2s;';
+    const head=document.createElement('div');
+    head.style.cssText='display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#5C4030;letter-spacing:1px;margin-bottom:8px;';
+    head.innerHTML='<span>锁 · 第 '+['一','二','三','四'][idx]+' 格</span><span style="color:#4a5568">○</span>';
+    const q=document.createElement('div');
+    q.textContent=rd.q;
+    q.style.cssText='font-size:15px;letter-spacing:1.5px;margin-bottom:11px;color:#f3e8d3;';
+    const opts=document.createElement('div');
+    opts.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:8px;';
+    const hint=document.createElement('div');
+    hint.style.cssText='font-size:11.5px;color:#8fdcff;line-height:1.7;margin-top:9px;display:none;';
+
+    let wrongs=0, done=false;
+    const chars=shuffleArr([rd.a, ...shuffleArr(allChars.filter(c=>c!==rd.a),rng).slice(0,5)],rng);
+    const btns={};
+    chars.forEach(ch=>{
+      const b=document.createElement('button');
+      b.textContent=ch;
+      b.style.cssText='height:44px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);color:#dbe4f2;font-size:19px;font-family:inherit;cursor:pointer;transition:.14s;';
+      b.onclick=()=>{
+        if(done) return;
+        if(ch===rd.a){
+          done=true; solvedCount++;
+          card.style.borderColor='rgba(232,180,74,.75)';
+          card.style.background='linear-gradient(135deg,rgba(232,180,74,.26),rgba(255,255,255,.04))';
+          head.lastElementChild.textContent='🔓'; head.lastElementChild.style.color='#efc264';
+          q.style.color='#efc264';
+          Object.keys(btns).forEach(k=>{ btns[k].disabled=true; btns[k].style.opacity=k===rd.a?'1':'0.3'; });
+          b.style.borderColor='#efc264'; b.style.background='linear-gradient(180deg,#efc264,#d9a33a)'; b.style.color='#2a1d08';
+          api.setTip('“'+rd.a+'”——一格打开了。（'+solvedCount+'/4）');
+          if(solvedCount===4){ setTimeout(()=>api.solve(), 1500); }
+        } else {
+          wrongs++;
+          card.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:240});
+          api.setTip('不是“'+ch+'”。再拆一次字。',true);
+          if(wrongs>=2){ hint.style.display='block'; hint.textContent='提示：'+rd.hint; }
+        }
+      };
+      btns[ch]=b;
+      opts.appendChild(b);
+    });
+    card.append(head,q,opts,hint);
+    wrap.appendChild(card);
+    return card;
+  });
+
+  api.setStep('0 / 4');
+  const row=document.createElement('div'); row.className='row';
+  const hintAll=document.createElement('button'); hintAll.className='cbtn'; hintAll.textContent='给一格提示';
+  hintAll.onclick=()=>{
+    for(let k=0;k<bank.length;k++){
+      const h=cards[k].lastElementChild;
+      if(h.style.display!=='block'){ h.style.display='block'; h.textContent='提示：'+bank[k].hint; api.setTip('第 '+['一','二','三','四'][k]+' 格的提示放出来了。'); return; }
+    }
+    api.setTip('四格提示都放出来了。');
+  };
+  row.appendChild(hintAll); controls.appendChild(row);
+
+  return {
+    destroy(){},
+    autoSolve(){
+      bank.forEach((rd,i)=>{ const b=[...cards[i].querySelectorAll('button')].find(x=>x.textContent===rd.a); if(b) b.click(); });
+    }
+  };
+};
+</script>
+</body>
+</html>

@@ -216,7 +216,7 @@
     </div>
 
     <button class="btn" id="btnStart">开始冲刺</button>
-    <div class="keys">键盘 <kbd>←</kbd><kbd>→</kbd> 换道 · <kbd>↑</kbd>/<kbd>空格</kbd> 跳 · <kbd>↓</kbd> 滑铲<br />手机可直接滑动屏幕，或用底部按钮</div>
+    <div class="keys">键盘 <kbd>←</kbd><kbd>→</kbd> 闪身 · <kbd>↑</kbd>/<kbd>空格</kbd> 跳跃 · <kbd>↓</kbd> 下滑<br />手机可直接滑动屏幕，或用底部按钮</div>
   </div>
 
   <!-- 结算卡片 -->
@@ -265,7 +265,7 @@ renderer.shadowMap.enabled = false;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 300);
-camera.position.set(0,3.1,3.4);
+camera.position.set(0,3.8,5.2);
 
 /* ============ 灯光 ============ */
 const ambient = new THREE.AmbientLight(0x4a6a9c, 1.0); scene.add(ambient);
@@ -299,7 +299,7 @@ const THEMES = {
 };
 
 const state = {
-  phase:'idle', lane:1, x:0, jumpY:0, jumpVy:0, slideT:0,
+  phase:'idle', lane:1, x:0, jumpY:0, jumpVy:0, slideT:0, dodgeT:0, dodgeDir:0,
   speed:16, score:0, coins:0, best:0, spawnAcc:0, nextGap:22, t:0,
   trainAcc:0, trainGap:6, muted:false,
   who:'sitong', scene:'metro', period:'night'
@@ -355,23 +355,200 @@ function loadChar(name){
 }
 await Promise.all([loadChar('sitong'),loadChar('sunzheng')]);
 
+/* ============ 3D 角色 ============ */
+const PALETTES = {
+  sitong: { hood:0x7C8798, hood2:0x616B7A, pants:0x3B414D, hair:0x795034, hair2:0x98613D, skin:0xF1C7A2, shoe:0xF4EFE7, sole:0x2E323A, accent:0xC4D0DE },
+  sunzheng: { hood:0x20242C, hood2:0x14171C, pants:0x17191F, hair:0x17161B, hair2:0x302C38, skin:0xEFC39D, shoe:0xF8F1E6, sole:0x1A1A1E, accent:0xDDE3EB }
+};
+function buildRunner(who){
+  const C=PALETTES[who] || PALETTES.sitong;
+  const root=new THREE.Group();
+  const rig=new THREE.Group(); root.add(rig);
+  const mat=c=>new THREE.MeshStandardMaterial({color:c,roughness:.84,metalness:.02});
+  const skin=mat(C.skin), cloth=mat(C.hood), cloth2=mat(C.hood2), pants=mat(C.pants);
+  const hair=mat(C.hair), hair2=mat(C.hair2), shoe=mat(C.shoe), sole=mat(C.sole), accent=mat(C.accent);
+  const dark=new THREE.MeshStandardMaterial({color:0x17130F,roughness:.8});
+
+  // 身体：帽子卫衣
+  const torso=new THREE.Mesh(new THREE.CapsuleGeometry(.265,.43,7,14), cloth);
+  torso.position.y=1.04; torso.scale.set(1.02,1,.9); rig.add(torso);
+  const chest=new THREE.Mesh(new THREE.BoxGeometry(.36,.34,.22), cloth2);
+  chest.position.set(0,1.08,-.12); rig.add(chest);
+  const zip=new THREE.Mesh(new THREE.BoxGeometry(.028,.38,.018), accent);
+  zip.position.set(0,1.04,-.255); rig.add(zip);
+  const hood=new THREE.Mesh(new THREE.TorusGeometry(.245,.06,8,18), cloth2);
+  hood.position.set(0,1.31,.01); hood.rotation.x=Math.PI/2; rig.add(hood);
+  const hoodBack=new THREE.Mesh(new THREE.SphereGeometry(.27,14,10), cloth2);
+  hoodBack.position.set(0,1.27,.16); hoodBack.scale.set(.95,.58,.55); rig.add(hoodBack);
+  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.105,.12,.15,10), skin);
+  neck.position.y=1.37; rig.add(neck);
+
+  // 头：脸朝跑道（-Z），镜头看到后脑勺
+  const headG=new THREE.Group(); headG.position.y=1.56; rig.add(headG);
+  const skull=new THREE.Mesh(new THREE.SphereGeometry(.315,20,16), hair);
+  skull.scale.set(1,1.05,.98); headG.add(skull);
+  const face=new THREE.Mesh(new THREE.CircleGeometry(.245,24), skin);
+  face.position.set(0,-.02,-.326); face.rotation.y=Math.PI; face.scale.set(1,1.09,1); headG.add(face);
+  const eyeL=new THREE.Mesh(new THREE.CircleGeometry(.038,12), dark);
+  eyeL.position.set(-.09,.035,-.34); eyeL.rotation.y=Math.PI; headG.add(eyeL);
+  const eyeR=eyeL.clone(); eyeR.position.x=.09; headG.add(eyeR);
+  const browL=new THREE.Mesh(new THREE.BoxGeometry(.075,.018,.012), dark);
+  browL.position.set(-.09,.105,-.343); headG.add(browL);
+  const browR=browL.clone(); browR.position.x=.09; headG.add(browR);
+  // 猫耳
+  const earL=new THREE.Mesh(new THREE.ConeGeometry(.105,.27,5), hair2);
+  earL.position.set(-.205,.285,.01); earL.rotation.z=.18; headG.add(earL);
+  const earR=new THREE.Mesh(new THREE.ConeGeometry(.105,.27,5), hair2);
+  earR.position.set(.205,.285,.01); earR.rotation.z=-.18; headG.add(earR);
+  const innerL=new THREE.Mesh(new THREE.ConeGeometry(.048,.15,5), mat(0xD98D86));
+  innerL.position.set(-.205,.30,-.035); innerL.rotation.z=.18; headG.add(innerL);
+  const innerR=new THREE.Mesh(new THREE.ConeGeometry(.048,.15,5), mat(0xD98D86));
+  innerR.position.set(.205,.30,-.035); innerR.rotation.z=-.18; headG.add(innerR);
+  // 后脑发片（贴着头皮，不凸出成尖角）
+  const nape=new THREE.Mesh(new THREE.SphereGeometry(.24,14,10), hair);
+  nape.position.set(0,-.18,.08); nape.scale.set(1,.48,.78); headG.add(nape);
+
+  // 手臂（肩/肘分层，可摆动）
+  function makeArm(side){
+    const shoulder=new THREE.Group(); shoulder.position.set(side*.335,1.24,.0);
+    const upper=new THREE.Mesh(new THREE.CapsuleGeometry(.075,.245,4,8), cloth);
+    upper.position.y=-.145; shoulder.add(upper);
+    const elbow=new THREE.Group(); elbow.position.y=-.30; shoulder.add(elbow);
+    const fore=new THREE.Mesh(new THREE.CapsuleGeometry(.064,.20,4,8), skin);
+    fore.position.y=-.115; elbow.add(fore);
+    const hand=new THREE.Mesh(new THREE.SphereGeometry(.087,10,8), skin);
+    hand.position.y=-.255; elbow.add(hand);
+    const cuff=new THREE.Mesh(new THREE.TorusGeometry(.072,.025,6,12), cloth2);
+    cuff.position.y=-.245; cuff.rotation.x=Math.PI/2; elbow.add(cuff);
+    rig.add(shoulder); return {shoulder,elbow};
+  }
+  const armL=makeArm(-1), armR=makeArm(1);
+
+  // 腿（髋/膝分层）
+  function makeLeg(side){
+    const hip=new THREE.Group(); hip.position.set(side*.145,.70,.0);
+    const thigh=new THREE.Mesh(new THREE.CapsuleGeometry(.095,.235,4,8), pants);
+    thigh.position.y=-.155; hip.add(thigh);
+    const knee=new THREE.Group(); knee.position.y=-.325; hip.add(knee);
+    const calf=new THREE.Mesh(new THREE.CapsuleGeometry(.082,.20,4,8), pants);
+    calf.position.y=-.115; knee.add(calf);
+    const foot=new THREE.Mesh(new THREE.BoxGeometry(.19,.11,.34), shoe);
+    foot.position.set(0,-.275,-.075); knee.add(foot);
+    const toe=new THREE.Mesh(new THREE.BoxGeometry(.20,.045,.12), sole);
+    toe.position.set(0,-.322,-.205); knee.add(toe);
+    rig.add(hip); return {hip,knee};
+  }
+  const legL=makeLeg(-1), legR=makeLeg(1);
+
+  return {root,rig,headG,armL,armR,legL,legR};
+}
+
+let runner3D=null;
+// 柔和的地面投影（径向渐变，避免硬边黑圆）
+const shadowCanvas=document.createElement('canvas'); shadowCanvas.width=shadowCanvas.height=128;
+const sctx=shadowCanvas.getContext('2d');
+const sg=sctx.createRadialGradient(64,64,6,64,64,62);
+sg.addColorStop(0,'rgba(0,0,0,0.55)'); sg.addColorStop(.55,'rgba(0,0,0,0.22)'); sg.addColorStop(1,'rgba(0,0,0,0)');
+sctx.fillStyle=sg; sctx.fillRect(0,0,128,128);
+const shadowTex=new THREE.CanvasTexture(shadowCanvas);
+const runnerShadow=new THREE.Mesh(
+  new THREE.PlaneGeometry(1.55,1.55),
+  new THREE.MeshBasicMaterial({map:shadowTex,transparent:true,opacity:.62,depthWrite:false})
+);
+runnerShadow.rotation.x=-Math.PI/2; runnerShadow.position.y=.012; scene.add(runnerShadow);
+
+// 跟随角色的柔光，让 3D 体积从背后也看得清
+const charLight=new THREE.PointLight(0xFFE4C8,1.8,6.5,2);
+charLight.position.set(0,2.6,1.2); scene.add(charLight);
+
+function disposeRunner(group){
+  group.traverse(o=>{
+    if(o.geometry) o.geometry.dispose();
+    if(o.material){ if(Array.isArray(o.material)) o.material.forEach(m=>m.dispose()); else o.material.dispose(); }
+  });
+}
+function spawnRunnerModel(){
+  if(runner3D){ scene.remove(runner3D.root); disposeRunner(runner3D.root); }
+  runner3D=buildRunner(state.who); runner3D.root.scale.setScalar(.84); scene.add(runner3D.root); placeRunner();
+}
 const runnerImg=document.getElementById('runnerImg');
 const shadowEl=document.getElementById('runnerShadow');
-runnerImg.src=charTex[state.who].src;
-const _v3=new THREE.Vector3();
+if(runnerImg) runnerImg.style.display='none';
+if(shadowEl) shadowEl.style.display='none';
+
 function placeRunner(){
-  camera.updateMatrixWorld();
-  const y=G+.95+state.jumpY+(state.slideT>0?-.28:0);
-  _v3.set(state.x,y,0).project(camera);
-  const sx=(_v3.x*.5+.5)*canvas.clientWidth;
-  const sy=(-_v3.y*.5+.5)*canvas.clientHeight;
-  const sliding=state.slideT>0;
-  const sc=sliding?1.12:1, sy2=sliding?0.72:1;
-  runnerImg.style.transform=`translate(-50%,-50%) translate(${sx}px,${sy}px) scale(${sc},${sy2})`;
-  _v3.set(state.x,0.05,0).project(camera);
-  const gx=(_v3.x*.5+.5)*canvas.clientWidth, gy=(-_v3.y*.5+.5)*canvas.clientHeight;
-  shadowEl.style.transform=`translate(-50%,-50%) translate(${gx}px,${gy}px)`;
+  if(!runner3D) return;
+  runner3D.root.position.set(state.x,state.jumpY,0);
+  const lift=Math.min(.72,state.jumpY*.42);
+  const sc=1-lift*.42;
+  runnerShadow.position.set(state.x,.012,0);
+  runnerShadow.scale.set(sc*.92,sc*.92,1);
+  runnerShadow.material.opacity=.60*(1-Math.min(.65,lift));
+  charLight.position.set(state.x,state.jumpY+2.6,1.2);
 }
+
+function poseRunner(t){
+  const p=runner3D; if(!p) return;
+  const run=state.phase==='run';
+  const slide=run && state.slideT>0;
+  const jump=run && state.jumpY>.03;
+
+  p.rig.position.set(0,0,0); p.rig.rotation.set(0,0,0); p.rig.scale.set(1,1,1);
+  p.legL.hip.rotation.set(0,0,0); p.legR.hip.rotation.set(0,0,0);
+  p.legL.knee.rotation.set(0,0,0); p.legR.knee.rotation.set(0,0,0);
+  p.armL.shoulder.rotation.set(0,0,0); p.armR.shoulder.rotation.set(0,0,0);
+  p.armL.elbow.rotation.set(0,0,0); p.armR.elbow.rotation.set(0,0,0);
+  p.headG.position.y=1.56; p.headG.rotation.set(0,0,0);
+
+  if(slide){
+    // 下滑：整体压低、前倾，双腿向前伸
+    p.rig.scale.set(1.05,.53,.94);
+    p.rig.rotation.x=-.30;
+    p.legL.hip.rotation.x=1.22; p.legR.hip.rotation.x=.88;
+    p.legL.knee.rotation.x=-.62; p.legR.knee.rotation.x=-.48;
+    p.armL.shoulder.rotation.x=-.78; p.armR.shoulder.rotation.x=.56;
+    p.armL.elbow.rotation.x=.25; p.armR.elbow.rotation.x=.12;
+  } else if(jump){
+    // 跳跃：双腿收拢，手臂向后上方
+    p.legL.hip.rotation.x=.98; p.legR.hip.rotation.x=.82;
+    p.legL.knee.rotation.x=-1.12; p.legR.knee.rotation.x=-.94;
+    p.armL.shoulder.rotation.x=.72; p.armR.shoulder.rotation.x=.72;
+    p.armL.elbow.rotation.x=.5; p.armR.elbow.rotation.x=.5;
+    p.rig.rotation.x=.10;
+  } else if(run){
+    // 跑步：双腿交替，手臂反摆
+    const ph=state.t*12.6;
+    const sw=Math.sin(ph), sw2=Math.sin(ph+Math.PI);
+    const amp=Math.min(1.12,.82+state.speed*.012);
+    p.legL.hip.rotation.x=sw*.92*amp;
+    p.legR.hip.rotation.x=sw2*.92*amp;
+    p.legL.knee.rotation.x=-Math.max(0,sw) * .92;
+    p.legR.knee.rotation.x=-Math.max(0,sw2) * .92;
+    p.armL.shoulder.rotation.x=sw2*.72;
+    p.armR.shoulder.rotation.x=sw*.72;
+    p.armL.elbow.rotation.x=.18+Math.max(0,sw2)*.38;
+    p.armR.elbow.rotation.x=.18+Math.max(0,sw)*.38;
+    p.rig.position.y=Math.abs(Math.sin(ph*2))*.032;
+    p.rig.rotation.z=sw*.028;
+    p.headG.rotation.z=-sw*.035;
+  } else {
+    // 待机轻微呼吸
+    p.rig.position.y=Math.sin(t*2.1)*.012;
+    p.armL.shoulder.rotation.x=-.06; p.armR.shoulder.rotation.x=.06;
+    p.armL.elbow.rotation.x=.08; p.armR.elbow.rotation.x=.08;
+    p.headG.rotation.z=Math.sin(t*1.6)*.018;
+  }
+
+  // 闪身：左右变道时整体侧倾（与输入方向一致）
+  if(run && state.dodgeT>0){
+    const k=state.dodgeT/.34;
+    p.rig.rotation.z += -state.dodgeDir*.52*k;
+    p.rig.position.x = state.dodgeDir*.065*k;
+    p.headG.rotation.z += -state.dodgeDir*.15*k;
+    p.legL.hip.rotation.x += .28*k; p.legR.hip.rotation.x -= .18*k;
+  }
+}
+spawnRunnerModel();
 
 /* ============ 共享几何体 ============ */
 const boxGeo=new THREE.BoxGeometry(1,1,1);
@@ -600,7 +777,10 @@ const isTouch=matchMedia('(pointer: coarse)').matches||'ontouchstart' in window;
 
 function moveLane(dir){ if(state.phase!=='run')return;
   const nl=Math.max(0,Math.min(2,state.lane+dir));
-  if(nl!==state.lane){ state.lane=nl; beep(dir>0?520:460); } }
+  if(nl!==state.lane){
+    state.lane=nl; state.dodgeDir=dir; state.dodgeT=.34;
+    beep(dir>0?520:460);
+  } }
 function doJump(){ if(state.phase!=='run')return;
   if(state.jumpY>0.01)return; state.jumpVy=5.6; state.slideT=0; beep(660,.1); }
 function doSlide(){ if(state.phase!=='run')return;
@@ -627,7 +807,7 @@ document.getElementById('btnDown').onclick=doSlide;
 
 document.getElementById('duo').addEventListener('click',e=>{
   const card=e.target.closest('.rcard'); if(!card)return;
-  state.who=card.dataset.who; runnerImg.src=charTex[state.who].src;
+  state.who=card.dataset.who; spawnRunnerModel();
   document.querySelectorAll('.rcard').forEach(c=>c.classList.toggle('on',c===card));
 });
 document.getElementById('sceneRow').addEventListener('click',e=>{
@@ -646,7 +826,7 @@ document.getElementById('periodRow').addEventListener('click',e=>{
 function resetGame(){
   obstacles.forEach(o=>obstacleRoot.remove(o.group)); coins.forEach(c=>coinRoot.remove(c.mesh));
   obstacles.length=0; coins.length=0;
-  state.lane=1; state.x=0; state.jumpY=0; state.jumpVy=0; state.slideT=0;
+  state.lane=1; state.x=0; state.jumpY=0; state.jumpVy=0; state.slideT=0; state.dodgeT=0; state.dodgeDir=0;
   state.speed=16; state.score=0; state.coins=0; state.spawnAcc=0; state.nextGap=22; state.t=0;
   state.trainAcc=0; state.trainGap=6;
   placeRunner();
@@ -698,7 +878,7 @@ document.getElementById('btnSound').onclick=()=>{ state.muted=!state.muted; refr
 document.getElementById('btnSetting').onclick=()=>{
   openModal('设置',`
     <div class="mrow"><span>音效 / 音乐</span><div class="switch ${state.muted?'':'on'}" id="swSound"></div></div>
-    <div class="mnote">操作：← → 换道，↑ / 空格 跳跃，↓ 滑铲；手机滑动屏幕即可。铁轨场景注意躲开迎面开来的列车。</div>
+    <div class="mnote">操作：← → 闪身，↑ / 空格 跳跃，↓ 下滑；手机滑动屏幕即可。铁轨场景注意躲开迎面开来的列车。</div>
     <button class="mbtn ghost" id="btnClear">清除最高分记录</button>
   `);
   document.getElementById('swSound').onclick=()=>{ state.muted=!state.muted; refreshSound(); document.getElementById('swSound').classList.toggle('on',!state.muted); };
@@ -715,7 +895,7 @@ document.getElementById('btnAccount').onclick=()=>{
 };
 document.getElementById('btnNotice').onclick=()=>{
   openModal('公告',`
-    <div class="mnote">v1.0 跑酷玩法上线：枫叶铁轨、城市公路、丛林土路三种场景，昼夜可切换。铁轨场景主要躲避迎面列车，提前变道躲开；路上也有少量障碍，跳跃或滑铲通过。收集星星刷新最高分。</div>
+    <div class="mnote">v1.1 跑酷角色升级为 3D 立体模型：跑步、闪身、跳跃、下滑都有对应动作；铁轨场景注意提前闪身躲开迎面列车。</div>
   `);
 };
 
@@ -744,6 +924,7 @@ function animate(){
 
     if(state.jumpY>.001||state.jumpVy>0){ state.jumpVy-=12.5*dt; state.jumpY+=state.jumpVy*dt; if(state.jumpY<=0){state.jumpY=0;state.jumpVy=0;} }
     if(state.slideT>0)state.slideT=Math.max(0,state.slideT-dt);
+    if(state.dodgeT>0)state.dodgeT=Math.max(0,state.dodgeT-dt);
 
     placeRunner();
     const shScale=1-Math.min(.4,state.jumpY*.3);
@@ -751,10 +932,10 @@ function animate(){
     shadowEl.style.opacity=String(1-Math.min(.6,state.jumpY*.4));
 
     camera.position.x=state.x*0.82;
-    camera.position.y=3.1+state.jumpY*.3;
-    camera.position.z=3.4;
+    camera.position.y=3.8+state.jumpY*.3;
+    camera.position.z=5.2;
     camera.updateMatrixWorld();
-    camera.lookAt(state.x*0.7,1.5+state.jumpY*.3,-8);
+    camera.lookAt(state.x*0.7,1.0+state.jumpY*.3,-8);
     camera.fov=58+Math.min(8,(state.speed-16)*.3); camera.updateProjectionMatrix();
 
     groundTex.offset.y-=dz*.045;
@@ -802,6 +983,7 @@ function animate(){
     spdTxt.textContent=(state.speed/16).toFixed(1)+'x';
   }
 
+  poseRunner(t);
   renderer.render(scene,camera);
 }
 
@@ -815,8 +997,8 @@ bestTxt.textContent=state.best;
 applyTheme();
 animate();
 
-window.__run={ god:false, start:startGame, endGame, state, obstacles, coins, spawnRow, addObstacle, addCoinLine, spawnTrain, LANES, G, runnerImg, charTex,
-  who:w=>{ state.who=w; runnerImg.src=charTex[w].src; },
+window.__run={ god:false, start:startGame, endGame, state, obstacles, coins, spawnRow, addObstacle, addCoinLine, spawnTrain, LANES, G, runnerImg, charTex, runner:()=>runner3D,
+  who:w=>{ state.who=w; spawnRunnerModel(); },
   setScene:s=>{ state.scene=s; applyTheme(); }, setPeriod:p=>{ state.period=p; applyTheme(); } };
 </script>
 </body>

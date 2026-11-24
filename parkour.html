@@ -658,12 +658,11 @@ function paintSprite(who,pose){
 }
 function spawnRunnerModel(){
   if(runner3D){ scene.remove(runner3D.root); disposeRunner(runner3D.root); runner3D=null; }
-  if(runnerSprite){ scene.remove(runnerSprite); if(runnerSprite.material) runnerSprite.material.dispose(); }
-  runnerSprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,alphaTest:0.02}));
-  runnerSprite.position.set(0,.90,0); scene.add(runnerSprite);
-  spritePose=''; spriteWho='';
-  paintSprite(state.who,'run');
-  ['run','run2','jump','slide'].forEach(function(p){ loadSpriteTex(state.who,p); });
+  if(runnerSprite){ scene.remove(runnerSprite); if(runnerSprite.material) runnerSprite.material.dispose(); runnerSprite=null; }
+  // 回到三区块关节 3D 角色：跑动时髋、膝、踝和手臂真实交替摆动，不再是两张立绘左右滑
+  runner3D=buildRunner(state.who);
+  runner3D.root.scale.setScalar(1.0);
+  scene.add(runner3D.root);
   placeRunner();
 }
 const runnerImg=document.getElementById('runnerImg');
@@ -672,11 +671,6 @@ if(runnerImg) runnerImg.style.display='none';
 if(shadowEl) shadowEl.style.display='none';
 
 function placeRunner(){
-  if(runnerSprite){
-    const pose=state.slideT>0?'slide':(state.jumpY>.03?'jump':'run');
-    const cy=pose==='slide'?.58:(pose==='jump'?.88:.91);
-    runnerSprite.position.set(state.x,cy+state.jumpY,0);
-  }
   if(!runner3D) return;
   runner3D.root.position.set(state.x,state.jumpY,0);
   const lift=Math.min(.72,state.jumpY*.42);
@@ -749,19 +743,22 @@ function poseRunner(t){
     // 跑步：双腿交替，手臂反摆
     const ph=state.t*12.6;
     const sw=Math.sin(ph), sw2=Math.sin(ph+Math.PI);
-    const amp=Math.min(1.12,.82+state.speed*.012);
-    p.legL.hip.rotation.x=sw*.78*amp;
-    p.legR.hip.rotation.x=sw2*.78*amp;
-    p.legL.knee.rotation.x=-Math.max(0,sw) * .80;
-    p.legR.knee.rotation.x=-Math.max(0,sw2) * .80;
-    p.armL.shoulder.rotation.x=sw2*.72;
-    p.armR.shoulder.rotation.x=sw*.72;
-    p.armL.elbow.rotation.x=.18+Math.max(0,sw2)*.38;
-    p.armR.elbow.rotation.x=.18+Math.max(0,sw)*.38;
-    p.rig.position.y=Math.abs(Math.sin(ph*2))*.032;
-    p.rig.rotation.z=sw*.032;
-    p.rig.rotation.x=-.055;
-    p.headG.rotation.z=-sw*.035;
+    const amp=Math.min(1.16,.9+state.speed*.012);
+    // 髋关节大幅前后摆，后摆腿膝盖折叠，前摆腿脚踝下压
+    p.legL.hip.rotation.x=sw*.94*amp;
+    p.legR.hip.rotation.x=sw2*.94*amp;
+    p.legL.knee.rotation.x=-Math.max(0,sw)*1.12;
+    p.legR.knee.rotation.x=-Math.max(0,sw2)*1.12;
+    p.legL.ankle.rotation.x=Math.max(0,-sw)*.30-Math.max(0,sw)*.16;
+    p.legR.ankle.rotation.x=Math.max(0,-sw2)*.30-Math.max(0,sw2)*.16;
+    p.armL.shoulder.rotation.x=sw2*.88;
+    p.armR.shoulder.rotation.x=sw*.88;
+    p.armL.elbow.rotation.x=.28+Math.max(0,sw2)*.44;
+    p.armR.elbow.rotation.x=.28+Math.max(0,sw)*.44;
+    p.rig.position.y=Math.abs(Math.sin(ph*2))*.042;
+    p.rig.rotation.z=sw*.038;
+    p.rig.rotation.x=-.065;
+    p.headG.rotation.z=-sw*.040;
   } else {
     // 待机轻微呼吸
     p.rig.position.y=Math.sin(t*2.1)*.012;

@@ -1191,10 +1191,19 @@ body.letter-lock{overflow:hidden;}
 .game-back:hover{background:#F8E7D6;color:#5A3524;border-color:#D7A57D;}
 
 #blessing .blessing-page{padding-top:24px;}
-.embed-shell{position:relative;border:1px solid #E6D0BC;border-radius:24px;overflow:hidden;background:#0B1322;box-shadow:0 24px 58px rgba(112,58,28,.14);}
-.embed-shell .game-iframe{display:block;width:100%;border:0;background:#0B1322;}
+.embed-shell{position:relative;border:1px solid #E6D0BC;border-radius:24px;overflow:hidden;background:#FCE8D6;box-shadow:0 24px 58px rgba(112,58,28,.14);}
+.embed-shell .game-iframe{position:relative;z-index:2;display:block;width:100%;border:0;background:#FCE8D6;}
 .blessing-frame{height:clamp(640px,90vh,980px);}
-.parkour-frame{height:clamp(520px,78vh,820px);}
+.parkour-frame{height:clamp(520px,78vh,820px);opacity:0;transition:opacity .28s ease;}
+.parkour-frame.loaded{opacity:1;}
+.frame-loading{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;text-align:center;background:
+  radial-gradient(520px 320px at 50% 0%,rgba(242,193,78,.24),rgba(242,193,78,0) 70%),
+  linear-gradient(160deg,#FCE6CF 0%,#F8D3B2 58%,#F1BE95 100%);color:#7A4A31;}
+.frame-loading.hide{display:none;}
+.frame-loading b{font-size:17px;letter-spacing:2px;color:#5A3524;}
+.frame-loading em{font-style:normal;font-size:12px;color:#9A6B50;letter-spacing:.5px;}
+.frame-loading .mini-spin{width:28px;height:28px;border-radius:50%;border:2px solid rgba(191,91,46,.22);border-top-color:#BF5B2E;animation:frameSpin .8s linear infinite;}
+@keyframes frameSpin{to{transform:rotate(360deg);}}
 @media (max-width:700px){
   .mini-game-hub{margin-top:46px;padding:0 18px;}
   .mini-game-head h3{font-size:25px;}
@@ -3682,7 +3691,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <div class="page" id="blessing">
 	<section class="container blessing-page">
 		<div class="embed-shell">
-			<iframe class="game-iframe blessing-frame" data-src="blessing.html?v=1124a" title="政瞳祝福树 · 3D"></iframe>
+			<iframe class="game-iframe blessing-frame" data-src="blessing.html?v=1124b" title="政瞳祝福树 · 3D"></iframe>
 		</div>
 	</section>
 </div>
@@ -3781,7 +3790,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳跑酷</h2><p>点进画面，方向键 / 触屏按键开始跑</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe parkour-frame" data-src="parkour.html?v=1124a" title="政瞳跑酷" allow="autoplay"></iframe>
+			<div class="frame-loading" id="parkourLoading"><span class="mini-spin"></span><b>正在打开政瞳跑酷…</b><em>第一次打开会稍等几秒</em></div>
+			<iframe class="game-iframe parkour-frame" data-src="parkour.html?v=1124b" title="政瞳跑酷" allow="autoplay"></iframe>
 		</div>
 	</section>
 </div>
@@ -6597,11 +6607,21 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 			frame.setAttribute("src", frame.getAttribute("data-src"));
 		}
 	}
+	var parkourFrame = document.querySelector("#parkour iframe[data-src]");
+	if (parkourFrame) {
+		parkourFrame.addEventListener("load", function(){
+			parkourFrame.classList.add("loaded");
+			var loading = document.getElementById("parkourLoading");
+			if (loading) loading.classList.add("hide");
+		});
+	}
 	window.addEventListener("zt:page", function(e){
+		if (e.detail === "theater") { loadEmbedded("parkour"); }
 		if (e.detail === "blessing" || e.detail === "parkour") { loadEmbedded(e.detail); }
 	});
 	var activePage = document.querySelector(".page.active");
-	if (activePage && (activePage.id === "blessing" || activePage.id === "parkour")) { loadEmbedded(activePage.id); }
+	if (activePage && (activePage.id === "theater" || activePage.id === "parkour")) { loadEmbedded("parkour"); }
+	if (activePage && activePage.id === "blessing") { loadEmbedded("blessing"); }
 })();
 </script>
 </body>

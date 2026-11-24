@@ -1088,7 +1088,7 @@ body.letter-lock{overflow:hidden;}
 .dc-text{font-size:14px;color:#7A6157;margin-top:12px;letter-spacing:.06em;}
 @media(max-width:600px){.days-counter{padding:24px 16px 22px;}.dc-nums{gap:14px;}.dc-num{font-size:28px;}}
 
-/* ===== 时光放映厅 ===== */
+/* ===== 旧放映厅样式（已停用） ===== */
 .reel-room{
 	max-width:960px;margin:0 auto;padding:22px 22px 26px;
 	background:linear-gradient(160deg,#FFFBF6,#F8E9DA);
@@ -1133,6 +1133,11 @@ body.letter-lock{overflow:hidden;}
 .memory-front{background:#fff;border:1px solid #F2DDCB;transform:rotateY(180deg);box-shadow:0 6px 16px rgba(150,74,30,.12);}
 .memory-front img{width:100%;height:100%;object-fit:cover;display:block;}
 .memory-card.matched .memory-front{outline:3px solid #D07C48;}
+.memory-note{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;}
+.memory-note .mn-glyph{font-size:34px;line-height:1;filter:drop-shadow(0 3px 4px rgba(120,60,30,.10));}
+.memory-note em{font-style:normal;font-size:13px;letter-spacing:3px;color:#6B432F;font-weight:600;}
+.memory-note b{font-size:10px;letter-spacing:2px;color:rgba(90,45,20,.42);font-weight:600;}
+
 .memory-tip{display:none;margin-top:14px;text-align:center;font-size:13px;color:#7A6157;letter-spacing:1px;}
 .memory-tip.show{display:block;}
 /* 全部配对成功 · 庆祝层 */
@@ -3794,10 +3799,18 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 </div>
 <script>
 (function(){
-	var IMG_BASE='img/';
-	var PAIR_FILES=["z12.jpg.jpg","z11.jpg.jpg","v11-2.jpg.jpg","home-banner1.jpg.jpg","menu-banner12.jpg.jpg","feature-banner13.jpg.jpg","contact-banner11.jpg.jpg","z1.jpg.jpg","z2.jpg.jpg"];
-	var PAIRS=PAIR_FILES.map(function(f,i){ return {id:i, img:/^https?:\/\//.test(f)?f:IMG_BASE+f}; });
-	PAIRS.forEach(function(p){ var pre=new Image(); pre.src=p.img; });
+	var NOTES=[
+		{g:'✦',t:'初见',c1:'#F9E6CE',c2:'#E8BE93',ink:'#8E4C2B'},
+		{g:'☾',t:'夜路',c1:'#F4DFC7',c2:'#D9A974',ink:'#7D4528'},
+		{g:'✿',t:'春天',c1:'#F8E9D6',c2:'#E9C39D',ink:'#9A5532'},
+		{g:'☼',t:'灯下',c1:'#FBE0C4',c2:'#E2AE7C',ink:'#8B4224'},
+		{g:'♡',t:'一起',c1:'#F7DCCB',c2:'#DFA28B',ink:'#8C3C31'},
+		{g:'✧',t:'雨里',c1:'#F1E4D2',c2:'#CFA57F',ink:'#74462E'},
+		{g:'❍',t:'车站',c1:'#F5E3C9',c2:'#DDB482',ink:'#815033'},
+		{g:'✾',t:'海边',c1:'#F6E8D2',c2:'#D8B58D',ink:'#7A4D30'},
+		{g:'◌',t:'生日',c1:'#FAE2C9',c2:'#E6B083',ink:'#91472A'}
+	];
+	var PAIRS=NOTES.map(function(n,i){ return {id:i, note:n}; });
 	var PREVIEW_MS=5000;
 	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
 	var overlay=document.getElementById('mcOverlay'), confetti=document.getElementById('mcConfetti'), mcMoves=document.getElementById('mcMoves'), mcReplay=document.getElementById('mcReplay'), mcClose=document.getElementById('mcClose');
@@ -3837,13 +3850,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 	function build(){
 		clearTimeout(previewTimer); clearInterval(countTimer); hideCelebration();
-		var deck=shuffle(PAIRS.concat(PAIRS).map(function(c){return {id:c.id,img:c.img};}));
+		var deck=shuffle(PAIRS.concat(PAIRS).map(function(c){return {id:c.id,note:c.note};}));
 		board.innerHTML=''; firstCard=null; lockBoard=false; matchedCount=0; moves=0;
 		movesEl.textContent='0'; matchedEl.textContent='0';
 		deck.forEach(function(card){
 			var el=document.createElement('div');
 			el.className='memory-card'; el.dataset.id=card.id;
-			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front"><img class="no-zoom" loading="eager" src="'+card.img+'" alt="配对照片" draggable="false"></div></div>';
+			var n=card.note;
+			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front memory-note" style="background:linear-gradient(145deg,'+n.c1+' 0%,'+n.c2+' 100%)"><span class="mn-glyph" style="color:'+n.ink+'">'+n.g+'</span><em>'+n.t+'</em><b>0'+(card.id+1)+'</b></div></div>';
 			el.addEventListener('click',function(){ flip(el); });
 			board.appendChild(el);
 		});

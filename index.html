@@ -1137,6 +1137,10 @@ body.letter-lock{overflow:hidden;}
 .memory-note .mn-glyph{font-size:34px;line-height:1;filter:drop-shadow(0 3px 4px rgba(120,60,30,.10));}
 .memory-note em{font-style:normal;font-size:13px;letter-spacing:3px;color:#6B432F;font-weight:600;}
 .memory-note b{font-size:10px;letter-spacing:2px;color:rgba(90,45,20,.42);font-weight:600;}
+.memory-photo{position:relative;background:#F7E8D8;}
+.memory-photo img{width:100%;height:100%;object-fit:cover;display:block;}
+.memory-photo .mp-cap{position:absolute;left:0;right:0;bottom:0;padding:16px 8px 7px;font-size:11px;letter-spacing:2px;color:#FFF7EC;font-weight:600;text-align:center;background:linear-gradient(0deg,rgba(58,28,14,.66),rgba(58,28,14,0));}
+.memory-photo .mp-no{position:absolute;left:7px;top:6px;padding:2px 6px;border-radius:999px;background:rgba(255,249,240,.82);color:#A2592F;font-size:9px;letter-spacing:1px;font-weight:700;line-height:1.5;}
 
 .memory-tip{display:none;margin-top:14px;text-align:center;font-size:13px;color:#7A6157;letter-spacing:1px;}
 .memory-tip.show{display:block;}
@@ -2275,7 +2279,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	var nickRow=document.getElementById('nickRow'), nickIn=document.getElementById('nickIn');
 	var whoBox=document.getElementById('whoBox');
 
-	var rendered={}, lastCount=-1, polling=null;
+	var rendered={}, lastCount=-1, lastSig='', polling=null;
 	var ME={mail:'',name:'',avatar:''};
 	var mineIds=[];
 	var USERSMAP={};
@@ -2346,6 +2350,40 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}).catch(function(){ return []; });
 	}
 	window.__readShared=readShared;
+
+	/* ---------- 删帖：Supabase 真删 + 墓碑兜底（静态 _index.json 也能隐藏） ---------- */
+	function localDeleted(){
+		try{ return JSON.parse(localStorage.getItem('aylio_deleted_posts')||'[]')||[]; }catch(e){ return []; }
+	}
+	function markLocalDeleted(id){
+		try{
+			var a=localDeleted(); if(a.indexOf(id)<0) a.push(id);
+			localStorage.setItem('aylio_deleted_posts',JSON.stringify(a.slice(-500)));
+		}catch(e){}
+	}
+	function supaDeletePost(id){
+		var name='posts/'+id+'.json';
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+name.split('/').map(encodeURIComponent).join('/'),{
+			method:'DELETE',headers:supaHeaders()
+		}).then(function(r){ return r.ok || r.status===404; });
+	}
+	function supaWriteTombstone(id){
+		var name='deleted/'+id+'.json';
+		return fetch(SUPA+'/storage/v1/object/'+BUCKET+'/'+name.split('/').map(encodeURIComponent).join('/'),{
+			method:'POST',
+			headers:supaHeaders({'Content-Type':'application/json','x-upsert':'true'}),
+			body:JSON.stringify({id:id,ts:Date.now()})
+		}).then(function(r){ return r.ok; });
+	}
+	function readDeleted(){
+		return supaList('deleted/').then(function(rows){
+			var files=(rows||[]).filter(function(x){ return x&&x.name&&/\.json$/.test(x.name); });
+			return Promise.all(files.slice(0,200).map(function(f){
+				var p=f.name.indexOf('deleted/')===0?f.name:('deleted/'+f.name);
+				return supaDownload(p).catch(function(){ return null; });
+			}));
+		}).then(function(list){ return (list||[]).map(function(x){ return x&&x.id; }).filter(Boolean); }).catch(function(){ return []; });
+	}
 
 	/* ---------- 身份 ---------- */
 	function myName(){
@@ -2575,11 +2613,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			delBtn.onclick=function(){
 				if(!confirm(isAdmin()&&!mine?'删掉这条帖子？（管理员可以删任何人的）':'删掉自己这条帖子？')) return;
 				delBtn.disabled=true;
-				readRoom().then(function(list){
-					var arr=dedupe(list||[]).filter(function(x){ return x.id!==m.id; });
-					return writeRoom(arr);
-				}).then(function(){ refresh(); setTimeout(refresh,900); })
-				.catch(function(e){ delBtn.disabled=false; alert(e.message||'没删掉'); });
+				Promise.all([
+					supaDeletePost(m.id).catch(function(){ return false; }),
+					supaWriteTombstone(m.id).catch(function(){ return false; })
+				]).then(function(){
+					markLocalDeleted(m.id);
+					refresh();
+					setTimeout(refresh,900);
+				}).catch(function(e){ delBtn.disabled=false; alert(e.message||'没删掉'); });
 			};
 			acts.appendChild(delBtn);
 		}
@@ -2868,12 +2909,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		show.forEach(function(m, idx){ msgsEl.appendChild(bubble(m, LAST.length-idx)); });
 		rendered={}; show.forEach(function(m){ rendered[m.id]=1; });
 		lastCount=LAST.length;
+		lastSig=LAST.map(function(m){ return m.id; }).join('|');
 		if(animate){ msgsEl.scrollIntoView({behavior:'smooth',block:'start'}); }
 	}
 	function refresh(){
-		Promise.all([readRoom(), readShared()]).then(function(res){
-			var list=dedupe((res[0]||[]).concat(res[1]||[]));
-			if(list.length!==lastCount || QUERY){ paint(list); }
+		Promise.all([readRoom(), readShared(), readDeleted()]).then(function(res){
+			var gone={};
+			localDeleted().forEach(function(id){ gone[id]=1; });
+			(res[2]||[]).forEach(function(id){ if(id) gone[id]=1; });
+			var list=dedupe((res[0]||[]).concat(res[1]||[])).filter(function(m){ return !gone[m.id]; });
+			var sig=list.map(function(m){ return m.id; }).join('|');
+			if(sig!==lastSig || QUERY){ paint(list); }
 		});
 	}
 	var pSearch=$('pSearch');
@@ -2902,20 +2948,12 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	if($('dmSend')) $('dmSend').onclick=sendDm;
 	if($('dmIn')) $('dmIn').addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); sendDm(); } });
 	function post(msg){
-		return readRoom().then(function(list){
-			list=dedupe(list||[]);
-			list.push(msg);
-			return writeRoom(list).then(function(){
-				/* 多人同时写会被覆盖，1 秒后自检一次，真丢了就再补一次 */
-				setTimeout(function(){
-					readRoom().then(function(now){
-						now=dedupe(now||[]);
-						if(!now.some(function(x){ return x.id===msg.id; })){
-							now.push(msg); writeRoom(dedupe(now));
-						}
-						refresh();
-					});
-				},1200);
+		/* 先写 Supabase Storage；写不进去再退回可写的 _index.json。GitHub Pages 是静态站，PUT 一定会 405，所以不能把它当主路径。 */
+		return supaWritePost(msg).catch(function(){
+			return readRoom().then(function(list){
+				list=dedupe(list||[]);
+				if(!list.some(function(x){ return x.id===msg.id; })) list.push(msg);
+				return writeRoom(list);
 			});
 		});
 	}
@@ -2961,8 +2999,6 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		function commit(msg, shared){
 			mineIds.push(msg.id);
 			return post(msg).then(function(){
-				if(shared) return supaWritePost(msg).catch(function(){});
-			}).then(function(){
 				txtEl.value=''; clearPending(); btnSend.disabled=false;
 				paint(dedupe([msg]),true); refresh();
 				upTip.textContent='发出去了';
@@ -3731,7 +3767,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="game-back-row"><a class="game-back" href="#theater" data-game-back="theater">← 返回游戏厅</a></div>
 	<section class="container blessing-page">
 		<div class="embed-shell">
-			<iframe class="game-iframe blessing-frame" data-src="blessing.html?v=1124h" title="政瞳祝福树 · 3D"></iframe>
+			<iframe class="game-iframe blessing-frame" data-src="blessing.html?v=1126a" title="政瞳祝福树 · 3D"></iframe>
 		</div>
 	</section>
 </div>
@@ -3785,7 +3821,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳档案</h2><p>四章一条线 · 每轮题目重新生成</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe archive-frame" data-src="archive.html?v=1125a" title="政瞳档案 · 四章"></iframe>
+			<iframe class="game-iframe archive-frame" data-src="archive.html?v=1126a" title="政瞳档案 · 四章"></iframe>
 		</div>
 	</section>
 </div>
@@ -3794,7 +3830,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳谜厅</h2><p>三把锁 · 看、想、试，把最后一道门打开</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe riddle-frame" data-src="riddle.html?v=1125a" title="政瞳谜厅 · 三锁"></iframe>
+			<iframe class="game-iframe riddle-frame" data-src="riddle.html?v=1126a" title="政瞳谜厅 · 三锁"></iframe>
 		</div>
 	</section>
 </div>
@@ -3804,7 +3840,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<section class="container">
 		<div class="embed-shell">
 			<div class="frame-loading" id="parkourLoading"><span class="mini-spin"></span><b>正在打开政瞳跑酷…</b><em>第一次打开会稍等几秒</em></div>
-			<iframe class="game-iframe parkour-frame" data-src="parkour.html?v=1125a" title="政瞳跑酷" allow="autoplay"></iframe>
+			<iframe class="game-iframe parkour-frame" data-src="parkour.html?v=1126a" title="政瞳跑酷" allow="autoplay"></iframe>
 		</div>
 	</section>
 </div>
@@ -3840,18 +3876,29 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 </div>
 <script>
 (function(){
-	var NOTES=[
-		{g:'✦',t:'初见',c1:'#F9E6CE',c2:'#E8BE93',ink:'#8E4C2B'},
-		{g:'☾',t:'夜路',c1:'#F4DFC7',c2:'#D9A974',ink:'#7D4528'},
-		{g:'✿',t:'春天',c1:'#F8E9D6',c2:'#E9C39D',ink:'#9A5532'},
-		{g:'☼',t:'灯下',c1:'#FBE0C4',c2:'#E2AE7C',ink:'#8B4224'},
-		{g:'♡',t:'一起',c1:'#F7DCCB',c2:'#DFA28B',ink:'#8C3C31'},
-		{g:'✧',t:'雨里',c1:'#F1E4D2',c2:'#CFA57F',ink:'#74462E'},
-		{g:'❍',t:'车站',c1:'#F5E3C9',c2:'#DDB482',ink:'#815033'},
-		{g:'✾',t:'海边',c1:'#F6E8D2',c2:'#D8B58D',ink:'#7A4D30'},
-		{g:'◌',t:'生日',c1:'#FAE2C9',c2:'#E6B083',ink:'#91472A'}
+	/* 换图只需要改根目录 memory-images.json（src 为图片路径，t 为卡面短标题），不用动这段代码 */
+	var PHOTOS=[
+		{src:'img/memory/01-chujian.jpg',t:'初见'},
+		{src:'img/memory/02-zhuguang.jpg',t:'烛光'},
+		{src:'img/memory/03-bingjian.jpg',t:'并肩'},
+		{src:'img/memory/04-tongkuang.jpg',t:'同框'},
+		{src:'img/memory/05-dongye.jpg',t:'冬夜'},
+		{src:'img/memory/06-xiaoju.jpg',t:'小聚'},
+		{src:'img/memory/07-baobao.jpg',t:'抱抱熊'},
+		{src:'img/memory/08-yiqi.jpg',t:'一起'},
+		{src:'img/memory/09-danao.jpg',t:'打闹'}
 	];
-	var PAIRS=NOTES.map(function(n,i){ return {id:i, note:n}; });
+	var CARDS_PER_ROUND=9;
+	var PAIRS=(function(){var a=[];for(var i=0;i<CARDS_PER_ROUND;i++){a.push({id:i,note:PHOTOS[i%PHOTOS.length]});}return a;})();
+	function escHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+	function loadPhotoConfig(){
+		return fetch('memory-images.json?ts='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){
+			if(d && d.images && d.images.length){
+				PHOTOS=d.images.filter(function(x){return x&&x.src;});
+				PAIRS=[]; for(var i=0;i<CARDS_PER_ROUND;i++){PAIRS.push({id:i,note:PHOTOS[i%PHOTOS.length]});}
+			}
+		}).catch(function(){});
+	}
 	var PREVIEW_MS=5000;
 	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
 	var overlay=document.getElementById('mcOverlay'), confetti=document.getElementById('mcConfetti'), mcMoves=document.getElementById('mcMoves'), mcReplay=document.getElementById('mcReplay'), mcClose=document.getElementById('mcClose');
@@ -3897,8 +3944,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		deck.forEach(function(card){
 			var el=document.createElement('div');
 			el.className='memory-card'; el.dataset.id=card.id;
-			var n=card.note;
-			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front memory-note" style="background:linear-gradient(145deg,'+n.c1+' 0%,'+n.c2+' 100%)"><span class="mn-glyph" style="color:'+n.ink+'">'+n.g+'</span><em>'+n.t+'</em><b>0'+(card.id+1)+'</b></div></div>';
+			var n=card.note || PHOTOS[0];
+			el.innerHTML='<div class="memory-inner"><div class="memory-face memory-back">✦</div><div class="memory-face memory-front memory-photo"><img src="'+escHtml(n.src)+'" alt="'+escHtml(n.t)+'" loading="lazy"><span class="mp-cap">'+escHtml(n.t)+'</span><b class="mp-no">0'+(card.id+1)+'</b></div></div>';
 			el.addEventListener('click',function(){ flip(el); });
 			board.appendChild(el);
 		});
@@ -3931,6 +3978,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 		}
 	}
 	restartBtn.addEventListener('click',build);
+	loadPhotoConfig().then(function(){ build(); });
 	if(mcReplay) mcReplay.addEventListener('click',function(){ hideCelebration(); build(); });
 	if(mcClose) mcClose.addEventListener('click',hideCelebration);
 	var started=false;

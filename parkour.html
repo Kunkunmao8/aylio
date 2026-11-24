@@ -112,6 +112,7 @@
 
   .btn{position:relative;z-index:2;margin-top:18px;padding:14px 44px;border-radius:999px;border:none;background:#fff;color:var(--ink);font-size:16px;letter-spacing:3px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 8px 0 #d97a28,0 14px 22px rgba(150,50,10,.35);transition:.16s;}
   .btn:active{transform:translateY(5px);box-shadow:0 3px 0 #d97a28,0 6px 12px rgba(150,50,10,.3);}
+  .btn:disabled{opacity:.72;cursor:progress;filter:saturate(.7);}
   .btn.ghost{background:rgba(255,255,255,.2);color:#fff;box-shadow:0 5px 0 rgba(150,50,10,.35);margin-left:10px;}
 
   .keys{position:relative;z-index:2;margin-top:14px;font-size:11.5px;color:rgba(255,255,255,.85);line-height:1.9;}
@@ -215,7 +216,7 @@
       </div>
     </div>
 
-    <button class="btn" id="btnStart">开始冲刺</button>
+    <button class="btn" id="btnStart" disabled>3D 引擎加载中…</button>
     <div class="keys">键盘 <kbd>←</kbd><kbd>→</kbd> 闪身 · <kbd>↑</kbd>/<kbd>空格</kbd> 跳跃 · <kbd>↓</kbd> 下滑<br />手机可直接滑动屏幕，或用底部按钮</div>
   </div>
 
@@ -851,7 +852,9 @@ function endGame(){
   resScore.textContent=sc; resCoin.textContent=state.coins; resBest.textContent='最高分 '+state.best;
   resultMask.classList.add('show');
 }
-document.getElementById('btnStart').onclick=startGame;
+const startBtn=document.getElementById('btnStart');
+startBtn.disabled=false; startBtn.textContent='开始冲刺';
+startBtn.onclick=startGame;
 document.getElementById('btnAgain').onclick=startGame;
 function backHome(){
   resultMask.classList.remove('show');

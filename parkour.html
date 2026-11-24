@@ -354,7 +354,7 @@ function loadChar(name){
     im.src=CHAR_SRC[name];
   });
 }
-await Promise.all([loadChar('sitong'),loadChar('sunzheng')]);
+Promise.all([loadChar('sitong'),loadChar('sunzheng')]);
 
 /* ============ 3D 角色 ============ */
 const PALETTES = {

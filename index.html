@@ -1162,6 +1162,47 @@ body.letter-lock{overflow:hidden;}
 @media(max-width:700px){.memory-room{padding:16px 12px 22px;border-radius:20px;}.memory-board{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;}.memory-back{font-size:18px;}.memory-bar{gap:14px;}}
 </style>
 
+<style>
+/* 政瞳小游戏 · 入口页 */
+.mini-game-hub{max-width:1180px;margin:64px auto 8px;padding:0 28px;}
+.mini-game-hub .mini-game-head{padding-top:30px;border-top:1px solid #EEDCC9;margin-bottom:22px;}
+.mini-game-kicker{margin:0 0 8px;font-size:11px;letter-spacing:5px;color:#B77A57;}
+.mini-game-head h3{margin:0 0 7px;font-size:29px;letter-spacing:3px;color:#5A3524;font-weight:700;}
+.mini-game-head p{margin:0;color:#8B6A58;font-size:14px;letter-spacing:.5px;}
+.mini-game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+.mini-game-card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:212px;padding:25px 24px 22px;border:1px solid #EAD4BF;border-radius:22px;background:linear-gradient(145deg,#FFF9F2 0%,#F8E4D1 100%);color:#4A2E21;text-align:left;font-family:inherit;cursor:pointer;overflow:hidden;box-shadow:0 14px 34px rgba(135,74,38,.08);transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;}
+.mini-game-card:hover{transform:translateY(-4px);border-color:#D7A57D;box-shadow:0 20px 42px rgba(135,74,38,.16);}
+.mini-game-card:active{transform:translateY(-1px) scale(.995);}
+.mini-game-card .mg-icon{font-size:30px;line-height:1;margin-bottom:7px;filter:drop-shadow(0 3px 4px rgba(90,45,20,.12));}
+.mini-game-card .mg-eyebrow{font-size:10px;letter-spacing:3px;color:#B37D58;font-weight:600;}
+.mini-game-card .mg-name{font-size:25px;line-height:1.25;letter-spacing:2px;font-weight:700;margin-top:2px;}
+.mini-game-card .mg-desc{font-size:13px;line-height:1.65;color:#8A6753;margin-top:2px;}
+.mini-game-card .mg-go{margin-top:auto;padding-top:16px;font-size:13px;letter-spacing:1px;color:#A9532D;font-weight:700;}
+.mini-game-card.parkour{background:linear-gradient(145deg,#1D2B46 0%,#0E1728 100%);border-color:#33445F;color:#FFF2DD;box-shadow:0 14px 34px rgba(16,25,44,.22);}
+.mini-game-card.parkour:hover{border-color:#7E94B6;box-shadow:0 20px 44px rgba(16,25,44,.32);}
+.mini-game-card.parkour .mg-eyebrow{color:#9DB2CE;}
+.mini-game-card.parkour .mg-desc{color:#B7C7DB;}
+.mini-game-card.parkour .mg-go{color:#F2C14E;}
+.mini-game-card.parkour .mg-icon{filter:drop-shadow(0 3px 8px rgba(242,193,78,.26));}
+
+.game-back-row{max-width:1180px;margin:0 auto;padding:22px 28px 0;}
+.game-back{display:inline-flex;align-items:center;gap:7px;padding:9px 17px;border:1px solid #E6CDB7;border-radius:999px;background:#FFF9F2;color:#8A563B;text-decoration:none;font-size:13.5px;letter-spacing:.5px;transition:.2s;}
+.game-back:hover{background:#F8E7D6;color:#5A3524;border-color:#D7A57D;}
+
+.embed-shell{position:relative;border:1px solid #E6D0BC;border-radius:24px;overflow:hidden;background:#0B1322;box-shadow:0 24px 58px rgba(112,58,28,.14);}
+.embed-shell .game-iframe{display:block;width:100%;border:0;background:#0B1322;}
+.blessing-frame{height:clamp(640px,90vh,980px);}
+.parkour-frame{height:clamp(520px,78vh,820px);}
+@media (max-width:700px){
+  .mini-game-hub{margin-top:46px;padding:0 18px;}
+  .mini-game-head h3{font-size:25px;}
+  .mini-game-grid{grid-template-columns:1fr;gap:14px;}
+  .mini-game-card{min-height:190px;padding:22px 20px 19px;}
+  .game-back-row{padding:16px 18px 0;}
+  .blessing-frame{height:90vh;min-height:680px;}
+  .parkour-frame{height:100vh;min-height:720px;}
+}
+</style>
 </head>
 <body>
 <div id="authGate">
@@ -1396,8 +1437,8 @@ body.letter-lock{overflow:hidden;}
 				<li><a href="#home" class="nav-link active" data-target="home">首页</a></li>
 				<li><a href="#menu" class="nav-link" data-target="menu">日常记录</a></li>
 				<li><a href="#pillow" class="nav-link" data-target="pillow">社区</a></li>
+				<li><a href="#blessing" class="nav-link" data-target="blessing">政瞳祝福树</a></li>
 				<li><a href="#theater" class="nav-link" data-target="theater">时光放映厅</a></li>
-				<li><a href="#game" class="nav-link" data-target="game">翻牌游戏</a></li>
 				<li><a href="#contact" class="nav-link" data-target="contact">联系我们</a></li>
 				<li><a href="#mine" class="nav-link" data-target="mine">我的</a></li>
 			</ul>
@@ -3636,6 +3677,14 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 })();
 </script>
 
+<div class="page" id="blessing">
+	<div class="pg-head"><h2>政瞳祝福树</h2><p>把想说的话挂上去，等它亮起来</p></div>
+	<section class="container">
+		<div class="embed-shell">
+			<iframe class="game-iframe blessing-frame" src="blessing.html" title="政瞳祝福树 · 3D" loading="lazy"></iframe>
+		</div>
+	</section>
+</div>
 <div class="page" id="theater">
 	<div class="pg-head"><h2>时光放映厅</h2><p>拖动时间轴，回到那一天</p></div>
 	<section class="container">
@@ -3657,6 +3706,30 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			</div>
 		</div>
 	</section>
+
+	<div class="mini-game-hub">
+		<div class="mini-game-head">
+			<p class="mini-game-kicker">MINI GAMES</p>
+			<h3>政瞳小游戏</h3>
+			<p>下面两个入口，点开哪一个，哪一个的游戏界面才会出现。</p>
+		</div>
+		<div class="mini-game-grid">
+			<button class="mini-game-card memory" type="button" data-game="game">
+				<span class="mg-icon">🃏</span>
+				<span class="mg-eyebrow">MEMORY · 9 PAIRS</span>
+				<strong class="mg-name">翻牌游戏</strong>
+				<span class="mg-desc">把散落的回忆，一张张找回来。</span>
+				<span class="mg-go">点开翻牌 →</span>
+			</button>
+			<button class="mini-game-card parkour" type="button" data-game="parkour">
+				<span class="mg-icon">🏃</span>
+				<span class="mg-eyebrow">RUN · ENDLESS</span>
+				<strong class="mg-name">政瞳跑酷</strong>
+				<span class="mg-desc">点进画面后，用方向键或触屏按键开始跑。</span>
+				<span class="mg-go">点开跑酷 →</span>
+			</button>
+		</div>
+	</div>
 </div>
 <script>
 (function(){
@@ -3702,7 +3775,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	render();
 })();
 </script>
+<div class="page" id="parkour">
+	<div class="game-back-row"><a class="game-back" href="#theater" data-game-back="theater">← 返回小游戏</a></div>
+	<div class="pg-head"><h2>政瞳跑酷</h2><p>点进画面，方向键 / 触屏按键开始跑</p></div>
+	<section class="container">
+		<div class="embed-shell">
+			<iframe class="game-iframe parkour-frame" src="parkour.html" title="政瞳跑酷" loading="lazy" allow="autoplay"></iframe>
+		</div>
+	</section>
+</div>
 <div class="page" id="game">
+	<div class="game-back-row"><a class="game-back" href="#theater" data-game-back="theater">← 返回小游戏</a></div>
 	<div class="pg-head"><h2>翻牌游戏</h2><p>把散落的回忆，一张张找回来</p></div>
 	<section class="container">
 		<div class="memory-room">
@@ -4838,8 +4921,9 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	}
 
 	function activatePage(targetId, keepHash) {
+		var navTarget = (targetId === "game" || targetId === "parkour") ? "theater" : targetId;
 		links.forEach(function (l) {
-			l.classList.toggle("active", l.getAttribute("data-target") === targetId);
+			l.classList.toggle("active", l.getAttribute("data-target") === navTarget);
 		});
 		pages.forEach(function (p) { p.classList.remove("active"); });
 		var target = document.getElementById(targetId);
@@ -6487,6 +6571,24 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	if(again) again.onclick=function(){ resetLetter(); };
 	modal.addEventListener('click',function(e){ if(e.target===modal) closeLetter(); });
 	document.addEventListener('keydown',function(e){ if(e.key==='Escape' && modal.classList.contains('show')) closeLetter(); });
+})();
+</script>
+<script>
+(function(){
+	function go(id){
+		if (window.__ztActivatePage) { window.__ztActivatePage(id); }
+		else { window.location.hash = id; }
+		window.scrollTo(0, 0);
+	}
+	document.querySelectorAll("[data-game]").forEach(function(el){
+		el.addEventListener("click", function(){ go(this.getAttribute("data-game")); });
+	});
+	document.querySelectorAll("[data-game-back]").forEach(function(el){
+		el.addEventListener("click", function(e){
+			e.preventDefault();
+			go(this.getAttribute("data-game-back"));
+		});
+	});
 })();
 </script>
 </body>

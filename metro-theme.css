@@ -758,3 +758,16 @@ select{
   border-top-width:3px!important;
 }
 .station-plate{border-top-width:3px!important;}
+
+/* 首页顶部只保留两枚站点小字，不做卡片 */
+.home-meta{
+  width:calc(100% - 48px);max-width:1104px;margin:18px auto 10px;padding:0 2px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  font-family:'Courier New',monospace;font-size:9px;line-height:1.4;letter-spacing:.14em;
+  color:#8A6B58;
+}
+.home-meta span{white-space:nowrap;}
+.home-meta .hm-next{color:var(--pz-sun);font-weight:700;}
+@media(max-width:700px){
+  .home-meta{width:auto;margin:14px 18px 8px;padding:0;font-size:8px;letter-spacing:.09em;gap:10px;}
+}

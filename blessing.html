@@ -150,6 +150,11 @@
     .btn{width:100%;}
   }
 </style>
+<style>
+/* 写作区在上，搜索区在下 */
+.panel + .stage-box{margin-top:18px;}
+.stage-box + .topbar{margin:18px auto 0;}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -160,11 +165,15 @@
     <div class="header-rule"><span>✦</span></div>
   </header>
 
-  <div class="topbar">
-    <div class="searchrow">
-      <input class="search" id="wallSearch" type="search" placeholder="搜索昵称或祝福关键字…" autocomplete="off" />
-      <button class="lockbtn" id="btnLock" type="button">锁定我的卡片</button>
+
+  <div class="panel">
+
+    <div class="row">
+      <input class="name" id="noteName" placeholder="你的昵称" maxlength="12" />
+      <input class="text" id="noteText" placeholder="写一句祝福，挂到树上…" maxlength="60" />
+      <button class="btn" id="noteSend">挂上树 🎄</button>
     </div>
+    <div class="tip" id="tipTxt">提示：点树上的小枕头可以看完整祝福</div>
   </div>
 
   <div class="stage-box" id="stageBox">
@@ -182,15 +191,13 @@
     <div class="loading" id="loading"><div class="spin"></div><span>正在点亮圣诞树…</span></div>
   </div>
 
-  <div class="panel">
-
-    <div class="row">
-      <input class="name" id="noteName" placeholder="你的昵称" maxlength="12" />
-      <input class="text" id="noteText" placeholder="写一句祝福，挂到树上…" maxlength="60" />
-      <button class="btn" id="noteSend">挂上树 🎄</button>
+  <div class="topbar">
+    <div class="searchrow">
+      <input class="search" id="wallSearch" type="search" placeholder="搜索昵称或祝福关键字…" autocomplete="off" />
+      <button class="lockbtn" id="btnLock" type="button">锁定我的卡片</button>
     </div>
-    <div class="tip" id="tipTxt">提示：点树上的小枕头可以看完整祝福</div>
   </div>
+
 
   <footer>© 2026 政瞳之家 · 仅作粉丝纪念，图片版权归原作者所有</footer>
 </div>

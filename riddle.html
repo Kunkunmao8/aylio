@@ -80,6 +80,28 @@
   .fxcard .bigbtn{margin:16px auto 0;display:block;padding:9px 26px;font-size:13px;}
 
   footer{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:10px;color:rgba(255,255,255,.2);letter-spacing:1px;}
+
+
+/* 谜厅「回谜厅」按钮：从文字链接改成明显的太阳橘胶囊 */
+#btnBack{
+  display:inline-flex!important;align-items:center!important;gap:6px!important;
+  padding:9px 17px!important;border:0!important;border-radius:999px!important;
+  background:#F26516!important;color:#FFF7EE!important;
+  font:800 13px/1 "PingFang SC","Noto Sans SC",system-ui,sans-serif!important;
+  letter-spacing:.08em!important;box-shadow:0 3px 0 #B93B05!important;
+  transition:transform .15s ease,background .15s ease!important;
+}
+#btnBack:hover{background:#D94F09!important;color:#FFF7EE!important;transform:translateY(-1px)!important;}
+#btnBack:active{transform:translateY(1px)!important;box-shadow:0 2px 0 #B93B05!important;}
+#btnEndBack{
+  background:#F26516!important;color:#FFF7EE!important;border:0!important;
+  box-shadow:0 4px 0 #B93B05!important;font-weight:800!important;
+}
+#btnEndBack:hover{background:#D94F09!important;}
+@media(max-width:600px){
+  #btnBack{padding:8px 13px!important;font-size:12px!important;}
+}
+
 </style>
 
 <style id="aylio-cream">

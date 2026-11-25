@@ -4737,7 +4737,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	<div class="pg-head"><h2>政瞳谜厅</h2><p>三把锁 · 看、想、试，把最后一道门打开</p></div>
 	<section class="container">
 		<div class="embed-shell">
-			<iframe class="game-iframe riddle-frame" data-src="riddle.html?v=1125a" title="政瞳谜厅 · 三锁"></iframe>
+			<iframe class="game-iframe riddle-frame" data-src="riddle.html?v=1126a" title="政瞳谜厅 · 三锁"></iframe>
 		</div>
 	</section>
 </div>
@@ -7658,7 +7658,27 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 			if (loading) loading.classList.add("hide");
 		});
 	}
+	var GAME_PREFETCHED = false;
+	function prefetchGamePages(){
+		if (GAME_PREFETCHED) return;
+		GAME_PREFETCHED = true;
+		[
+			'blessing.html?v=1125b',
+			'parkour-v1129.html?v=1129',
+			'archive.html?v=1125a',
+			'riddle.html?v=1126a',
+			'three.module.min.js?v=3'
+		].forEach(function(href, i){
+			setTimeout(function(){
+				var l = document.createElement('link');
+				l.rel = 'prefetch'; l.href = href;
+				if (href.indexOf('three') !== -1) l.as = 'script';
+				document.head.appendChild(l);
+			}, i * 220);
+		});
+	}
 	window.addEventListener("zt:page", function(e){
+		if (e.detail === "theater") { prefetchGamePages(); }
 		if (e.detail === "blessing" || e.detail === "parkour" || e.detail === "archive" || e.detail === "riddle") { loadEmbedded(e.detail); }
 	});
 	var activePage = document.querySelector(".page.active");

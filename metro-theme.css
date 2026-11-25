@@ -774,3 +774,14 @@ select{
 
 /* 我的页不显示“下一站” */
 #mine .xp-page-head .sp-next{display:none!important;}
+
+/* 登录页：验证码直接显示在设置密码下方 */
+#authGate .ag-code-line{
+  margin:-2px 0 10px;padding-left:2px;
+  font-family:'Courier New',monospace;font-size:10.5px;line-height:1.5;
+  letter-spacing:.06em;color:#A77051;
+}
+#authGate .ag-code-line b{
+  color:var(--pz-sun);font-size:13px;letter-spacing:.16em;margin-left:3px;
+}
+#authGate .ag-tip{min-height:0;}

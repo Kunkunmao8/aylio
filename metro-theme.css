@@ -794,3 +794,31 @@ select{
 #authGate .ag-btn{border-radius:999px!important;height:46px!important;box-shadow:0 4px 0 #B93B05!important;}
 #authGate .ag-tabs,#authGate .ag-tabs button{border-radius:999px!important;}
 #authGate .ag-forgot button{text-decoration:none!important;border-bottom:1px dashed rgba(242,101,22,.5)!important;padding-bottom:2px!important;}
+
+/* 社区长图：完整显示，不再裁成横图；缩略图先加载，点开看原图 */
+#pillow .post-media img{
+  width:auto!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  margin:0 auto!important;
+  display:block!important;
+  border-radius:14px!important;
+  background:#F6E3D4!important;
+}
+#pillow .post-media video{
+  width:100%!important;
+  height:auto!important;
+  max-height:70vh!important;
+  object-fit:contain!important;
+  border-radius:14px!important;
+  background:#1b120c!important;
+  display:block!important;
+}
+
+/* 社区图片加载失败时给一个明确入口 */
+#pillow .post-media .media-fail{
+  display:block;padding:18px 16px;border:1px dashed #E6C6AF;border-radius:12px;
+  background:#FFF8F0;color:#A23B0B;font-size:13px;line-height:1.6;text-align:center;text-decoration:none;
+}

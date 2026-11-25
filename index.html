@@ -1480,22 +1480,62 @@ body.letter-lock{overflow:hidden;}
 	};
 })();
 </script>
-<header class="site-header">
-	<div class="container header-inner">
-		<a class="logo" href="#home">政瞳之家</a>
-		<nav>
-			<ul class="nav">
-				<li><a href="#home" class="nav-link active" data-target="home">首页</a></li>
-				<li><a href="#menu" class="nav-link" data-target="menu">日常记录</a></li>
-				<li><a href="#pillow" class="nav-link" data-target="pillow">社区</a></li>
-				<li><a href="#theater" class="nav-link" data-target="theater">游戏厅</a></li>
-				<li><a href="#contact" class="nav-link" data-target="contact">联系我们</a></li>
-				<li><a href="#mine" class="nav-link" data-target="mine">我的</a></li>
-			</ul>
-		</nav>
+<header class="metro-header" id="metroHeader">
+	<div class="mh-top">
+		<a class="mh-brand" href="#home" aria-label="政瞳线首页">
+			<span class="mh-seal">政</span>
+			<span class="mh-title"><b>政瞳线</b><small>SUN LINE / PZ·01</small></span>
+		</a>
+		<div class="mh-status"><i></i><span id="mhStatus">全线运行中</span><b id="mhClock">--:--</b></div>
+		<div class="mh-actions">
+			<button type="button" class="mh-btn" id="mhRandom">随机一站</button>
+			<button type="button" class="mh-btn solid" id="mhNetwork">全线图</button>
+		</div>
+	</div>
+	<div class="mh-line" role="tablist" aria-label="政瞳线站点">
+		<button class="nav-link station-link mh-station active" data-target="home" data-code="01"><span class="dot">01</span><span class="name">门厅</span><span class="en">HOME</span></button>
+		<button class="nav-link station-link mh-station" data-target="menu" data-code="02"><span class="dot">02</span><span class="name">客厅</span><span class="en">DAILY</span></button>
+		<button class="nav-link station-link mh-station" data-target="pillow" data-code="03"><span class="dot">03</span><span class="name">邻里</span><span class="en">COMMUNITY</span></button>
+		<button class="nav-link station-link mh-station" data-target="theater" data-code="04"><span class="dot">04</span><span class="name">游戏厅</span><span class="en">ARCADE</span><span class="g">G</span></button>
+		<button class="nav-link station-link mh-station" data-target="mine" data-code="05"><span class="dot">05</span><span class="name">我的房间</span><span class="en">MY ROOM</span></button>
+		<button class="nav-link station-link mh-station" data-target="contact" data-code="06"><span class="dot">06</span><span class="name">信箱</span><span class="en">CONTACT</span></button>
 	</div>
 </header>
 <div class="page active" id="home">
+<section class="line-board" id="lineBoard" data-current="home">
+	<div class="lb-head">
+		<div class="lb-brand"><span class="lb-symbol">PZ</span><div><b>政瞳线</b><small>SUN LINE · 从门厅到信箱</small></div></div>
+		<div class="lb-meta"><span><i></i><b id="lbStatus">全线运行</b></span><span id="lbClock">--:--</span></div>
+	</div>
+	<div class="lb-copy">
+		<p class="lb-kicker">A HOME ON ONE LINE</p>
+		<h2>一条线，<em>逛完一个家。</em></h2>
+		<p>六站，一天。点站名下车，或者等下一班。</p>
+	</div>
+	<div class="line-track">
+		<div class="track-line" aria-hidden="true"></div>
+		<div class="train" aria-hidden="true"></div>
+		<div class="line-stations">
+			<button class="nav-link station-link lb-station active" data-target="home" data-code="01"><span class="lb-node">01</span><span class="lb-name">门厅<small>HOME</small></span></button>
+			<button class="nav-link station-link lb-station" data-target="menu" data-code="02"><span class="lb-node">02</span><span class="lb-name">客厅<small>DAILY</small></span></button>
+			<button class="nav-link station-link lb-station" data-target="pillow" data-code="03"><span class="lb-node">03</span><span class="lb-name">邻里<small>COMMUNITY</small></span></button>
+			<button class="nav-link station-link lb-station" data-target="theater" data-code="04"><span class="lb-node">04</span><span class="lb-name">游戏厅<small>ARCADE</small></span></button>
+			<button class="nav-link station-link lb-station" data-target="mine" data-code="05"><span class="lb-node">05</span><span class="lb-name">我的房间<small>MY ROOM</small></span></button>
+			<button class="nav-link station-link lb-station" data-target="contact" data-code="06"><span class="lb-node">06</span><span class="lb-name">信箱<small>CONTACT</small></span></button>
+		</div>
+	</div>
+	<div class="branch-bar">
+		<span class="branch-title"><i></i>G 支线</span>
+		<div class="branch-list">
+			<button class="nav-link station-link branch-stop" data-target="blessing" data-code="G1"><b>G1</b>祝福树</button>
+			<button class="nav-link station-link branch-stop" data-target="parkour" data-code="G2"><b>G2</b>跑酷</button>
+			<button class="nav-link station-link branch-stop" data-target="game" data-code="G3"><b>G3</b>翻牌</button>
+			<button class="nav-link station-link branch-stop" data-target="archive" data-code="G4"><b>G4</b>档案</button>
+			<button class="nav-link station-link branch-stop" data-target="riddle" data-code="G5"><b>G5</b>谜厅</button>
+		</div>
+	</div>
+	<div class="lb-foot"><span>6 站 · 全天运营 · 2026</span><span class="lb-next" id="lbNext">下一站：客厅</span><button type="button" id="lbNetwork">查看全线图 ↗</button></div>
+</section>
 	<div class="pg-head"><h2>首页</h2><p>孙政 × 吕思瞳 · 把日常过成可以回看的样子</p></div>
 	<section class="banner">
 		<img class="banner-img" src="img/feature-banner13.jpg.jpg" alt="首页横幅：蛋糕前的两个人">
@@ -3743,7 +3783,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	</div>
 	<section class="container">
 		<div class="gamehall-room">
-			<div class="gamehall-top"><span><span class="bulbs"><i></i><i></i><i></i><i></i></span>政瞳游戏厅</span><span>OPEN · 随时进来</span></div>
+			<div class="game-branch">
+			<div class="gb-head"><span><b>G 支线</b> / GAME BRANCH</span><span>5 站 · 随时开</span></div>
+			<div class="gb-track">
+				<button class="nav-link station-link g-stop" data-target="blessing" data-code="G1"><span class="gdot">G1</span><span class="gname">祝福树</span></button>
+				<button class="nav-link station-link g-stop" data-target="parkour" data-code="G2"><span class="gdot">G2</span><span class="gname">跑酷</span></button>
+				<button class="nav-link station-link g-stop" data-target="game" data-code="G3"><span class="gdot">G3</span><span class="gname">翻牌</span></button>
+				<button class="nav-link station-link g-stop" data-target="archive" data-code="G4"><span class="gdot">G4</span><span class="gname">档案</span></button>
+				<button class="nav-link station-link g-stop" data-target="riddle" data-code="G5"><span class="gdot">G5</span><span class="gname">谜厅</span></button>
+			</div>
+		</div>
+		<div class="gamehall-top"><span><span class="bulbs"><i></i><i></i><i></i><i></i></span>政瞳游戏厅</span><span>OPEN · 随时进来</span></div>
 			<div class="mini-game-grid gamehall-grid">
 				<button class="mini-game-card wish" type="button" data-game="blessing">
 					<span class="mg-eyebrow">WISH TREE · 200 张牌</span>
@@ -4957,6 +5007,36 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 					</div>
 	</div>
 </div>
+<div class="network-overlay" id="networkOverlay" aria-hidden="true">
+	<div class="network-bg"></div>
+	<section class="network-sheet" aria-label="政瞳线全线图">
+		<div class="net-head">
+			<div><small>NETWORK MAP / PZ·01</small><h2>全线图</h2></div>
+			<button type="button" class="net-close" id="networkClose" aria-label="关闭全线图">×</button>
+		</div>
+		<div class="network-body">
+			<div class="net-main">
+				<p class="net-label">主线 · 门厅 → 信箱</p>
+				<button class="nav-link station-link net-stop" data-target="home" data-code="01"><span class="ndot">01</span><span><b>门厅</b><small>HOME / 起点</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="menu" data-code="02"><span class="ndot">02</span><span><b>客厅</b><small>DAILY NOTES</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="pillow" data-code="03"><span class="ndot">03</span><span><b>邻里</b><small>COMMUNITY</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="theater" data-code="04"><span class="ndot">04</span><span><b>游戏厅</b><small>ARCADE / G 支线换乘</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="mine" data-code="05"><span class="ndot">05</span><span><b>我的房间</b><small>MY ROOM</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="contact" data-code="06"><span class="ndot">06</span><span><b>信箱</b><small>CONTACT / 终点</small></span></button>
+			</div>
+			<div class="net-branch">
+				<span class="branch-mark">G 支线</span>
+				<p class="net-label">游戏厅出发 · 5 站</p>
+				<button class="nav-link station-link net-stop" data-target="blessing" data-code="G1"><span class="ndot">G1</span><span><b>祝福树</b><small>WISH TREE</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="parkour" data-code="G2"><span class="ndot">G2</span><span><b>跑酷</b><small>PARKOUR</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="game" data-code="G3"><span class="ndot">G3</span><span><b>翻牌</b><small>CARD MATCH</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="archive" data-code="G4"><span class="ndot">G4</span><span><b>影子档案</b><small>ARCHIVE</small></span></button>
+				<button class="nav-link station-link net-stop" data-target="riddle" data-code="G5"><span class="ndot">G5</span><span><b>谜厅</b><small>RIDDLE</small></span></button>
+			</div>
+		</div>
+	</section>
+</div>
+
 <script>
 (function () {
 	var links = document.querySelectorAll(".nav-link");
@@ -5866,6 +5946,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	.xp-head{margin-top:-38px;}
 }
 </style>
+<link rel="stylesheet" href="metro-theme.css?v=1125m">
 <!-- photoWall -->
 <script>
 /* 照片墙存储配置：Supabase 免费公共桶，所有人上传的都看得见 */
@@ -6672,6 +6753,7 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
 	if (activePage && activePage.id === "riddle") { loadEmbedded("riddle"); }
 })();
 </script>
+<script src="metro-theme.js?v=1125m"></script>
 </body>
 </html>
 

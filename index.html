@@ -855,6 +855,34 @@ select{
 @keyframes pzTimerPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.07);}}
 @media (prefers-reduced-motion:reduce){#memoryCount{animation:none;}}
 
+
+/* 主页「相识计时器」：文字加深成太阳橘，避免太浅看不清 */
+.days-counter .dc-label{
+  display:inline-block!important;margin-bottom:4px!important;padding:5px 14px!important;
+  background:#FFF2DC!important;border:1px solid #F2B083!important;
+  border-radius:999px!important;color:#B93B05!important;
+  font:800 13.5px/1.35 var(--pz-mono)!important;letter-spacing:.11em!important;
+  box-shadow:0 2px 0 rgba(185,59,5,.10);
+}
+.days-counter .dc-num{color:#B93B05!important;text-shadow:none!important;}
+.days-counter .dc-unit{color:#C2410C!important;font-weight:800!important;}
+.days-counter .dc-text{
+  color:#8A3A12!important;font-weight:600!important;font-size:14px!important;
+  border-top:1px solid #E8C4A8!important;padding-top:11px!important;margin-top:13px!important;
+}
+/* 主页顶栏时钟也加深一点，别再是小小的浅字 */
+.mh-status b{
+  font:800 11px/1 var(--pz-mono)!important;color:#B93B05!important;
+  background:#FFF2DC!important;border:1px solid #F2B083!important;border-radius:999px!important;
+  padding:4px 8px!important;letter-spacing:.04em!important;
+  box-shadow:0 2px 0 rgba(185,59,5,.10);
+}
+@media(max-width:600px){
+  .days-counter .dc-label{font-size:12.5px!important;padding:4px 10px!important;}
+  .days-counter .dc-text{font-size:13px!important;}
+  .mh-status b{font-size:10px!important;padding:3px 6px!important;}
+}
+
 </style>
 <script>
 (function(){

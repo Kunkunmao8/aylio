@@ -3,11 +3,11 @@
 
   var STATIONS = {
     home:    { code: "01", name: "序章", en: "HOME", next: "日常" },
-    menu:    { code: "02", name: "日常", en: "DAILY NOTES", next: "同频" },
-    pillow:  { code: "03", name: "同频", en: "COMMUNITY", next: "游戏厅" },
+    menu:    { code: "02", name: "日常", en: "DAILY NOTES", next: "社区" },
+    pillow:  { code: "03", name: "社区", en: "COMMUNITY", next: "游戏厅" },
     theater: { code: "04", name: "游戏厅", en: "ARCADE", next: "信箱" },
-    mine:    { code: "06", name: "归处", en: "MY ROOM", next: "序章" },
-    contact: { code: "05", name: "信箱", en: "CONTACT", next: "归处" },
+    mine:    { code: "06", name: "我的", en: "MINE", next: "序章" },
+    contact: { code: "05", name: "信箱", en: "CONTACT", next: "我的" },
     blessing:{ code: "G1", name: "祝福树", en: "WISH TREE", next: "返回游戏厅" },
     parkour: { code: "G2", name: "跑酷", en: "PARKOUR", next: "返回游戏厅" },
     game:    { code: "G3", name: "翻牌", en: "CARD MATCH", next: "返回游戏厅" },

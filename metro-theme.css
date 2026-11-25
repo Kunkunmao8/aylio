@@ -771,3 +771,6 @@ select{
 @media(max-width:700px){
   .home-meta{width:auto;margin:14px 18px 8px;padding:0;font-size:8px;letter-spacing:.09em;gap:10px;}
 }
+
+/* 我的页不显示“下一站” */
+#mine .xp-page-head .sp-next{display:none!important;}

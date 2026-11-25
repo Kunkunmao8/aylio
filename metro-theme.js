@@ -2,12 +2,12 @@
   "use strict";
 
   var STATIONS = {
-    home:    { code: "01", name: "门厅", en: "HOME", next: "客厅" },
-    menu:    { code: "02", name: "客厅", en: "DAILY NOTES", next: "邻里" },
-    pillow:  { code: "03", name: "邻里", en: "COMMUNITY", next: "游戏厅" },
-    theater: { code: "04", name: "游戏厅", en: "ARCADE", next: "我的房间" },
-    mine:    { code: "05", name: "我的房间", en: "MY ROOM", next: "信箱" },
-    contact: { code: "06", name: "信箱", en: "CONTACT", next: "回到门厅" },
+    home:    { code: "01", name: "序章", en: "HOME", next: "日常" },
+    menu:    { code: "02", name: "日常", en: "DAILY NOTES", next: "同频" },
+    pillow:  { code: "03", name: "同频", en: "COMMUNITY", next: "游戏厅" },
+    theater: { code: "04", name: "游戏厅", en: "ARCADE", next: "信箱" },
+    mine:    { code: "06", name: "归处", en: "MY ROOM", next: "序章" },
+    contact: { code: "05", name: "信箱", en: "CONTACT", next: "归处" },
     blessing:{ code: "G1", name: "祝福树", en: "WISH TREE", next: "返回游戏厅" },
     parkour: { code: "G2", name: "跑酷", en: "PARKOUR", next: "返回游戏厅" },
     game:    { code: "G3", name: "翻牌", en: "CARD MATCH", next: "返回游戏厅" },
@@ -15,7 +15,7 @@
     riddle:  { code: "G5", name: "谜厅", en: "RIDDLE", next: "返回游戏厅" }
   };
   var SUBLINE = ["blessing", "parkour", "game", "archive", "riddle"];
-  var MAINLINE = ["home", "menu", "pillow", "theater", "mine", "contact"];
+  var MAINLINE = ["home", "menu", "pillow", "theater", "contact", "mine"];
 
   function currentId() {
     var active = document.querySelector(".page.active");

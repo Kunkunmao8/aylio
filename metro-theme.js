@@ -100,6 +100,7 @@
   }
 
   var toastTimer = null;
+  var canToast = false;
   function showToast(id, isSubLine) {
     var s = STATIONS[id];
     if (!s) return;
@@ -177,6 +178,7 @@
     addPlates();
     tickClock();
     setInterval(tickClock, 30000);
+    setTimeout(function () { canToast = true; }, 650);
     setTimeout(pinTop, 80);
     setTimeout(pinTop, 420);
     window.addEventListener("load", function () { setTimeout(pinTop, 0); });
@@ -230,8 +232,10 @@
     window.addEventListener("zt:page", function (e) {
       var id = e.detail || currentId();
       syncUI(id);
-      if (isSub(id)) showToast(id, true);
-      else showToast(id, false);
+      if (canToast) {
+        if (isSub(id)) showToast(id, true);
+        else showToast(id, false);
+      }
       var lineBoard = document.querySelector(".line-board");
       if (lineBoard) lineBoard.setAttribute("data-current", id);
     });

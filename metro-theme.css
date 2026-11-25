@@ -785,3 +785,12 @@ select{
   color:var(--pz-sun);font-size:13px;letter-spacing:.16em;margin-left:3px;
 }
 #authGate .ag-tip{min-height:0;}
+
+/* 登录页彻底圆角：卡片、输入框、按钮都收圆 */
+#authGate .ag-card{border-radius:28px!important;overflow:hidden!important;}
+#authGate .ag-card:before{border-radius:12px!important;}
+#authGate .ag-field{border-radius:16px!important;}
+#authGate .ag-pass .ag-field{border-radius:16px!important;padding-right:64px!important;}
+#authGate .ag-btn{border-radius:999px!important;height:46px!important;box-shadow:0 4px 0 #B93B05!important;}
+#authGate .ag-tabs,#authGate .ag-tabs button{border-radius:999px!important;}
+#authGate .ag-forgot button{text-decoration:none!important;border-bottom:1px dashed rgba(242,101,22,.5)!important;padding-bottom:2px!important;}

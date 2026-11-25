@@ -883,6 +883,24 @@ select{
   .mh-status b{font-size:10px!important;padding:3px 6px!important;}
 }
 
+
+/* 所有游戏页：固定在左下角的回游戏厅按钮，滚到哪都在 */
+.pz-quick-back{
+  position:fixed!important;left:max(16px,env(safe-area-inset-left))!important;
+  bottom:max(16px,env(safe-area-inset-bottom))!important;z-index:70!important;
+  display:none;align-items:center;gap:7px;height:44px;padding:0 18px!important;
+  background:#F26516!important;color:#FFF7EE!important;border:0!important;border-radius:999px!important;
+  font:800 13px/1 var(--pz-serif)!important;letter-spacing:.08em!important;text-decoration:none!important;
+  box-shadow:0 4px 0 #B93B05,0 10px 24px rgba(185,59,5,.24)!important;
+  transition:transform .16s ease,background .16s ease!important;
+}
+.pz-quick-back.show{display:inline-flex!important;}
+.pz-quick-back:hover{background:#D94F09!important;color:#FFF7EE!important;transform:translateY(-1px);}
+.pz-quick-back:active{transform:translateY(2px);box-shadow:0 2px 0 #B93B05!important;}
+@media(max-width:600px){
+  .pz-quick-back{left:max(12px,env(safe-area-inset-left))!important;bottom:max(12px,env(safe-area-inset-bottom))!important;height:42px;padding:0 15px!important;font-size:12px!important;}
+}
+
 </style>
 <script>
 (function(){
@@ -7945,7 +7963,32 @@ window.AYLIO_MAIL = { serviceId: "service_4a91okx", templateId: "template_l7wdw9
   }
 })();
 
+
+(function(){
+  function initQuickBack(){
+    var GAME_PAGES = ["blessing","parkour","game","archive","riddle"];
+    var btn = document.getElementById("pzQuickBack");
+    if (!btn) return;
+    function sync(id){
+      var active = id || (document.querySelector(".page.active")||{}).id;
+      btn.classList.toggle("show", GAME_PAGES.indexOf(active) >= 0);
+    }
+    btn.addEventListener("click", function(e){
+      e.preventDefault();
+      if (window.__ztActivatePage) window.__ztActivatePage("theater");
+      else { location.hash = "theater"; }
+      window.scrollTo(0,0);
+    });
+    window.addEventListener("zt:page", function(e){ sync(e.detail); });
+    sync();
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initQuickBack);
+  else initQuickBack();
+})();
+
 </script>
+
+<a class="pz-quick-back" id="pzQuickBack" href="#theater" aria-label="返回游戏厅">← 回游戏厅</a>
 </body>
 </html>
 

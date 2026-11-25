@@ -720,7 +720,8 @@ select{
 #pillow .room-search{border-radius:999px!important;}
 #pillow .gate,#pillow .gate-card{border-radius:18px!important;overflow:hidden!important;}
 .memory-room{border-radius:24px!important;overflow:hidden!important;}
-.memory-card,.memory-inner,.memory-front,.memory-back{border-radius:16px!important;overflow:hidden!important;}
+.memory-card,.memory-inner{border-radius:16px!important;overflow:visible!important;}
+.memory-front,.memory-back{border-radius:16px!important;overflow:hidden!important;-webkit-backface-visibility:hidden!important;backface-visibility:hidden!important;}
 #authGate .ag-card{border-radius:24px!important;}
 #authGate .ag-card:before{border-radius:10px!important;}
 #authGate .ag-tabs{border-radius:999px!important;}

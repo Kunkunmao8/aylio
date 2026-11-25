@@ -832,6 +832,21 @@ select{
   background:#FFF8F0;color:#A23B0B;font-size:13px;line-height:1.6;text-align:center;text-decoration:none;
 }
 
+/* 翻牌倒计时：放到牌面上方，改成一眼能看见的太阳橘 */
+.memory-tip{
+  width:fit-content;max-width:100%;margin:0 auto 16px;padding:10px 18px;
+  background:#FFF2DC;border:1px solid #F2B083;border-radius:999px;
+  color:#5A2A0E!important;font-size:13px;font-weight:700;letter-spacing:.05em;
+  box-shadow:0 4px 12px rgba(242,101,22,.10);text-align:center;
+}
+.memory-tip.show{display:flex!important;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+#memoryCount{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:32px;height:32px;padding:0 9px;
+  background:#F26516;color:#FFF7EE;border-radius:999px;
+  font:700 20px/1 var(--pz-mono);box-shadow:0 3px 0 #B93B05;
+}
+
 </style>
 <script>
 (function(){
@@ -4710,8 +4725,8 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 				<span>已配对 <b id="memoryMatched">0</b> / 9</span>
 				<button class="memory-restart" type="button" id="memoryRestart">重新洗牌</button>
 			</div>
+			<div class="memory-tip" id="memoryTip">先记住每张照片的位置，<span id="memoryCount">6</span> 秒后开始配对…</div>
 			<div class="memory-board" id="memoryBoard"></div>
-			<div class="memory-tip" id="memoryTip">先记住每张照片的位置，<span id="memoryCount">5</span> 秒后开始配对…</div>
 		</div>
 	</section>
 
@@ -4733,18 +4748,18 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 <script>
 (function(){
 	var NOTES=[
-		{src:'img/5.jpg.jpg',t:'初见'},
-		{src:'img/z12.jpg.jpg',t:'夜路'},
-		{src:'img/v11-2.jpg.jpg',t:'春天'},
-		{src:'img/z11.jpg.jpg',t:'灯下'},
-		{src:'img/v1.jpg.jpg',t:'一起'},
-		{src:'img/z2.jpg.jpg',t:'雨里'},
-		{src:'img/z3.jpg.jpg',t:'车站'},
-		{src:'img/v5-1.jpg.jpg',t:'海边'},
-		{src:'img/z41.jpg.jpg',t:'生日'}
+		{src:'thumbs/memory/01-chujian.webp',t:'初见'},
+		{src:'thumbs/memory/02-zhuguang.webp',t:'夜路'},
+		{src:'thumbs/memory/03-bingjian.webp',t:'春天'},
+		{src:'thumbs/memory/04-tongkuang.webp',t:'灯下'},
+		{src:'thumbs/memory/05-dongye.webp',t:'一起'},
+		{src:'thumbs/memory/06-xiaoju.webp',t:'雨里'},
+		{src:'thumbs/memory/07-baobao.webp',t:'车站'},
+		{src:'thumbs/memory/08-yiqi.webp',t:'海边'},
+		{src:'thumbs/memory/09-danao.webp',t:'生日'}
 	];
 	var PAIRS=NOTES.map(function(n,i){ return {id:i, note:n}; });
-	var PREVIEW_MS=5000;
+	var PREVIEW_MS=6000;
 	var board=document.getElementById('memoryBoard'), movesEl=document.getElementById('memoryMoves'), matchedEl=document.getElementById('memoryMatched'), restartBtn=document.getElementById('memoryRestart'), tip=document.getElementById('memoryTip'), countEl=document.getElementById('memoryCount');
 	var overlay=document.getElementById('mcOverlay'), confetti=document.getElementById('mcConfetti'), mcMoves=document.getElementById('mcMoves'), mcReplay=document.getElementById('mcReplay'), mcClose=document.getElementById('mcClose');
 	if(!board||!restartBtn) return;
@@ -4780,6 +4795,17 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 			frag.appendChild(p);
 		}
 		confetti.appendChild(frag);
+	}
+	function preloadNotes(cb){
+		var n=NOTES.length, finished=false;
+		function finish(){ if(finished) return; finished=true; cb(); }
+		if(!n){ finish(); return; }
+		NOTES.forEach(function(item){
+			var im=new Image();
+			im.onload=im.onerror=function(){ n--; if(n<=0) finish(); };
+			im.src=item.src;
+		});
+		setTimeout(finish,2200);
 	}
 	function build(){
 		clearTimeout(previewTimer); clearInterval(countTimer); hideCelebration();
@@ -4825,8 +4851,15 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	restartBtn.addEventListener('click',build);
 	if(mcReplay) mcReplay.addEventListener('click',function(){ hideCelebration(); build(); });
 	if(mcClose) mcClose.addEventListener('click',hideCelebration);
-	var started=false;
-	function startOnce(){ if(started) return; started=true; build(); }
+	var started=false, starting=false;
+	function startOnce(){
+		if(started||starting) return;
+		starting=true;
+		preloadNotes(function(){
+			if(!document.getElementById('game').classList.contains('active')){ starting=false; return; }
+			started=true; starting=false; build();
+		});
+	}
 	window.addEventListener('zt:page',function(e){
 		if(e.detail==='game') startOnce();
 		else hideCelebration();

@@ -1273,20 +1273,17 @@ body.letter-lock{overflow:hidden;}
 			</div>
 			<button class="ag-btn" id="agDoLogin" type="button">登录</button>
 			<p class="ag-msg" id="agLoginMsg"></p>
-			<p class="ag-forgot"><button type="button" id="agForgot">忘记密码？用邮箱验证码重设</button></p>
+			<p class="ag-forgot"><button type="button" id="agForgot">忘记密码？直接重设</button></p>
 		</div>
 
 		<div id="agReg" class="hide">
-			<input class="ag-field" id="agRMail" placeholder="邮箱（找密码、收验证码用）">
+			<input class="ag-field" id="agRMail" placeholder="邮箱（登录账号）">
 			<input class="ag-field" id="agRName" placeholder="昵称（社区里显示这个名字）" maxlength="10">
 			<div class="ag-pass">
 				<input class="ag-field" id="agRPass" type="password" placeholder="设置密码，至少 6 位">
 				<button class="pass-eye" type="button" data-eye="agRPass" aria-label="查看密码">显示</button>
 			</div>
-			<div class="ag-code">
-				<input class="ag-field" id="agCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
-				<button class="ag-mini" id="agSendCode" type="button">获取验证码</button>
-			</div>
+			<p class="ag-code-line" id="agRCodeLine">验证码：<b id="agRCode">------</b></p>
 			<p class="ag-tip" id="agCodeTip"></p>
 			<button class="ag-btn" id="agDoReg" type="button">注册</button>
 			<p class="ag-msg" id="agRegMsg"></p>
@@ -1298,17 +1295,14 @@ body.letter-lock{overflow:hidden;}
 				<input class="ag-field" id="agXPass" type="password" placeholder="新密码，至少 6 位">
 				<button class="pass-eye" type="button" data-eye="agXPass" aria-label="查看密码">显示</button>
 			</div>
-			<div class="ag-code">
-				<input class="ag-field" id="agXCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric">
-				<button class="ag-mini" id="agXSend" type="button">获取验证码</button>
-			</div>
+			<p class="ag-code-line" id="agXCodeLine">验证码：<b id="agXCode">------</b></p>
 			<p class="ag-tip" id="agXTip"></p>
 			<button class="ag-btn" id="agDoReset" type="button">重设密码并登录</button>
 			<p class="ag-msg" id="agXMsg"></p>
 			<p class="ag-forgot"><button type="button" id="agBackLogin">返回登录</button></p>
 		</div>
 
-		<p class="ag-foot">登录之后可以看全部的图片和视频，也能在社区说话、投稿。<br>第一次来先注册，验证码发到你填的邮箱。</p>
+		<p class="ag-foot">登录之后可以看全部的图片和视频，也能在社区说话、投稿。<br>第一次来先注册，验证码直接显示在设置密码下方。</p>
 	</div>
 </div>
 <script>
@@ -1344,6 +1338,7 @@ body.letter-lock{overflow:hidden;}
 		location.reload();
 	}
 
+	showRegCode();
 	Array.prototype.forEach.call(g.querySelectorAll('.ag-tabs button'),function(b){
 		b.onclick=function(){
 			Array.prototype.forEach.call(g.querySelectorAll('.ag-tabs button'),function(x){ x.classList.toggle('on',x===b); });
@@ -1351,45 +1346,25 @@ body.letter-lock{overflow:hidden;}
 			$('agLogin').classList.toggle('hide',t!=='login');
 			$('agReg').classList.toggle('hide',t!=='reg');
 			$('agReset').classList.add('hide');
+			if(t==='reg') showRegCode();
 		};
 	});
 
-	$('agSendCode').onclick=async function(){
-		var mail=$('agRMail').value.trim();
-		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ $('agCodeTip').textContent='先填一个像样的邮箱'; return; }
-		pendMail=mail;
-		pendCode=String(Math.floor(100000+Math.random()*900000));
-		if(!ready()){ $('agCodeTip').textContent='验证码：'+pendCode+'（还没接发信服务，先在页面显示）'; return; }
-		var tip=$('agCodeTip'), btn=$('agSendCode');
-		tip.textContent='正在发到 '+mail+' …';
-		btn.disabled=true;
-		var c=mailcfg();
-		var payload=JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
-			template_params:{to_email:mail,code:pendCode,passcode:pendCode,time:'10 分钟',site_name:'政瞳之家 · 社区',note:'10 分钟内有效'}});
-		function send(){
-			return fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:payload})
-				.then(function(r){ if(!r.ok){ return r.text().then(function(t){ throw new Error(t||('HTTP '+r.status)); }); } });
-		}
-		var okText='验证码已经发到 '+mail+'，去邮箱收一下（找不到看垃圾箱）';
-		var e1=null;
-		try{ await send(); tip.textContent=okText; }
-		catch(err){ e1=err; }
-		if(e1){
-			await new Promise(function(s){ setTimeout(s,4000); });
-			try{ await send(); tip.textContent=okText; }
-			catch(err2){ tip.textContent='发信没成功（'+(String(err2.message||err2).slice(0,70))+'），先显示验证码：'+pendCode; }
-		}
-		btn.disabled=false;
-	};
+	function makeCode(){ return String(Math.floor(100000+Math.random()*900000)); }
+	function showRegCode(){
+		if(!pendCode) pendCode=makeCode();
+		var el=document.getElementById('agRCode');
+		if(el) el.textContent=pendCode;
+		var tip=document.getElementById('agCodeTip');
+		if(tip) tip.textContent='';
+	}
 
 	$('agDoReg').onclick=function(){
-		var mail=$('agRMail').value.trim(), name=$('agRName').value.trim(), pass=$('agRPass').value, code=$('agCode').value.trim();
+		var mail=$('agRMail').value.trim(), name=$('agRName').value.trim(), pass=$('agRPass').value;
 		var msg=$('agRegMsg');
 		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ msg.textContent='邮箱格式不对'; return; }
 		if(name.length<1){ msg.textContent='给自己起个昵称'; return; }
 		if(pass.length<6){ msg.textContent='密码至少 6 位'; return; }
-		if(!pendCode){ msg.textContent='先点「获取验证码」'; return; }
-		if(code!==pendCode||mail.toLowerCase()!==pendMail.toLowerCase()){ msg.textContent='验证码不对，或者邮箱换了，重新获取一次'; return; }
 		msg.textContent='正在注册…';
 		$('agDoReg').disabled=true;
 		readUsers().then(function(list){
@@ -1412,33 +1387,23 @@ body.letter-lock{overflow:hidden;}
 		$('agLogin').classList.toggle('hide',t!=='login');
 		$('agReg').classList.toggle('hide',t!=='reg');
 		$('agReset').classList.toggle('hide',t!=='reset');
-		if(t==='reset'){ $('agXMail').value=$('agLMail').value.trim(); }
+		if(t==='reset'){ $('agXMail').value=$('agLMail').value.trim(); showResetCode(); }
 	}
 	$('agForgot').onclick=function(){ showPane('reset'); };
 	$('agBackLogin').onclick=function(){ showPane('login'); };
 
 	var xCode='', xMail='';
-	$('agXSend').onclick=function(){
-		var mail=$('agXMail').value.trim();
-		if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){ $('agXTip').textContent='先填注册用的邮箱'; return; }
-		xMail=mail; xCode=String(Math.floor(100000+Math.random()*900000));
-		if(!ready()){ $('agXTip').textContent='验证码：'+xCode+'（还没接发信服务，先在页面显示）'; return; }
-		$('agXTip').textContent='正在发到 '+mail+' …';
-		$('agXSend').disabled=true;
-		var c=mailcfg();
-		var payload=JSON.stringify({service_id:c.serviceId,template_id:c.templateId,user_id:c.publicKey,
-			template_params:{to_email:mail,code:xCode,passcode:xCode,time:'10 分钟',site_name:'政瞳之家 · 社区',note:'10 分钟内有效'}});
-		fetch('https://api.emailjs.com/api/v1.0/email/send',{method:'POST',headers:{'Content-Type':'application/json'},body:payload})
-			.then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); $('agXTip').textContent='验证码已经发到 '+mail+'，去邮箱收一下'; })
-			.catch(function(){ $('agXTip').textContent='发信没成功，先显示验证码：'+xCode; })
-			.then(function(){ $('agXSend').disabled=false; });
-	};
+	function showResetCode(){
+		xCode=makeCode();
+		var el=document.getElementById('agXCode');
+		if(el) el.textContent=xCode;
+		var tip=document.getElementById('agXTip');
+		if(tip) tip.textContent='';
+	}
 
 	$('agDoReset').onclick=function(){
-		var mail=$('agXMail').value.trim(), np=$('agXPass').value, code=$('agXCode').value.trim();
+		var mail=$('agXMail').value.trim(), np=$('agXPass').value;
 		var msg=$('agXMsg'); msg.textContent='';
-		if(!xCode){ msg.textContent='先点「获取验证码」'; return; }
-		if(code!==xCode||mail.toLowerCase()!==(xMail||'').toLowerCase()){ msg.textContent='验证码不对，或者邮箱换了，重新获取一次'; return; }
 		if(np.length<6){ msg.textContent='新密码至少 6 位'; return; }
 		$('agDoReset').disabled=true;
 		var uname='', uava='';
@@ -5937,7 +5902,7 @@ var NEED_LOGIN = !/[?&]open=1/.test(location.search);   /* 加 ?open=1 就是免
 	.xp-head{margin-top:-38px;}
 }
 </style>
-<link rel="stylesheet" href="metro-theme.css?v=1125u">
+<link rel="stylesheet" href="metro-theme.css?v=1125v">
 <!-- photoWall -->
 <script>
 /* 照片墙存储配置：Supabase 免费公共桶，所有人上传的都看得见 */

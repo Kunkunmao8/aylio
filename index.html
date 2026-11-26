@@ -1972,6 +1972,11 @@ body.letter-lock{overflow:hidden;}
 #authGate .ag-foot{margin:16px 0 0;font-size:12px;line-height:1.7;color:#B28A6C;text-align:center;}
 #authGate .hide{display:none;}
 @media (max-width:420px){#authGate .ag-card{padding:22px 18px 16px;}}
+
+#authGate .ag-code-line{cursor:pointer!important;transition:color .15s ease;}
+#authGate .ag-code-line:hover{color:#B93B05!important;}
+#authGate .ag-code-hint{margin-left:6px;font-size:9.5px;color:#B78A66;letter-spacing:.02em;}
+
 </style>
 
 <style>
@@ -2160,15 +2165,24 @@ body.letter-lock{overflow:hidden;}
 <div id="authGate">
 	<div class="ag-card">
 		<div class="ag-brand">政瞳之家</div>
-		<p class="ag-sub">孙政 × 吕思瞳 · 不用邮箱，数字就能进</p>
+		<p class="ag-sub">孙政 × 吕思瞳 · 数字账号 + 密码</p>
 		<div class="ag-tabs">
 			<button class="on" type="button" data-t="login">登录</button>
 			<button type="button" data-t="reg">注册</button>
 		</div>
 
 		<div id="agLogin">
-			<input class="ag-field" id="agLMail" inputmode="numeric" maxlength="20" placeholder="输入任意数字，直接进入" autocomplete="username">
-			<p class="ag-tip">不用邮箱，不用密码，也不用验证码。</p>
+			<input class="ag-field" id="agLMail" inputmode="numeric" maxlength="20" placeholder="输入数字账号" autocomplete="username">
+			<div class="ag-pass">
+				<input class="ag-field" id="agLPass" type="password" placeholder="密码，至少 6 位" autocomplete="current-password">
+				<button class="pass-eye" type="button" data-eye="agLPass" aria-label="查看密码">显示</button>
+			</div>
+			<div class="ag-code">
+				<input class="ag-field" id="agLCode" inputmode="numeric" maxlength="6" placeholder="6 位验证码">
+				<button class="ag-mini" id="agLGetCode" type="button">获取验证码</button>
+			</div>
+			<p class="ag-code-line hide" id="agLCodeLine">验证码：<b id="agLCodeVal">------</b><span class="ag-code-hint">点这行自动填入</span></p>
+			<p class="ag-tip">不用邮箱，验证码会直接显示在下面。</p>
 			<button class="ag-btn" id="agDoLogin" type="button">进入</button>
 			<p class="ag-msg" id="agLoginMsg"></p>
 		</div>
@@ -2176,12 +2190,21 @@ body.letter-lock{overflow:hidden;}
 		<div id="agReg" class="hide">
 			<input class="ag-field" id="agRMail" inputmode="numeric" maxlength="20" placeholder="数字账号（同一个数字就是同一个账号）">
 			<input class="ag-field" id="agRName" placeholder="昵称（社区里显示这个名字，可留空）" maxlength="10">
+			<div class="ag-pass">
+				<input class="ag-field" id="agRPass" type="password" placeholder="设置密码，至少 6 位" autocomplete="new-password">
+				<button class="pass-eye" type="button" data-eye="agRPass" aria-label="查看密码">显示</button>
+			</div>
+			<div class="ag-code">
+				<input class="ag-field" id="agRCode" inputmode="numeric" maxlength="6" placeholder="6 位验证码">
+				<button class="ag-mini" id="agRGetCode" type="button">获取验证码</button>
+			</div>
+			<p class="ag-code-line hide" id="agRCodeLine">验证码：<b id="agRCodeVal">------</b><span class="ag-code-hint">点这行自动填入</span></p>
 			<button class="ag-btn" id="agDoReg" type="button">用这个数字进入</button>
-			<p class="ag-tip" id="agCodeTip">第一次输入数字会自动注册；换设备也能用同一个数字进来。</p>
+			<p class="ag-tip" id="agCodeTip">第一次注册要设置密码；账号和密码记在这台设备上。</p>
 			<p class="ag-msg" id="agRegMsg"></p>
 		</div>
 
-		<p class="ag-foot">输入任意数字就能进，不用邮箱，不用密码。<br>昵称会记在这台设备上，社区里看到的就是这个名字。</p>
+		<p class="ag-foot">输入数字账号和密码就能进，不用邮箱。<br>点「获取验证码」，验证码会以小字显示在下面。</p>
 	</div>
 </div>
 <script>
@@ -2205,6 +2228,22 @@ body.letter-lock{overflow:hidden;}
 		try{ localStorage.setItem(NKEY,JSON.stringify(map)); }catch(e){}
 	}
 	function defaultName(id){ return '朋友'+String(id).slice(-4); }
+	var AKEY='aylio_digit_accounts_v1';
+	function readAccounts(){
+		try{ return JSON.parse(localStorage.getItem(AKEY)||'{}')||{}; }catch(e){ return {}; }
+	}
+	function saveAccounts(map){
+		try{ localStorage.setItem(AKEY,JSON.stringify(map)); }catch(e){}
+	}
+	function buf2hex(b){ var a=new Uint8Array(b), s=''; for(var i=0;i<a.length;i++) s+=('0'+a[i].toString(16)).slice(-2); return s; }
+	function hashPass(id,pass){
+		var s=String(id)+':'+pass+':aylio-digit';
+		if(window.crypto && crypto.subtle && crypto.subtle.digest){
+			return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(buf2hex);
+		}
+		var hsh=5381; for(var i=0;i<s.length;i++) hsh=((hsh<<5)+hsh+s.charCodeAt(i))|0;
+		return Promise.resolve('w'+Math.abs(hsh));
+	}
 	function enter(id,name){
 		var map=readNames();
 		var finalName=(name&&name.trim())||map[id]||defaultName(id);
@@ -2212,6 +2251,31 @@ body.letter-lock{overflow:hidden;}
 		localStorage.setItem('aylio_pillow_user',JSON.stringify({mail:id,name:finalName,avatar:''}));
 		location.reload();
 	}
+
+	var lCode='', rCode='';
+	function makeCode(){ return String(Math.floor(100000+Math.random()*900000)); }
+	function showCode(prefix){
+		var code=makeCode();
+		if(prefix==='L') lCode=code; else rCode=code;
+		var line=document.getElementById('ag'+prefix+'CodeLine');
+		var val=document.getElementById('ag'+prefix+'CodeVal');
+		var btn=document.getElementById('ag'+prefix+'GetCode');
+		if(val) val.textContent=code;
+		if(line) line.classList.remove('hide');
+		if(btn) btn.textContent='换一个';
+	}
+	function bindCode(prefix){
+		var btn=document.getElementById('ag'+prefix+'GetCode');
+		var line=document.getElementById('ag'+prefix+'CodeLine');
+		var input=document.getElementById('ag'+prefix+'Code');
+		if(btn) btn.onclick=function(){ showCode(prefix); };
+		if(line) line.onclick=function(){
+			var code=(prefix==='L'?lCode:rCode);
+			if(!code){ showCode(prefix); code=(prefix==='L'?lCode:rCode); }
+			if(input){ input.value=code; input.focus(); }
+		};
+	}
+	bindCode('L'); bindCode('R');
 
 	function showPane(t){
 		Array.prototype.forEach.call(g.querySelectorAll('.ag-tabs button'),function(x){ x.classList.toggle('on',x.getAttribute('data-t')===t); });
@@ -2223,19 +2287,37 @@ body.letter-lock{overflow:hidden;}
 	});
 
 	$('agDoLogin').onclick=function(){
-		var id=digits($('agLMail').value), msg=$('agLoginMsg');
+		var id=digits($('agLMail').value), pass=$('agLPass').value, code=digits($('agLCode').value), msg=$('agLoginMsg');
 		msg.textContent='';
-		if(!id){ msg.textContent='输入任意数字就能进'; $('agLMail').focus(); return; }
-		msg.textContent='正在进门…';
-		enter(id);
+		if(!id){ msg.textContent='输入数字账号'; $('agLMail').focus(); return; }
+		if(pass.length<6){ msg.textContent='密码至少 6 位'; $('agLPass').focus(); return; }
+		if(!lCode){ msg.textContent='先点「获取验证码」'; return; }
+		if(code!==lCode){ msg.textContent='验证码不对，点「换一个」再看一次'; return; }
+		var acc=readAccounts()[id];
+		if(!acc){ msg.textContent='这个数字还没注册过，先去注册设置密码'; return; }
+		msg.textContent='正在验证…';
+		hashPass(id,pass).then(function(ph){
+			if(ph!==acc.ph) throw new Error('密码不对');
+			enter(id,acc.name||defaultName(id));
+		}).catch(function(e){ msg.textContent=e.message||'登录失败'; });
 	};
 
 	$('agDoReg').onclick=function(){
-		var id=digits($('agRMail').value), name=$('agRName').value.trim(), msg=$('agRegMsg');
+		var id=digits($('agRMail').value), name=$('agRName').value.trim(), pass=$('agRPass').value, code=digits($('agRCode').value), msg=$('agRegMsg');
 		msg.textContent='';
 		if(!id){ msg.textContent='先输入一个数字账号'; $('agRMail').focus(); return; }
-		msg.textContent='正在进门…';
-		enter(id,name);
+		if(pass.length<6){ msg.textContent='密码至少 6 位'; $('agRPass').focus(); return; }
+		if(!rCode){ msg.textContent='先点「获取验证码」'; return; }
+		if(code!==rCode){ msg.textContent='验证码不对，点「换一个」再看一次'; return; }
+		var accounts=readAccounts();
+		if(accounts[id]){ msg.textContent='这个数字已经注册过，切到登录'; return; }
+		var finalName=name||defaultName(id);
+		msg.textContent='正在注册…';
+		hashPass(id,pass).then(function(ph){
+			accounts[id]={name:finalName,ph:ph,ts:Date.now()};
+			saveAccounts(accounts);
+			enter(id,finalName);
+		}).catch(function(e){ msg.textContent=e.message||'注册失败'; });
 	};
 })();
 </script>

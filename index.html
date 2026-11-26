@@ -2177,12 +2177,6 @@ body.letter-lock{overflow:hidden;}
 				<input class="ag-field" id="agLPass" type="password" placeholder="密码，至少 6 位" autocomplete="current-password">
 				<button class="pass-eye" type="button" data-eye="agLPass" aria-label="查看密码">显示</button>
 			</div>
-			<div class="ag-code">
-				<input class="ag-field" id="agLCode" inputmode="numeric" maxlength="6" placeholder="6 位验证码">
-				<button class="ag-mini" id="agLGetCode" type="button">获取验证码</button>
-			</div>
-			<p class="ag-code-line hide" id="agLCodeLine">验证码：<b id="agLCodeVal">------</b><span class="ag-code-hint">点这行自动填入</span></p>
-			<p class="ag-tip">不用邮箱，验证码会直接显示在下面。</p>
 			<button class="ag-btn" id="agDoLogin" type="button">进入</button>
 			<p class="ag-msg" id="agLoginMsg"></p>
 		</div>
@@ -2204,7 +2198,7 @@ body.letter-lock{overflow:hidden;}
 			<p class="ag-msg" id="agRegMsg"></p>
 		</div>
 
-		<p class="ag-foot">输入数字账号和密码就能进，不用邮箱。<br>点「获取验证码」，验证码会以小字显示在下面。</p>
+		<p class="ag-foot">登录只要数字账号 + 密码，不用验证码。<br>注册时才需要验证码，点「获取验证码」后以小字显示。</p>
 	</div>
 </div>
 <script>
@@ -2252,11 +2246,11 @@ body.letter-lock{overflow:hidden;}
 		location.reload();
 	}
 
-	var lCode='', rCode='';
+	var rCode='';
 	function makeCode(){ return String(Math.floor(100000+Math.random()*900000)); }
 	function showCode(prefix){
 		var code=makeCode();
-		if(prefix==='L') lCode=code; else rCode=code;
+		rCode=code;
 		var line=document.getElementById('ag'+prefix+'CodeLine');
 		var val=document.getElementById('ag'+prefix+'CodeVal');
 		var btn=document.getElementById('ag'+prefix+'GetCode');
@@ -2275,7 +2269,7 @@ body.letter-lock{overflow:hidden;}
 			if(input){ input.value=code; input.focus(); }
 		};
 	}
-	bindCode('L'); bindCode('R');
+	bindCode('R');
 
 	function showPane(t){
 		Array.prototype.forEach.call(g.querySelectorAll('.ag-tabs button'),function(x){ x.classList.toggle('on',x.getAttribute('data-t')===t); });
@@ -2287,12 +2281,10 @@ body.letter-lock{overflow:hidden;}
 	});
 
 	$('agDoLogin').onclick=function(){
-		var id=digits($('agLMail').value), pass=$('agLPass').value, code=digits($('agLCode').value), msg=$('agLoginMsg');
+		var id=digits($('agLMail').value), pass=$('agLPass').value, msg=$('agLoginMsg');
 		msg.textContent='';
 		if(!id){ msg.textContent='输入数字账号'; $('agLMail').focus(); return; }
 		if(pass.length<6){ msg.textContent='密码至少 6 位'; $('agLPass').focus(); return; }
-		if(!lCode){ msg.textContent='先点「获取验证码」'; return; }
-		if(code!==lCode){ msg.textContent='验证码不对，点「换一个」再看一次'; return; }
 		var acc=readAccounts()[id];
 		if(!acc){ msg.textContent='这个数字还没注册过，先去注册设置密码'; return; }
 		msg.textContent='正在验证…';
